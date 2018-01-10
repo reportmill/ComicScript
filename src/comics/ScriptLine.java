@@ -68,8 +68,12 @@ public int run(SnapScene aStage)
             runSetting();
         if(word.equals("walks"))
             runWalks();
+        if(word.equals("grows"))
+            runGrows();
         if(word.equals("says"))
             runSays();
+        if(word.equals("flips"))
+            runFlips();
         if(word.equals("explodes"))
             runExplodes();
     }
@@ -83,7 +87,7 @@ public int run(SnapScene aStage)
 public void runSetting()
 {
     ImageView iview = getNextImageView(); if(iview==null) return;
-    iview.setSize(_stage.getWidth(), _stage.getHeight());
+    iview.setSize(_stage.getWidth(), _stage.getHeight()); iview.setFillWidth(true); iview.setFillHeight(true);
     _stage.addChild(iview);
 }
 
@@ -117,6 +121,34 @@ public void runWalks()
 }
 
 /**
+ * Runs a grows command.
+ */
+public void runGrows()
+{
+    _index = -1;
+    
+    ImageView iview = (ImageView)getView(); if(iview==null) return;
+    iview.getAnim(_startTime).getAnim(_startTime+1000).setScale(iview.getScale()+.1).play();
+    
+    _index = _words.length;
+    _runTime = 1000;
+}
+
+/**
+ * Runs a flips command.
+ */
+public void runFlips()
+{
+    _index = -1;
+    
+    ImageView iview = (ImageView)getView(); if(iview==null) return;
+    iview.getAnim(_startTime).getAnim(_startTime+1000).setRotate(iview.getRotate()+360).play();
+    
+    _index = _words.length;
+    _runTime = 1000;
+}
+
+/**
  * Runs a walk command.
  */
 public void runSays()
@@ -146,7 +178,7 @@ public void runSays()
 public void runExplodes()
 {
     View child = getView(); if(child==null) return;
-    
+
     Explode.explode(child, _startTime);
     _index = _words.length;
     _runTime = 2500;
@@ -172,8 +204,10 @@ public View getView()
 public Image getNextImage()
 {
     for(int i=_index+1;i<_words.length;i++) { String word = _words[i].toLowerCase();
-        WebURL url = WebURL.getURL("/Temp/aday/" + word + ".jpg");
-        WebFile file = url.getFile();
+        WebURL url = WebURL.getURL(getClass(), "/images/" + word + ".jpg");
+        if(SnapUtils.isTeaVM && url!=null && !url.isFound()) url = null;
+        if(url==null) url = WebURL.getURL(getClass(), "/images/" + word + ".png");
+        WebFile file = url!=null? url.getFile() : null;
         if(file!=null)
             return Image.get(file);
     }
@@ -188,6 +222,8 @@ public ImageView getNextImageView()
 {
     Image img = getNextImage(); if(img==null) return null;
     ImageView iview = new ImageView(img); iview.setName(img.getName());
+    if(!img.isLoaded())
+        img.addPropChangeListener(pc -> iview.repaint());
     return iview;
 }
 

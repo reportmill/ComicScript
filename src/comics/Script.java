@@ -10,13 +10,13 @@ import snap.viewx.*;
 public class Script {
     
     // The View text
-    String             _text = "Setting is OvalOffice\n";
+    String             _text = "Setting is WhiteHouse\n";
 
     // The Script lines
     List <ScriptLine>  _lines;
     
     // The current line index
-    int                _lineIndex;
+    int                _lineIndex, _lineIndexMax;
     
     // The time
     int                _time;
@@ -53,9 +53,9 @@ public List <ScriptLine> getLines()
 /**
  * Runs for Stage.
  */
-public void run(SnapScene aScene)
+public void run(SnapScene aScene, int lineIndex)
 {
-    _time = 0; _lineIndex = 0;
+    _time = 0; _lineIndexMax = Math.min(lineIndex+1, getLines().size());
     runNextLine(aScene);
 }
 
@@ -64,9 +64,11 @@ public void run(SnapScene aScene)
  */
 protected void runNextLine(SnapScene aScene)
 {
-    System.out.println("Run Line " + _lineIndex + " at " + _time);
-    if(_lineIndex>=getLines().size()) return;
-    
+    // If at LineIndexMax, return
+    if(_lineIndex>=_lineIndexMax) return;
+    System.out.println("Run Line " + _lineIndex + " of " + _lineIndexMax);
+
+    // Get Line and run    
     ScriptLine sline = getLines().get(_lineIndex);
     int runTime = sline.run(aScene);
     _lineIndex++; _time += runTime;

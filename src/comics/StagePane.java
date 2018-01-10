@@ -13,24 +13,38 @@ public class StagePane extends ViewOwner {
     // The script text view
     TextView     _textView;
     
+    // The HelpPane
+    HelpPane     _helpPane = new HelpPane(this);
+    
     // The Script
     Script       _script;
-
+    
 /**
  * Initialize the UI.
  */
 protected void initUI()
 {
     _stage = new SnapScene();
+    _stage.setClipToBounds(true);
 
     ColView colView = getUI(ColView.class);
     colView.addChild(_stage, 0);
     
     _script = new Script();
     
+    // Install HelpPane
+    RowView rowView = getView("TextRowView", RowView.class);
+    rowView.addChild(_helpPane.getUI());
+    
+    // Get TextView and configure
     _textView = getView("ScriptText", TextView.class);
     _textView.setText(_script.getText());
+    _textView.setSel(_textView.length());
     _textView.addEventFilter(e -> textViewReturnKey(e), KeyRelease);
+    setFirstFocus(_textView.getTextArea());
+    
+    // Run to end of first line
+    runLaterDelayed(100,() -> runScript(1));
 }
 
 /**
@@ -43,25 +57,40 @@ protected void respondUI(ViewEvent anEvent)
         _stage.removeChildren();
         
     // Handle RunButton
-    if(anEvent.equals("RunButton"))
-        runScript();
+    if(anEvent.equals("RunButton")) {
+        _script._lineIndex = 9999;
+        runScript(999);
+    }
 }
 
+/**
+ * Called when user hits Enter Key in TextView.
+ */
 void textViewReturnKey(ViewEvent anEvent)
 {
-    if(anEvent.isEnterKey())
-        getEnv().runLater(() -> runScript());
+    // Handle EnterKey: Run to previous line
+    if(anEvent==null || anEvent.isEnterKey()) {
+        _helpPane.reset();
+        int lineIndex = _textView.getSel().getStartLine().getIndex() - 1;
+        getEnv().runLater(() -> runScript(lineIndex));
+    }
 }
 
 /**
  * Runs the script.
  */
-public void runScript()
+public void runScript(int lineIndex)
 {
-    _stage.removeChildren();
+    // If running to line we've already hit, reset scene
+    if(lineIndex<_script._lineIndex) {
+        _script._lineIndex = 0;
+        _stage.removeChildren();
+    }
+    
+    // Set Script Text and run to line
     String text = _textView.getText();
     _script.setText(text);
-    _script.run(_stage);
+    _script.run(_stage, lineIndex);
 }
 
 
