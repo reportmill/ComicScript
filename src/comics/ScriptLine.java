@@ -68,6 +68,8 @@ public int run(SnapScene aStage)
             runSetting();
         if(word.equals("walks"))
             runWalks();
+        if(word.equals("drops"))
+            runDrops();
         if(word.equals("grows"))
             runGrows();
         if(word.equals("says"))
@@ -114,6 +116,32 @@ public void runWalks()
         iview.setBounds(-60,200,80,240);
         _stage.addChild(iview);
         iview.getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2-120).play();
+    }
+    
+    _index = _words.length;
+    _runTime = 2000;
+}
+
+/**
+ * Runs a walk command.
+ */
+public void runDrops()
+{
+    _index = -1;
+    ImageView iview = getNextImageView(); if(iview==null) return;
+    
+    if(ArrayUtils.contains(_words, "right")) {
+        iview.setSize(80,240);
+        iview.setXY(_stage.getWidth()/2+60,-iview.getHeight());
+        _stage.addChild(iview);
+        iview.getAnim(_startTime).getAnim(_startTime+2000).setY(200).play();
+    }
+    
+    else {
+        iview.setSize(80,240);
+        iview.setXY(_stage.getWidth()/2-120,-iview.getHeight());
+        _stage.addChild(iview);
+        iview.getAnim(_startTime).getAnim(_startTime+2000).setY(200).play();
     }
     
     _index = _words.length;

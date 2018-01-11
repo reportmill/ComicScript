@@ -20,7 +20,7 @@ public class HelpPane extends ViewOwner {
     // Constants
     String _starters[] = { "Title is", "Setting is", "Car", "Cat", "Dog", "Trump", "Obama", "Duke" };
     String _settings[] = { "Beach", "WhiteHouse", "OvalOffice" };
-    String _verbs[] = { "walks", "says", "grows", "flips", "explodes" };
+    String _verbs[] = { "walks", "drops", "says", "grows", "flips", "explodes" };
     String _walks[] = { "in", "in from right", "out" };
  
 /**
@@ -35,7 +35,7 @@ public String[] getWords()
 {
     if(_lastAdd==null) return _starters;
     if(_lastAdd=="Setting is") return _settings;
-    if(_lastAdd=="walks") return _walks;
+    if(_lastAdd=="walks" || _lastAdd=="drops") return _walks;
     if(ArrayUtils.contains(_starters, _lastAdd)) return _verbs;
     return new String[] { "  \u23CE" };
 }
