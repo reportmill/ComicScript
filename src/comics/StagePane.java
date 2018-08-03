@@ -18,7 +18,16 @@ public class StagePane extends ViewOwner {
     
     // The Script
     Script       _script;
-    
+
+/**
+ * Shows the stage.
+ */
+public void showStage()
+{
+    setWindowVisible(true);
+    runLater(() -> runScript(1));
+}
+
 /**
  * Initialize the UI.
  */
@@ -42,9 +51,6 @@ protected void initUI()
     _textView.setSel(_textView.length());
     _textView.addEventFilter(e -> textViewReturnKey(e), KeyRelease);
     setFirstFocus(_textView.getTextArea());
-    
-    // Run to end of first line
-    runLaterDelayed(100,() -> runScript(1));
 }
 
 /**

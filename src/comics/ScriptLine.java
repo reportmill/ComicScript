@@ -62,19 +62,31 @@ public int run(SnapScene aStage)
     _startTime = 0;
     
     String words[] = getWords();
-    for(_index=0;_index<words.length;_index++) { String word = words[_index].toLowerCase();
     
-        if(word.equals("setting")) runSetting();
-        if(word.equals("walks")) runWalks();
-        if(word.equals("drops")) runDrops();
-        if(word.equals("grows")) runGrows();
-        if(word.equals("says")) runSays();
-        if(word.equals("flips")) runFlips();
-        if(word.equals("explodes")) runExplodes();
+    String word = words[0];
+    
+    // Handle setting
+    if(word.equals("setting")) runSetting();
+    
+    // Handle view
+    else {
+        
+        // Get actor
+        Actor actor = (Actor)getView(); if(actor==null) return 0;
+        actor._stage = _stage; actor._scriptLine = this; actor._words = words;
+        
+        word = words[1];
+        if(word.equals("walks")) actor.runWalks();
+        if(word.equals("drops")) actor.runDrops();
+        if(word.equals("grows")) actor.runGrows();
+        if(word.equals("says")) actor.runSays();
+        if(word.equals("flips")) actor.runFlips();
+        if(word.equals("explodes")) actor.runExplodes();
+        _runTime = actor._runTime;
     }
     
     // Register for OnFinish callback and play
-    _stage.getAnim(0).getAnim(_runTime).setOnFinish(a -> runFinished());
+    _stage.getAnim(0).getAnim(_runTime).setOnFinish(a -> ViewUtils.runLater(() -> runFinished(a)));
     _stage.playAnimDeep();
     
     return _runTime;
@@ -83,9 +95,10 @@ public int run(SnapScene aStage)
 /**
  * Called when script line is finished.
  */
-public void runFinished()
+public void runFinished(ViewAnim anAnim)
 {
     // Clear all anims
+    _stage.getAnimCleared(0);
     for(View child : _stage.getChildren()) child.getAnimCleared(0);
     
     // Trigger next script line
@@ -97,147 +110,18 @@ public void runFinished()
  */
 public void runSetting()
 {
-    // Get setting
-    ImageView iview = getNextImageView(); if(iview==null) return;
-    iview.setSize(_stage.getWidth(), _stage.getHeight()); iview.setFillWidth(true); iview.setFillHeight(true);
-    iview.setPrefWidth(-1); iview.setKeepAspect(false);
-    iview.setName("Setting");
+    // Get setting Image and ImageView
+    Image img = getNextImage(); if(img==null) return;
+    ImageView iview = new ImageView(img, true, true); iview.setName(img.getName());
+    iview.setSize(_stage.getWidth(), _stage.getHeight());
+    iview.setName("Setting"); //iview.setOpacity(.5);
     
     // If old setting, remove
     View oldStg = getView("Setting"); if(oldStg!=null) _stage.removeChild(oldStg);
     
     // Add new setting
-    _stage.addChild(iview,0);
-}
-
-/**
- * Runs a walk command.
- */
-public void runWalks()
-{
-    _index = -1;
-    ImageView iview = (ImageView)getView();
-    if(iview==null) { iview = getNextImageView(); if(iview.getParent()==null) _stage.addChild(iview); }
-    if(iview==null) { System.err.println("No Image found"); return; }
-    
-    if(ArrayUtils.contains(_words, "right")) {
-        iview.setXY(_stage.getWidth(), _stage.getHeight() - iview.getHeight() - 10); //_stage.addChild(iview);
-        iview.getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2+60);//.play();
-    }
-    
-    else if(ArrayUtils.contains(_words, "out")) {
-        //iview = (ImageView)getView(); if(iview==null) return;
-        iview.getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth());//.play();
-    }
-    
-    else {
-        iview.setXY(-iview.getWidth(), _stage.getHeight() - iview.getHeight() - 10); //_stage.addChild(iview);
-        iview.getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2-120);//.play();
-    }
-    
-    // Look for animation
-    String name = FilePathUtils.getFileNameSimple(iview.getName());
-    WebURL url = WebURL.getURL("/Temp/ComicScriptLib/images/" + name + "Walking" + ".gif");
-    if(url.isFound()) {
-        Image img = Image.get(url), img0 = iview.getImage(); ImageView iview2 = iview;
-        iview.setImage(img); iview.setWidth(iview.getPrefWidth(-1)/2);
-        iview.getAnim(_startTime).getAnim(_startTime+2000).setValue("Frame", 36);
-        iview.getAnim(_startTime).getAnim(_startTime+2000).setOnFinish(a -> {
-            iview2.setImage(img0); iview2.setWidth(iview2.getPrefWidth(-1)/2); });
-    }
-    
-    _index = _words.length;
-    _runTime = 2000;
-}
-
-/**
- * Runs a walk command.
- */
-public void runDrops()
-{
-    _index = -1;
-    ImageView iview = getNextImageView(); if(iview==null) return;
-    
-    if(ArrayUtils.contains(_words, "right")) {
-        iview.setSize(80,240);
-        iview.setXY(_stage.getWidth()/2+60,-iview.getHeight());
-        _stage.addChild(iview);
-        iview.getAnim(_startTime).getAnim(_startTime+2000).setY(200).play();
-    }
-    
-    else {
-        iview.setSize(80,240);
-        iview.setXY(_stage.getWidth()/2-120,-iview.getHeight());
-        _stage.addChild(iview);
-        iview.getAnim(_startTime).getAnim(_startTime+2000).setY(200).play();
-    }
-    
-    _index = _words.length;
-    _runTime = 2000;
-}
-
-/**
- * Runs a grows command.
- */
-public void runGrows()
-{
-    _index = -1;
-    
-    ImageView iview = (ImageView)getView(); if(iview==null) return;
-    iview.getAnim(_startTime).getAnim(_startTime+1000).setScale(iview.getScale()+.1).play();
-    
-    _index = _words.length;
-    _runTime = 1000;
-}
-
-/**
- * Runs a flips command.
- */
-public void runFlips()
-{
-    _index = -1;
-    
-    ImageView iview = (ImageView)getView(); if(iview==null) return;
-    iview.getAnim(_startTime).getAnim(_startTime+1000).setRotate(iview.getRotate()+360).play();
-    
-    _index = _words.length;
-    _runTime = 1000;
-}
-
-/**
- * Runs a walk command.
- */
-public void runSays()
-{
-    int index = _text.indexOf("says,");
-    if(index<0) index = _text.indexOf("says"); if(index<0) return;
-
-    String str = _text.substring(index+4).trim();
-
-    TextArea text = new TextArea(); text.setFont(Font.Arial10.deriveFont(24));
-    text.setFill(Color.WHITE);
-    text.setAlign(Pos.CENTER);
-    text.setBorder(Border.createLineBorder(Color.BLACK,2));
-    text.setText(str);
-    text.setBounds(_stage.getWidth()/2-150, 100, 300,60);
-    text.scaleTextToFit();
-    text.setOpacity(0);
-    _stage.addChild(text);
-    text.getAnim(_startTime).getAnim(_startTime+500).setOpacity(1).getAnim(_startTime+500+2000)
-        .getAnim(_startTime+500+2000+500).setOpacity(0).play();
-    _runTime = 3000;
-}
-
-/**
- * Runs a walk command.
- */
-public void runExplodes()
-{
-    View child = getView(); if(child==null) return;
-
-    Explode.explode(child, _startTime);
-    _index = _words.length;
-    _runTime = 2500;
+    _stage.addChild(iview, 0);
+    _runTime = 0;
 }
 
 /**
@@ -245,10 +129,22 @@ public void runExplodes()
  */
 public View getView()
 {
+    // Get image for word
     int ind = _index; _index = -1;
     Image img = getNextImage();
+    
+    // Get actor for image
     String name = img!=null? img.getName() : null;
     View child = getView(name);
+    
+    // If actor not found, create
+    if(child==null) {
+        ImageView iview = new Actor(img); iview.setName(img.getName()); child = iview;
+        iview.setSize(iview.getPrefWidth(-1)/2, iview.getPrefHeight(-1)/2);
+        iview.setFillHeight(true); iview.setKeepAspect(true);
+        _stage.addChild(child);
+    }
+    
     _index = ind;
     return child;
 }
@@ -289,20 +185,6 @@ public Image getNextImage()
     }
     _index = _words.length;
     return null;
-}
-
-/**
- * Returns the next image.
- */
-public ImageView getNextImageView()
-{
-    Image img = getNextImage(); if(img==null) return null;
-    ImageView iview = new ImageView(img); iview.setName(img.getName());
-    if(!img.isLoaded())
-        img.addPropChangeListener(pc -> iview.repaint());
-    iview.setSize(iview.getPrefWidth(-1)/2, iview.getPrefHeight(-1)/2);
-    iview.setFillHeight(true); iview.setKeepAspect(true);
-    return iview;
 }
 
 }
