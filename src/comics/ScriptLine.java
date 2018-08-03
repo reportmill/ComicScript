@@ -82,6 +82,7 @@ public int run(SnapScene aStage)
         if(word.equals("says")) actor.runSays();
         if(word.equals("flips")) actor.runFlips();
         if(word.equals("explodes")) actor.runExplodes();
+        if(word.equals("dances")) actor.runDances();
         _runTime = actor._runTime;
     }
     
@@ -121,7 +122,7 @@ public void runSetting()
     
     // Add new setting
     _stage.addChild(iview, 0);
-    _runTime = 0;
+    _runTime = 1;
 }
 
 /**

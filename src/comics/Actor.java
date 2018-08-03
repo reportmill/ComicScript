@@ -110,7 +110,7 @@ public void runSays()
 
     String str = text2.substring(index+4).trim();
 
-    TextArea text = new TextArea2(); text.setFont(Font.Arial10.deriveFont(24)); text.setText(str);
+    TextArea text = new TextArea(); text.setFont(Font.Arial10.deriveFont(24)); text.setText(str);
     text.setFill(Color.WHITE); text.setBorder(Color.BLACK,2); text.setAlign(Pos.CENTER);
     text.setBounds(_stage.getWidth()/2-150, 100, 300,60);
     text.scaleTextToFit();
@@ -130,15 +130,23 @@ public void runExplodes()
     _runTime = 2500;
 }
 
-public static class TextArea2 extends TextArea {
-    
-    public void setOpacity(double aValue)
-    {
-        System.out.println("Opacity: " + aValue + " " + getAnim(0).getTime());
-        if(getAnim(0).getTime()>2000)
-            System.out.println("WTF");
-        super.setOpacity(aValue);
+/**
+ * Runs a walk command.
+ */
+public void runDances()
+{
+    // Look for animation
+    String name = FilePathUtils.getFileNameSimple(getName());
+    WebURL url = WebURL.getURL("/Temp/ComicScriptLib/images/" + name + "Dancing" + ".gif");
+    if(url.isFound()) {
+        Image img = Image.get(url), img0 = getImage();
+        setImage(img); setWidth(getPrefWidth(-1)/2);
+        getAnim(_startTime).getAnim(_startTime+5000).setValue("Frame", 170);
+        getAnim(_startTime).getAnim(_startTime+5000).setOnFinish(a -> {
+            setImage(img0); setFrame(0); setWidth(getPrefWidth(-1)/2); });
     }
+    
+    _runTime = 5000;
 }
 
 }
