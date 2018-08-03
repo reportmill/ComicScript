@@ -1,7 +1,6 @@
 package comics;
 import java.util.ArrayList;
 import java.util.List;
-import snap.view.ViewEnv;
 import snap.viewx.*;
 
 /**
@@ -72,7 +71,6 @@ protected void runNextLine(SnapScene aScene)
     ScriptLine sline = getLines().get(_lineIndex);
     int runTime = sline.run(aScene);
     _lineIndex++; _time += runTime;
-    ViewEnv.getEnv().runDelayed(() -> runNextLine(aScene), runTime, true);
 }
 
 }

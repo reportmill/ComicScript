@@ -10,7 +10,7 @@ public class App {
  */
 public static void main(String args[])
 {
-    //snaptea.TV.set();
+    snaptea.TV.set();
     new StagePane().setWindowVisible(true);
 }
 

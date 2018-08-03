@@ -59,28 +59,37 @@ public String[] getWords()
 public int run(SnapScene aStage)
 {
     _stage = aStage;
-    _startTime = 0;//_script._time;
+    _startTime = 0;
     
     String words[] = getWords();
     for(_index=0;_index<words.length;_index++) { String word = words[_index].toLowerCase();
     
-        if(word.equals("setting"))
-            runSetting();
-        if(word.equals("walks"))
-            runWalks();
-        if(word.equals("drops"))
-            runDrops();
-        if(word.equals("grows"))
-            runGrows();
-        if(word.equals("says"))
-            runSays();
-        if(word.equals("flips"))
-            runFlips();
-        if(word.equals("explodes"))
-            runExplodes();
+        if(word.equals("setting")) runSetting();
+        if(word.equals("walks")) runWalks();
+        if(word.equals("drops")) runDrops();
+        if(word.equals("grows")) runGrows();
+        if(word.equals("says")) runSays();
+        if(word.equals("flips")) runFlips();
+        if(word.equals("explodes")) runExplodes();
     }
     
+    // Register for OnFinish callback and play
+    _stage.getAnim(0).getAnim(_runTime).setOnFinish(a -> runFinished());
+    _stage.playAnimDeep();
+    
     return _runTime;
+}
+
+/**
+ * Called when script line is finished.
+ */
+public void runFinished()
+{
+    // Clear all anims
+    for(View child : _stage.getChildren()) child.getAnimCleared(0);
+    
+    // Trigger next script line
+    ViewUtils.runLater(() -> _script.runNextLine(_stage));
 }
 
 /**
@@ -88,9 +97,17 @@ public int run(SnapScene aStage)
  */
 public void runSetting()
 {
+    // Get setting
     ImageView iview = getNextImageView(); if(iview==null) return;
     iview.setSize(_stage.getWidth(), _stage.getHeight()); iview.setFillWidth(true); iview.setFillHeight(true);
-    _stage.addChild(iview);
+    iview.setPrefWidth(-1); iview.setKeepAspect(false);
+    iview.setName("Setting");
+    
+    // If old setting, remove
+    View oldStg = getView("Setting"); if(oldStg!=null) _stage.removeChild(oldStg);
+    
+    // Add new setting
+    _stage.addChild(iview,0);
 }
 
 /**
@@ -99,23 +116,34 @@ public void runSetting()
 public void runWalks()
 {
     _index = -1;
-    ImageView iview = getNextImageView(); if(iview==null) return;
+    ImageView iview = (ImageView)getView();
+    if(iview==null) { iview = getNextImageView(); if(iview.getParent()==null) _stage.addChild(iview); }
+    if(iview==null) { System.err.println("No Image found"); return; }
     
     if(ArrayUtils.contains(_words, "right")) {
-        iview.setBounds(_stage.getWidth(),200,80,240);
-        _stage.addChild(iview);
-        iview.getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2+60).play();
+        iview.setXY(_stage.getWidth(), _stage.getHeight() - iview.getHeight() - 10); //_stage.addChild(iview);
+        iview.getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2+60);//.play();
     }
     
     else if(ArrayUtils.contains(_words, "out")) {
-        iview = (ImageView)getView(); if(iview==null) return;
-        iview.getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()).play();
+        //iview = (ImageView)getView(); if(iview==null) return;
+        iview.getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth());//.play();
     }
     
     else {
-        iview.setBounds(-60,200,80,240);
-        _stage.addChild(iview);
-        iview.getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2-120).play();
+        iview.setXY(-iview.getWidth(), _stage.getHeight() - iview.getHeight() - 10); //_stage.addChild(iview);
+        iview.getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2-120);//.play();
+    }
+    
+    // Look for animation
+    String name = FilePathUtils.getFileNameSimple(iview.getName());
+    WebURL url = WebURL.getURL("/Temp/ComicScriptLib/images/" + name + "Walking" + ".gif");
+    if(url.isFound()) {
+        Image img = Image.get(url), img0 = iview.getImage(); ImageView iview2 = iview;
+        iview.setImage(img); iview.setWidth(iview.getPrefWidth(-1)/2);
+        iview.getAnim(_startTime).getAnim(_startTime+2000).setValue("Frame", 36);
+        iview.getAnim(_startTime).getAnim(_startTime+2000).setOnFinish(a -> {
+            iview2.setImage(img0); iview2.setWidth(iview2.getPrefWidth(-1)/2); });
     }
     
     _index = _words.length;
@@ -220,9 +248,17 @@ public View getView()
     int ind = _index; _index = -1;
     Image img = getNextImage();
     String name = img!=null? img.getName() : null;
-    View child = name!=null? _stage.getChild(name) : null;
+    View child = getView(name);
     _index = ind;
-    if(child!=null) child.getAnimCleared(0);
+    return child;
+}
+
+/**
+ * Returns the view with name.
+ */
+public View getView(String aName)
+{
+    View child = aName!=null? _stage.getChild(aName) : null;
     return child;
 }
 
@@ -232,9 +268,21 @@ public View getView()
 public Image getNextImage()
 {
     for(int i=_index+1;i<_words.length;i++) { String word = _words[i].toLowerCase();
+        String word2 = Character.toUpperCase(word.charAt(0)) + word.substring(1);
+    
+        // Look for jpg
         WebURL url = WebURL.getURL(getClass(), "/images/" + word + ".jpg");
         if(SnapUtils.isTeaVM && url!=null && !url.isFound()) url = null;
+        if(url==null) url = WebURL.getURL("/Temp/ComicScriptLib/images/" + word2 + ".jpg"); if(!url.isFound()) url = null;
+
+        // Look for png
         if(url==null) url = WebURL.getURL(getClass(), "/images/" + word + ".png");
+        if(url==null) url = WebURL.getURL("/Temp/ComicScriptLib/images/" + word2 + ".png"); if(!url.isFound()) url = null;
+        
+        // Look for gif
+        if(url==null) url = WebURL.getURL("/Temp/ComicScriptLib/images/" + word2 + ".gif"); if(!url.isFound()) url = null;
+        
+        // Get file from URL and load image
         WebFile file = url!=null? url.getFile() : null;
         if(file!=null)
             return Image.get(file);
@@ -252,6 +300,8 @@ public ImageView getNextImageView()
     ImageView iview = new ImageView(img); iview.setName(img.getName());
     if(!img.isLoaded())
         img.addPropChangeListener(pc -> iview.repaint());
+    iview.setSize(iview.getPrefWidth(-1)/2, iview.getPrefHeight(-1)/2);
+    iview.setFillHeight(true); iview.setKeepAspect(true);
     return iview;
 }
 

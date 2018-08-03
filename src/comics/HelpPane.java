@@ -18,7 +18,7 @@ public class HelpPane extends ViewOwner {
     String             _lastAdd;
     
     // Constants
-    String _starters[] = { "Title is", "Setting is", "Car", "Cat", "Dog", "Trump", "Obama", "Duke" };
+    String _starters[] = { "Title is", "Setting is", "Lady", "Car", "Cat", "Dog", "Trump", "Obama", "Duke" };
     String _settings[] = { "Beach", "WhiteHouse", "OvalOffice" };
     String _verbs[] = { "walks", "drops", "says", "grows", "flips", "explodes" };
     String _walks[] = { "in", "in from right", "out" };
@@ -80,13 +80,13 @@ protected void respondUI(ViewEvent anEvent)
         
         // Handle MouseRelease on empty
         if(anEvent.isMouseClick()) {
-            if(_listView.getSelectedItem()==null)
+            if(_listView.getSelItem()==null)
                 doReturn();
         }
         
         // Handle selection
         else {
-          _lastAdd = _listView.getSelectedItem();
+          _lastAdd = _listView.getSelItem();
           if("  \u23CE".equals(_lastAdd)) doReturn();
           else _stagePane._textView.replaceChars(_lastAdd + " ");
         }
