@@ -2,7 +2,6 @@ package comics;
 import snap.gfx.*;
 import snap.view.*;
 import snap.viewx.*;
-import snap.util.*;
 import snap.web.*;
 
 /**
@@ -73,16 +72,8 @@ public int run(SnapScene aStage)
         
         // Get actor
         Actor actor = (Actor)getView(); if(actor==null) return 0;
-        actor._stage = _stage; actor._scriptLine = this; actor._words = words;
-        
-        word = words[1];
-        if(word.equals("walks")) actor.runWalks();
-        if(word.equals("drops")) actor.runDrops();
-        if(word.equals("grows")) actor.runGrows();
-        if(word.equals("says")) actor.runSays();
-        if(word.equals("flips")) actor.runFlips();
-        if(word.equals("explodes")) actor.runExplodes();
-        if(word.equals("dances")) actor.runDances();
+        actor._stage = _stage; actor._scriptLine = this; actor._words = words; actor._runTime = 0;
+        actor.run(words[1]);
         _runTime = actor._runTime;
     }
     
@@ -164,20 +155,12 @@ public View getView(String aName)
  */
 public Image getNextImage()
 {
-    for(int i=_index+1;i<_words.length;i++) { String word = _words[i].toLowerCase();
-        String word2 = Character.toUpperCase(word.charAt(0)) + word.substring(1);
-    
-        // Look for jpg
-        WebURL url = WebURL.getURL(getClass(), "/images/" + word + ".jpg");
-        if(SnapUtils.isTeaVM && url!=null && !url.isFound()) url = null;
-        if(url==null) url = WebURL.getURL("/Temp/ComicScriptLib/images/" + word2 + ".jpg"); if(!url.isFound()) url = null;
-
-        // Look for png
-        if(url==null) url = WebURL.getURL(getClass(), "/images/" + word + ".png");
-        if(url==null) url = WebURL.getURL("/Temp/ComicScriptLib/images/" + word2 + ".png"); if(!url.isFound()) url = null;
+    for(int i=_index+1;i<_words.length;i++) { String word = _words[i];
         
-        // Look for gif
-        if(url==null) url = WebURL.getURL("/Temp/ComicScriptLib/images/" + word2 + ".gif"); if(!url.isFound()) url = null;
+        // Look for actor/setting
+        String filePath = Index.get().getActorFilePath(word);
+        if(filePath==null) filePath = Index.get().getSettingFilePath(word);
+        WebURL url = filePath!=null? WebURL.getURL(filePath) : null;
         
         // Get file from URL and load image
         WebFile file = url!=null? url.getFile() : null;

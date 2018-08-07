@@ -29,6 +29,24 @@ public class Actor extends ImageView {
 public Actor(Image anImg)  { super(anImg); }
 
 /**
+ * Runs the given command.
+ */
+public boolean run(String aCmd)
+{
+    switch(aCmd) {
+        case "walks": runWalks(); break;
+        case "drops": runDrops(); break;
+        case "grows": runGrows(); break;
+        case "says": runSays(); break;
+        case "flips": runFlips(); break;
+        case "explodes": runExplodes(); break;
+        case "dances": runDances(); break;
+        default: return false;
+    }
+    return true;
+}
+
+/**
  * Runs a walk command.
  */
 public void runWalks()
@@ -48,14 +66,12 @@ public void runWalks()
     }
     
     // Look for animation
-    String name = FilePathUtils.getFileNameSimple(getName());
-    WebURL url = WebURL.getURL("/Temp/ComicScriptLib/images/" + name + "Walking" + ".gif");
-    if(url.isFound()) {
-        Image img = Image.get(url), img0 = getImage();
+    Image img = getAnimImage("Walking"), imgOld = getImage();
+    if(img!=null) {
         setImage(img); setWidth(getPrefWidth(-1)/2);
         getAnim(_startTime).getAnim(_startTime+2000).setValue("Frame", 36);
         getAnim(_startTime).getAnim(_startTime+2000).setOnFinish(a -> {
-            setImage(img0); setWidth(getPrefWidth(-1)/2); });
+            setImage(imgOld); setWidth(getPrefWidth(-1)/2); });
     }
     
     _runTime = 2000;
@@ -136,17 +152,28 @@ public void runExplodes()
 public void runDances()
 {
     // Look for animation
-    String name = FilePathUtils.getFileNameSimple(getName());
-    WebURL url = WebURL.getURL("/Temp/ComicScriptLib/images/" + name + "Dancing" + ".gif");
-    if(url.isFound()) {
-        Image img = Image.get(url), img0 = getImage();
+    Image img = getAnimImage("Dancing"), imgOld = getImage();
+    if(img!=null) {
         setImage(img); setWidth(getPrefWidth(-1)/2);
         getAnim(_startTime).getAnim(_startTime+5000).setValue("Frame", 170);
         getAnim(_startTime).getAnim(_startTime+5000).setOnFinish(a -> {
-            setImage(img0); setFrame(0); setWidth(getPrefWidth(-1)/2); });
+            setImage(imgOld); setFrame(0); setWidth(getPrefWidth(-1)/2); });
     }
     
     _runTime = 5000;
+}
+
+/**
+ * Returns an anim image for name.
+ */
+public Image getAnimImage(String aName)
+{
+    String name = FilePathUtils.getFileNameSimple(getName());
+    String filePath = Index.get().getActorFilePath(name); if(filePath==null) return null;
+    String filePath2 = FilePathUtils.getPeer(filePath, name + aName + ".gif");
+    WebURL url = WebURL.getURL(filePath2);
+    Image img = url.isFound()? Image.get(url) : null;
+    return img;
 }
 
 }
