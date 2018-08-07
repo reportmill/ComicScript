@@ -73,7 +73,14 @@ public int run(SnapScene aStage)
         // Get actor
         Actor actor = (Actor)getView(); if(actor==null) return 0;
         actor._stage = _stage; actor._scriptLine = this; actor._words = words; actor._runTime = 0;
-        actor.run(words[1]);
+        if(!actor.getImage().isLoaded()) {
+            ViewUtils.runDelayed(() -> run(aStage), 50, true); return 0; }
+        
+        // Run command
+        String cmd = words[1];
+        actor.run(cmd);
+        if(actor._runTime<0) {
+            ViewUtils.runDelayed(() -> run(aStage), 50, true); return 0; }
         _runTime = actor._runTime;
     }
     
@@ -131,9 +138,7 @@ public View getView()
     
     // If actor not found, create
     if(child==null) {
-        ImageView iview = new Actor(img); iview.setName(img.getName()); child = iview;
-        iview.setSize(iview.getPrefWidth(-1)/2, iview.getPrefHeight(-1)/2);
-        iview.setFillHeight(true); iview.setKeepAspect(true);
+        ImageView iview = new Actor(img); iview.setName(img.getName()); child = iview; iview.setX(-999);
         _stage.addChild(child);
     }
     

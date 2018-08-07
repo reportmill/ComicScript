@@ -1,9 +1,11 @@
 package comics;
+import java.util.*;
 import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.SnapScene;
 import snap.web.WebURL;
+import snaptea.TVWebSite;
 
 /**
  * A class to model actors.
@@ -24,9 +26,23 @@ public class Actor extends ImageView {
     
     // The run time
     int              _runTime;
+    
+    PropChangeListener _imgLoadLsnr;
 
 /** Create new actor. */
-public Actor(Image anImg)  { super(anImg); }
+public Actor(Image anImg)
+{
+    super(anImg);
+    setFillHeight(true); setKeepAspect(true);
+    if(!anImg.isLoaded()) anImg.addPropChangeListener(_imgLoadLsnr = pce -> imageLoaded());
+    else imageLoaded();
+}
+
+void imageLoaded()
+{
+    setSize(getPrefWidth(-1)/2, getPrefHeight(-1)/2);
+    if(_imgLoadLsnr!=null) { getImage().removePropChangeListener(_imgLoadLsnr); _imgLoadLsnr = null; }
+}
 
 /**
  * Runs the given command.
@@ -66,14 +82,8 @@ public void runWalks()
     }
     
     // Look for animation
-    Image img = getAnimImage("Walking"), imgOld = getImage();
-    if(img!=null) {
-        setImage(img); setWidth(getPrefWidth(-1)/2);
-        getAnim(_startTime).getAnim(_startTime+2000).setValue("Frame", 36);
-        getAnim(_startTime).getAnim(_startTime+2000).setOnFinish(a -> {
-            setImage(imgOld); setWidth(getPrefWidth(-1)/2); });
-    }
-    
+    boolean canWalk = setAnimImage("Walking", 2000, 36);
+    if(canWalk && !getImage().isLoaded()) { _runTime = -1; return; }
     _runTime = 2000;
 }
 
@@ -151,16 +161,24 @@ public void runExplodes()
  */
 public void runDances()
 {
-    // Look for animation
-    Image img = getAnimImage("Dancing"), imgOld = getImage();
-    if(img!=null) {
-        setImage(img); setWidth(getPrefWidth(-1)/2);
-        getAnim(_startTime).getAnim(_startTime+5000).setValue("Frame", 170);
-        getAnim(_startTime).getAnim(_startTime+5000).setOnFinish(a -> {
-            setImage(imgOld); setFrame(0); setWidth(getPrefWidth(-1)/2); });
-    }
-    
+    setAnimImage("Dancing", 5000, 170);
+    if(!getImage().isLoaded()) { _runTime = -1; return; }
     _runTime = 5000;
+}
+
+/**
+ * Sets the animated image over given range (if found).
+ */
+public boolean setAnimImage(String aName, int aTime, int aFrame)
+{
+    Image img = getAnimImage(aName); if(img==null) return false;
+
+    Image imgOld = getImage();
+    setImage(img); setWidth(getPrefWidth(-1)/2);
+    getAnim(_startTime).getAnim(_startTime+aTime).setValue("Frame", aFrame);
+    getAnim(_startTime).getAnim(_startTime+aTime).setOnFinish(a -> {
+        setImage(imgOld); setFrame(0); setWidth(getPrefWidth(-1)/2); });
+    return true;
 }
 
 /**
@@ -169,11 +187,16 @@ public void runDances()
 public Image getAnimImage(String aName)
 {
     String name = FilePathUtils.getFileNameSimple(getName());
-    String filePath = Index.get().getActorFilePath(name); if(filePath==null) return null;
-    String filePath2 = FilePathUtils.getPeer(filePath, name + aName + ".gif");
-    WebURL url = WebURL.getURL(filePath2);
-    Image img = url.isFound()? Image.get(url) : null;
+    Image imgCached = _images.get(name + aName); if(imgCached!=null) return imgCached;
+    
+    String filePath = Index.get().getActorFilePath(name, aName); if(filePath==null) return null;
+    WebURL url = WebURL.getURL(filePath);
+    if(SnapUtils.isTeaVM) snaptea.TVWebSite.addKnownPath(url.getPath());
+    Image img = Image.get(url);
+    _images.put(name + aName, img);
     return img;
 }
+
+static Map <String,Image> _images = new HashMap();
 
 }
