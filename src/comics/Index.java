@@ -1,9 +1,8 @@
 package comics;
 import java.util.*;
 import snap.gfx.Image;
-import snap.util.JSONNode;
-import snap.util.SnapUtils;
-import snap.web.WebURL;
+import snap.util.*;
+import snap.web.*;
 
 /**
  * A class to manage assetts.
@@ -148,13 +147,18 @@ public static class IndexEntry {
     public String getNameLC()  { return _nameLC; }
     
     /** Returns the image. */
-    public Image getImage()
+    public Image getImage()  { return _img!=null? _img : (_img=getImageImpl()); }
+    
+    /** Returns the image. */
+    protected Image getImageImpl()
     {
-        if(_img!=null) return _img;
         WebURL url = WebURL.getURL(_urls);
         if(SnapUtils.isTeaVM) snaptea.TVWebSite.addKnownPath(url.getPath());
-        _img = Image.get(url);
-        return _img;
+        Image img = Image.get(url);
+        
+        if(img.getImageSet()!=null && url.getPath().endsWith("gif"))
+            saveSpriteSheet(img, url);
+        return img;
     }
 }
 
@@ -171,9 +175,24 @@ public static class ActorEntry extends IndexEntry {
  * An IndexEntry subclass to manage actor animation entries.
  */
 public static class AnimEntry extends IndexEntry {
+    
+    int _frameCount;
 
     /** Creates a new AnimEntry for map. */
-    public AnimEntry(Map aMap)  { super(aMap); _urls = ROOT + "actors/" + _path; }
+    public AnimEntry(Map aMap)
+    {
+        super(aMap); _urls = ROOT + "actors/" + _path;
+        _frameCount = SnapUtils.intValue(aMap.get("FrameCount"));
+    }
+
+    /** Returns the image. */
+    public Image getImageImpl()
+    {
+        Image img = super.getImageImpl(), img0 = img;
+        if(img.isLoaded()) img = img.getSpriteSheetFrames(_frameCount);
+        else img.addPropChangeListener(pc -> _img = img0.getSpriteSheetFrames(_frameCount));
+        return img;
+    }
 }
 
 /**
@@ -183,6 +202,23 @@ public static class SettingEntry extends IndexEntry {
 
     /** Creates a new SettingEntry for map. */
     public SettingEntry(Map aMap)  { super(aMap); _urls = ROOT + "settings/" + _path; }
+}
+
+/**
+ * Saves an image to a sprite sheet.
+ */
+private static void saveSpriteSheet(Image anImg, WebURL aURL)
+{
+    // Get URL for PNG file (if already there and newer than gif, just return)
+    WebURL url = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getPathNameSimple() + ".png"));
+    if(url.isFound() && url.getHead().getModTime()>aURL.getHead().getModTime()) return;
+    
+    // Create sprite sheet image, get PNG bytes, set in file and save
+    Image sheet = anImg.getImageSet().getSpriteSheetImage();
+    byte bytes[] = sheet.getBytesPNG();
+    WebFile file = url.createFile(false);
+    file.setBytes(bytes);
+    file.save();
 }
 
 }

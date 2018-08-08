@@ -79,8 +79,8 @@ public void runWalks()
     }
     
     // Look for animation
-    boolean canWalk = setAnimImage("Walking", 2000, 36);
-    if(canWalk && !getImage().isLoaded()) { _runTime = -1; return; }
+    if(isAnimImageLoading("Walking")) { _runTime = -1; return; }
+    setAnimImage("Walking", 2000, 30);
     _runTime = 2000;
 }
 
@@ -158,9 +158,18 @@ public void runExplodes()
  */
 public void runDances()
 {
-    setAnimImage("Dancing", 5000, 170);
-    if(!getImage().isLoaded()) { _runTime = -1; return; }
-    _runTime = 5000;
+    if(isAnimImageLoading("Dancing")) { _runTime = -1; return; }
+    setAnimImage("Dancing", 4000, 88);
+    _runTime = 4000;
+}
+
+/**
+ * Returns whether anim image is present, but loading.
+ */
+public boolean isAnimImageLoading(String aName)
+{
+    Image img = getAnimImage(aName);
+    return img!=null && !img.isLoaded();
 }
 
 /**
@@ -183,7 +192,7 @@ public boolean setAnimImage(String aName, int aTime, int aFrame)
     Image imgOld = getImage();
     
     // Set image and size
-    setImage(img); setWidth(getPrefWidth(-1)/2);
+    setImage(img); setWidth(getPrefWidth(-1)/2); setFrame(0);
     
     // Configure anim
     getAnim(_startTime).getAnim(_startTime+aTime).setValue("Frame", aFrame);
