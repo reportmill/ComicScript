@@ -1,6 +1,6 @@
 package comics;
 import java.util.*;
-import snap.util.FilePathUtils;
+import snap.gfx.Image;
 import snap.util.JSONNode;
 import snap.util.SnapUtils;
 import snap.web.WebURL;
@@ -11,10 +11,13 @@ import snap.web.WebURL;
 public class Index {
 
     // The actors
-    List <Map>           _actors;
+    List <ActorEntry>    _actors;
+    
+    // The anims
+    List <AnimEntry>     _anims;
     
     // The settings
-    List <Map>           _settings;
+    List <SettingEntry>  _settings;
     
     // The root path
     static String ROOT = "/Temp/ComicScriptLib/";
@@ -35,96 +38,151 @@ public Index()
     WebURL url = WebURL.getURL(ROOT + "index.json");
     JSONNode root = JSONNode.readSource(url);
     JSONNode actors = root.getNode("Actors");
+    JSONNode anims = root.getNode("Anims");
     JSONNode settings = root.getNode("Settings");
     
+    // Get Actors
     _actors = new ArrayList();
-    for(int i=0;i<actors.getNodeCount();i++) {
-        JSONNode actor = actors.getNode(i);
-        Map map = actor.getAsMap();
-        String name = (String)map.get("Name"); map.put("Name2", name.toLowerCase());
-        _actors.add(map);
-    }
+    for(int i=0;i<actors.getNodeCount();i++) { Map map = actors.getNode(i).getAsMap();
+        _actors.add(new ActorEntry(map)); }
     
+    // Get Anims
+    _anims = new ArrayList();
+    for(int i=0;i<anims.getNodeCount();i++) { Map map = anims.getNode(i).getAsMap();
+        _anims.add(new AnimEntry(map)); }
+    
+    // Get Settings
     _settings = new ArrayList();
-    for(int i=0;i<settings.getNodeCount();i++) {
-        JSONNode setting = settings.getNode(i);
-        Map map = setting.getAsMap();
-        String name = (String)map.get("Name"); map.put("Name2", name.toLowerCase());
-        _settings.add(map);
-    }
-    
-    // Add actor and setting files to known files
-    if(SnapUtils.isTeaVM) {
-        for(Map m : _actors) snaptea.TVWebSite.addKnownPath("/files/actors/" + m.get("File"));
-        for(Map m : _settings) snaptea.TVWebSite.addKnownPath("/files/settings/" + m.get("File"));
-    }
+    for(int i=0;i<settings.getNodeCount();i++) { Map map = settings.getNode(i).getAsMap();
+        _settings.add(new SettingEntry(map)); }
 }
 
 /**
- * Returns the actor with given name.
+ * Returns the actor entry for given name.
  */
-public Map getActor(String aName)
+public ActorEntry getActor(String aName)
 {
     String name = aName.toLowerCase();
-
-    for(Map actor : _actors) { String name2 = (String)actor.get("Name2");
-        if(name.equals(name2))
-            return actor;
-    }
+    for(ActorEntry entry : _actors) { if(name.equals(entry.getNameLC()))
+        return entry; }
     return null;
 }
 
 /**
- * Returns the actor file path for name.
+ * Returns the actor image for given name.
  */
-public String getActorFilePath(String aName)
+public Image getActorImage(String aName)
 {
-    Map obj = getActor(aName); if(obj==null) return null;
-    String path = (String)obj.get("File");
-    return ROOT + "actors/" + path;
+    ActorEntry entry = getActor(aName); if(entry==null) return null;
+    return entry.getImage();
 }
 
 /**
- * Returns the actor file path for name.
+ * Returns the anim with given actor and anim.
  */
-public String getActorFilePath(String aName, String anAnim)
+public AnimEntry getAnim(String anActor, String anAnim)
 {
-    Map obj = getActor(aName); if(obj==null) return null;
-    List <JSONNode> anims = (List)obj.get("Anims"); if(anims==null) return null;
-    String anim = null;
-    for(JSONNode jn : anims) if(jn.getString().equalsIgnoreCase(anAnim)) { anim = jn.getString(); break; }
-    String path = (String)obj.get("File"); if(anim==null) return null;
-    String path2 = FilePathUtils.getPeer(path, obj.get("Name") + anim + ".gif");
-    return ROOT + "actors/" + path2;
-}
-
-/**
- * Returns the setting with given name.
- */
-public Map getSetting(String aName)
-{
-    String name = aName.toLowerCase();
-
-    for(Map setting : _settings) { String name2 = (String)setting.get("Name2");
-        if(name.equals(name2))
-            return setting;
-    }
+    String name = anActor.toLowerCase() + '-' + anAnim.toLowerCase();
+    for(AnimEntry entry : _anims) { if(name.equals(entry.getNameLC()))
+        return entry; }
     return null;
 }
 
 /**
- * Returns the setting file path for name.
+ * Returns the anims image for actor and anim.
  */
-public String getSettingFilePath(String aName)
+public Image getAnimImage(String anActor, String anAnim)
 {
-    Map obj = getSetting(aName); if(obj==null) return null;
-    String path = (String)obj.get("File");
-    return ROOT + "settings/" + path;
+    AnimEntry entry = getAnim(anActor, anAnim); if(entry==null) return null;
+    return entry.getImage();
+}
+
+/**
+ * Returns the setting entry for given name.
+ */
+public SettingEntry getSetting(String aName)
+{
+    String name = aName.toLowerCase();
+    for(SettingEntry entry : _settings) { if(name.equals(entry.getNameLC()))
+            return entry; }
+    return null;
+}
+
+/**
+ * Returns the setting image for name.
+ */
+public Image getSettingImage(String aName)
+{
+    SettingEntry entry = getSetting(aName); if(entry==null) return null;
+    return entry.getImage();
 }
 
 /**
  * Returns the shared index.
  */
 public static Index get()  { return _shared; }
+
+/**
+ * A class to manage index entries.
+ */
+public static class IndexEntry {
+
+    // The name and full name
+    String          _name, _nameLC;
+    
+    // The path and URL string
+    String          _path, _urls;
+    
+    // The image
+    Image           _img;
+    
+    /** Creates a new IndexEntry for map. */
+    public IndexEntry(Map aMap)
+    {
+        _name = (String)aMap.get("Name"); _nameLC = _name.toLowerCase();
+        _path = (String)aMap.get("File");
+        _urls = ROOT + "actors/" + _path;
+    }
+    
+    /** Returns the full name. */
+    public String getNameLC()  { return _nameLC; }
+    
+    /** Returns the image. */
+    public Image getImage()
+    {
+        if(_img!=null) return _img;
+        WebURL url = WebURL.getURL(_urls);
+        if(SnapUtils.isTeaVM) snaptea.TVWebSite.addKnownPath(url.getPath());
+        _img = Image.get(url);
+        return _img;
+    }
+}
+
+/**
+ * An IndexEntry subclass to manage actor entries.
+ */
+public static class ActorEntry extends IndexEntry {
+
+    /** Creates a new ActorEntry for map. */
+    public ActorEntry(Map aMap)  { super(aMap); _urls = ROOT + "actors/" + _path; }
+}
+
+/**
+ * An IndexEntry subclass to manage actor animation entries.
+ */
+public static class AnimEntry extends IndexEntry {
+
+    /** Creates a new AnimEntry for map. */
+    public AnimEntry(Map aMap)  { super(aMap); _urls = ROOT + "actors/" + _path; }
+}
+
+/**
+ * An IndexEntry subclass to manage setting entries.
+ */
+public static class SettingEntry extends IndexEntry {
+
+    /** Creates a new SettingEntry for map. */
+    public SettingEntry(Map aMap)  { super(aMap); _urls = ROOT + "settings/" + _path; }
+}
 
 }

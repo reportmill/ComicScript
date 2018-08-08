@@ -1,11 +1,8 @@
 package comics;
-import java.util.*;
 import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.SnapScene;
-import snap.web.WebURL;
-import snaptea.TVWebSite;
 
 /**
  * A class to model actors.
@@ -167,36 +164,32 @@ public void runDances()
 }
 
 /**
- * Sets the animated image over given range (if found).
- */
-public boolean setAnimImage(String aName, int aTime, int aFrame)
-{
-    Image img = getAnimImage(aName); if(img==null) return false;
-
-    Image imgOld = getImage();
-    setImage(img); setWidth(getPrefWidth(-1)/2);
-    getAnim(_startTime).getAnim(_startTime+aTime).setValue("Frame", aFrame);
-    getAnim(_startTime).getAnim(_startTime+aTime).setOnFinish(a -> {
-        setImage(imgOld); setFrame(0); setWidth(getPrefWidth(-1)/2); });
-    return true;
-}
-
-/**
  * Returns an anim image for name.
  */
 public Image getAnimImage(String aName)
 {
     String name = FilePathUtils.getFileNameSimple(getName());
-    Image imgCached = _images.get(name + aName); if(imgCached!=null) return imgCached;
-    
-    String filePath = Index.get().getActorFilePath(name, aName); if(filePath==null) return null;
-    WebURL url = WebURL.getURL(filePath);
-    if(SnapUtils.isTeaVM) snaptea.TVWebSite.addKnownPath(url.getPath());
-    Image img = Image.get(url);
-    _images.put(name + aName, img);
+    Image img = Index.get().getAnimImage(name, aName);
     return img;
 }
 
-static Map <String,Image> _images = new HashMap();
+/**
+ * Sets the animated image over given range (if found).
+ */
+public boolean setAnimImage(String aName, int aTime, int aFrame)
+{
+    // Get image for name and cache old image
+    Image img = getAnimImage(aName); if(img==null) return false;
+    Image imgOld = getImage();
+    
+    // Set image and size
+    setImage(img); setWidth(getPrefWidth(-1)/2);
+    
+    // Configure anim
+    getAnim(_startTime).getAnim(_startTime+aTime).setValue("Frame", aFrame);
+    getAnim(_startTime).getAnim(_startTime+aTime).setOnFinish(a -> {
+        setImage(imgOld); setFrame(0); setWidth(getPrefWidth(-1)/2); });
+    return true;
+}
 
 }

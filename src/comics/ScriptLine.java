@@ -2,7 +2,6 @@ package comics;
 import snap.gfx.*;
 import snap.view.*;
 import snap.viewx.*;
-import snap.web.*;
 
 /**
  * A class to represent a line of script.
@@ -163,14 +162,12 @@ public Image getNextImage()
     for(int i=_index+1;i<_words.length;i++) { String word = _words[i];
         
         // Look for actor/setting
-        String filePath = Index.get().getActorFilePath(word);
-        if(filePath==null) filePath = Index.get().getSettingFilePath(word);
-        WebURL url = filePath!=null? WebURL.getURL(filePath) : null;
+        Image img = Index.get().getActorImage(word);
+        if(img==null) img = Index.get().getSettingImage(word);
         
         // Get file from URL and load image
-        WebFile file = url!=null? url.getFile() : null;
-        if(file!=null)
-            return Image.get(file);
+        if(img!=null)
+            return img;
     }
     _index = _words.length;
     return null;
