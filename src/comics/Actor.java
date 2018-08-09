@@ -53,7 +53,8 @@ public boolean run(String aCmd)
         case "says": runSays(); break;
         case "flips": runFlips(); break;
         case "explodes": runExplodes(); break;
-        case "dances": runDances(); break;
+        case "dances": runDance(); break;
+        case "jumps": runJump(); break;
         default: return false;
     }
     return true;
@@ -79,8 +80,8 @@ public void runWalks()
     }
     
     // Look for animation
-    if(isAnimImageLoading("Walking")) { _runTime = -1; return; }
-    setAnimImage("Walking", 2000, 30);
+    if(isAnimImageLoading("Walk")) { _runTime = -1; return; }
+    setAnimImage("Walk", 2000, 30);
     _runTime = 2000;
 }
 
@@ -154,13 +155,23 @@ public void runExplodes()
 }
 
 /**
- * Runs a walk command.
+ * Runs a dance command.
  */
-public void runDances()
+public void runDance()
 {
-    if(isAnimImageLoading("Dancing")) { _runTime = -1; return; }
-    setAnimImage("Dancing", 4000, 88);
+    if(isAnimImageLoading("Dance")) { _runTime = -1; return; }
+    setAnimImage("Dance", 4000, 88);
     _runTime = 4000;
+}
+
+/**
+ * Runs a jump command.
+ */
+public void runJump()
+{
+    if(isAnimImageLoading("Jump")) { _runTime = -1; return; }
+    setAnimImage("Jump", 1000, 16);
+    _runTime = 1000;
 }
 
 /**
