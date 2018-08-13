@@ -203,13 +203,25 @@ public boolean setAnimImage(String aName, int aTime, int aFrame)
     Image imgOld = getImage();
     
     // Set image and size
-    setImage(img); setWidth(getPrefWidth(-1)/2); setFrame(0);
+    setImage2(img); setFrame(0); //setWidth(getPrefWidth(-1)/2);
     
     // Configure anim
     getAnim(_startTime).getAnim(_startTime+aTime).setValue("Frame", aFrame);
     getAnim(_startTime).getAnim(_startTime+aTime).setOnFinish(a -> {
-        setImage(imgOld); setFrame(0); setWidth(getPrefWidth(-1)/2); });
+        setImage2(imgOld); setFrame(0); }); // setWidth(getPrefWidth(-1)/2);
     return true;
+}
+
+/**
+ * Sets the image.
+ */
+public void setImage2(Image anImg)
+{
+    Rect bnds = getBounds();
+    double bx = bnds.x - (anImg.getWidth()/2 - bnds.width)/2;
+    double by = bnds.y - (anImg.getHeight()/2 - bnds.height);
+    super.setImage(anImg);
+    setBounds(bx, by, anImg.getWidth()/2, anImg.getHeight()/2);
 }
 
 }

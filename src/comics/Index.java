@@ -156,8 +156,10 @@ public static class IndexEntry {
         if(SnapUtils.isTeaVM) snaptea.TVWebSite.addKnownPath(url.getPath());
         Image img = Image.get(url);
         
-        if(img.getImageSet()!=null && url.getPath().endsWith("gif"))
-            saveSpriteSheet(img, url);
+        if(isNewGifAvailable(url)) {
+            saveSpriteSheet(url);
+            img = Image.get(url);
+        }
         return img;
     }
 }
@@ -204,19 +206,37 @@ public static class SettingEntry extends IndexEntry {
     public SettingEntry(Map aMap)  { super(aMap); _urls = ROOT + "settings/" + _path; }
 }
 
+private static boolean isNewGifAvailable(WebURL aURL)
+{
+    // If not looking for png file return false
+    if(!aURL.getPath().endsWith(".png")) return false;
+    
+    // Get GIF URL
+    WebURL url2 = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getPathNameSimple() + ".gif"));
+    
+    // If no gif file or it's older than
+    long pngMod = aURL.isFound()? aURL.getHead().getModTime() : 0;
+    long gifMod = url2.isFound()? url2.getHead().getModTime() : 0;
+    return gifMod>pngMod;
+}
+
 /**
  * Saves an image to a sprite sheet.
  */
-private static void saveSpriteSheet(Image anImg, WebURL aURL)
+private static void saveSpriteSheet(WebURL aURL)
 {
-    // Get URL for PNG file (if already there and newer than gif, just return)
-    WebURL url = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getPathNameSimple() + ".png"));
-    if(url.isFound() && url.getHead().getModTime()>aURL.getHead().getModTime()) return;
+    // Get URL for GIF file
+    WebURL url = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getPathNameSimple() + ".gif"));
+    Image img = Image.get(url);
+    
+    // Scale image
+    if(img.getImageSet()!=null) img = img.getImageSet().getImageScaled(.434);
+    else img = img.getImageScaled(.434);
     
     // Create sprite sheet image, get PNG bytes, set in file and save
-    Image sheet = anImg.getImageSet().getSpriteSheetImage();
+    Image sheet = img.getImageSet()!=null? img.getImageSet().getSpriteSheetImage() : img;
     byte bytes[] = sheet.getBytesPNG();
-    WebFile file = url.createFile(false);
+    WebFile file = aURL.createFile(false);
     file.setBytes(bytes);
     file.save();
 }
