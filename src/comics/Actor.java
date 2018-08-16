@@ -33,6 +33,7 @@ public Actor(Image anImg)
     setFillHeight(true); setKeepAspect(true);
     if(!anImg.isLoaded()) anImg.addPropChangeListener(_imgLoadLsnr = pce -> imageLoaded());
     else imageLoaded();
+    setEffect(new ShadowEffect(6, Color.BLACK, 0, 0));
 }
 
 void imageLoaded()
@@ -66,8 +67,9 @@ public boolean run(String aCmd)
 public void runWalks()
 {
     if(ArrayUtils.contains(_words, "right")) {
+        setScaleX(-1);
         setXY(_stage.getWidth(), _stage.getHeight() - getHeight() - 10);
-        getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2+60);
+        getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2-getWidth()/2+60);
     }
     
     else if(ArrayUtils.contains(_words, "out")) {
@@ -76,7 +78,7 @@ public void runWalks()
     
     else {
         setXY(-getWidth(), _stage.getHeight() - getHeight() - 10);
-        getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2-120);
+        getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2-getWidth()/2-60);
     }
     
     // Look for animation
@@ -160,8 +162,8 @@ public void runExplodes()
 public void runDance()
 {
     if(isAnimImageLoading("Dance")) { _runTime = -1; return; }
-    setAnimImage("Dance", 4000, 88);
-    _runTime = 4000;
+    setAnimImage("Dance", 3000, 88);
+    _runTime = 3000;
 }
 
 /**

@@ -9,7 +9,7 @@ import snap.viewx.*;
 public class Script {
     
     // The View text
-    String             _text = "Setting is WhiteHouse\n";
+    String             _text = "Setting is beach\n";
 
     // The Script lines
     List <ScriptLine>  _lines;
