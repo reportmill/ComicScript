@@ -1,4 +1,6 @@
 package comics;
+import snap.gfx.Color;
+import snap.gfx.ShadowEffect;
 import snap.view.*;
 import snap.viewx.*;
 
@@ -9,6 +11,9 @@ public class StagePane extends ViewOwner {
     
     // The StageView
     SnapScene    _stage;
+    
+    // The Stage box
+    BoxView      _stageBox;
     
     // The script text view
     TextView     _textView;
@@ -24,6 +29,7 @@ public class StagePane extends ViewOwner {
  */
 public void showStage()
 {
+    getWindow().setGrowWidth(true);
     setWindowVisible(true);
     runLater(() -> runScript(1));
 }
@@ -35,9 +41,14 @@ protected void initUI()
 {
     _stage = new SnapScene();
     _stage.setClipToBounds(true);
+    _stage.setBorder(Color.BLACK, 1);
+    _stage.setEffect(new ShadowEffect());
+    
+    _stageBox = new BoxView(); _stageBox.setPadding(10,10,10,10);
+    _stageBox.setContent(_stage);
 
     ColView colView = getUI(ColView.class);
-    colView.addChild(_stage, 0);
+    colView.addChild(_stageBox, 1);
     
     _script = new Script();
     

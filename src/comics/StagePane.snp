@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<VBox PrefWidth="800" Spacing="5" FillWidth="true">
+<ColView PrefWidth="800" Spacing="5" FillWidth="true">
   <font name="Arial" size="15" />
-  <HBox name="TextRowView" FillHeight="true" GrowHeight="true">
-    <TextView name="ScriptText" PrefHeight="300" Padding="5,5,5,5" GrowWidth="true">
-      <font name="Arial" size="18" />
+  <RowView Align="CENTER" Padding="4" GrowWidth="true" Spacing="4">
+    <BevelBorder />
+    <color value="#3dcece" />
+    <Label image="Header.png" />
+  </RowView>
+  <RowView Name="TextRowView" GrowHeight="true" FillHeight="true">
+    <TextView Name="ScriptText" PrefHeight="300" Padding="5" GrowWidth="true">
+      <font name="Arial" size="20" />
     </TextView>
-  </HBox>
-  <HBox Padding="3,3,3,3" Spacing="5" >
-    <Button name="GifButton" PrefWidth="100" text="Make GIF" />
-    <Button name="RunButton" PrefWidth="100" text="Run" LeanX="Right" />
-  </HBox>
-</VBox>
+  </RowView>
+  <RowView Padding="3" Spacing="5">
+    <Button Name="GifButton" PrefWidth="100" text="Make GIF" />
+    <Button Name="RunButton" PrefWidth="100" LeanX="RIGHT" text="Run" />
+  </RowView>
+</ColView>

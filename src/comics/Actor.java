@@ -93,15 +93,14 @@ public void runWalks()
 public void runDrops()
 {
     if(ArrayUtils.contains(_words, "right")) {
-        setSize(80,240);
-        setXY(_stage.getWidth()/2+60,-getHeight());
-        getAnim(_startTime).getAnim(_startTime+2000).setY(200);
+        setScaleX(-1);
+        setXY(_stage.getWidth()/2-getWidth()/2+60, -getHeight());
+        getAnim(_startTime).getAnim(_startTime+2000).setY(_stage.getHeight() - getHeight() - 10);
     }
     
     else {
-        setSize(80,240);
-        setXY(_stage.getWidth()/2-120,-getHeight());
-        getAnim(_startTime).getAnim(_startTime+2000).setY(200);
+        setXY(_stage.getWidth()/2-getWidth()/2-60, -getHeight());
+        getAnim(_startTime).getAnim(_startTime+2000).setY(_stage.getHeight() - getHeight() - 10);
     }
     
     _runTime = 2000;
