@@ -178,14 +178,21 @@ public static class ActorEntry extends IndexEntry {
  */
 public static class AnimEntry extends IndexEntry {
     
-    int _frameCount;
+    int     _frameCount;
 
+    // The offset
+    double  _offsetX;
+    
     /** Creates a new AnimEntry for map. */
     public AnimEntry(Map aMap)
     {
         super(aMap); _urls = ROOT + "actors/" + _path;
         _frameCount = SnapUtils.intValue(aMap.get("FrameCount"));
+        _offsetX = SnapUtils.doubleValue(aMap.get("Offset"));
     }
+    
+    /** Returns the offset. */
+    public double getOffsetX()  { return _offsetX; }
 
     /** Returns the image. */
     public Image getImageImpl()

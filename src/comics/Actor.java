@@ -24,9 +24,15 @@ public class Actor extends ImageView {
     // The run time
     int              _runTime;
     
+    // The offset
+    double           _offsetX;
+    
+    // A PropChangeListener to be called when image is loaded
     PropChangeListener _imgLoadLsnr;
 
-/** Create new actor. */
+/**
+ * Create new actor.
+ */
 public Actor(Image anImg)
 {
     super(anImg);
@@ -36,6 +42,9 @@ public Actor(Image anImg)
     setEffect(new ShadowEffect(6, Color.BLACK, 0, 0));
 }
 
+/**
+ * Called when image is loaded.
+ */
 void imageLoaded()
 {
     setSize(getPrefWidth(-1)/2, getPrefHeight(-1)/2);
@@ -67,24 +76,38 @@ public boolean run(String aCmd)
  */
 public void runWalks()
 {
-    if(ArrayUtils.contains(_words, "right")) {
-        setScaleX(-1);
-        setXY(_stage.getWidth(), _stage.getHeight() - getHeight() - 10);
-        getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2-getWidth()/2+60);
-    }
-    
-    else if(ArrayUtils.contains(_words, "out")) {
-        getAnimCleared(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth());
-    }
-    
-    else {
-        setXY(-getWidth(), _stage.getHeight() - getHeight() - 10);
-        getAnim(_startTime).getAnim(_startTime+2000).setX(_stage.getWidth()/2-getWidth()/2-60);
-    }
-    
+    // Get anim for final destination
+    ViewAnim anim = getAnim(_startTime).getAnim(_startTime+2000);
+
     // Look for animation
     if(isAnimImageLoading("Walk")) { _runTime = -1; return; }
     setAnimImage("Walk", 2000, 30);
+
+    // Handle walk in from right
+    if(ArrayUtils.contains(_words, "right")) {
+        setScaleX(-1);
+        setLocX(HPos.LEFT, _stage.getWidth(), null);
+        setLocY(VPos.BOTTOM, 10, null);
+        setLocX(HPos.CENTER, 60, getAnim(_startTime).getAnim(_startTime+2000));
+        //setXY(_stage.getWidth(), _stage.getHeight() - getHeight() - 10);
+        //anim.setX(_stage.getWidth()/2-getWidth()/2+60);
+    }
+    
+    // Handle walk out
+    else if(ArrayUtils.contains(_words, "out")) {
+        setLocX(HPos.LEFT, _stage.getWidth(), anim);
+        //anim.setX(_stage.getWidth());
+    }
+    
+    // Handle walk in
+    else {
+        setLocX(HPos.LEFT, -getWidth(), null);
+        setLocY(VPos.BOTTOM, 10, null);
+        setLocX(HPos.CENTER, -60, anim);
+        //setXY(-getWidth(), _stage.getHeight() - getHeight() - 10);
+        //anim.setX(_stage.getWidth()/2-getWidth()/2-60);
+    }
+    
     _runTime = 2000;
 }
 
@@ -93,15 +116,26 @@ public void runWalks()
  */
 public void runDrops()
 {
+    // Get anim for final destination
+    ViewAnim anim = getAnim(_startTime).getAnim(_startTime+2000);
+
+    // Handle drop right
     if(ArrayUtils.contains(_words, "right")) {
         setScaleX(-1);
-        setXY(_stage.getWidth()/2-getWidth()/2+60, -getHeight());
-        getAnim(_startTime).getAnim(_startTime+2000).setY(_stage.getHeight() - getHeight() - 10);
+        setLocX(HPos.CENTER, 60, null);
+        setLocY(VPos.TOP, -getHeight(), null);
+        setLocY(VPos.BOTTOM, 10, anim);
+        //setXY(_stage.getWidth()/2-getWidth()/2+60, -getHeight());
+        //getAnim(_startTime).getAnim(_startTime+2000).setY(_stage.getHeight() - getHeight() - 10);
     }
     
+    // Handle drop
     else {
-        setXY(_stage.getWidth()/2-getWidth()/2-60, -getHeight());
-        getAnim(_startTime).getAnim(_startTime+2000).setY(_stage.getHeight() - getHeight() - 10);
+        setLocX(HPos.CENTER, -60, null);
+        setLocY(VPos.TOP, -getHeight(), null);
+        setLocY(VPos.BOTTOM, 10, anim);
+        //setXY(_stage.getWidth()/2-getWidth()/2-60, -getHeight());
+        //getAnim(_startTime).getAnim(_startTime+2000).setY(_stage.getHeight() - getHeight() - 10);
     }
     
     _runTime = 2000;
@@ -187,6 +221,15 @@ public void runWave()
 }
 
 /**
+ * Returns an anim entry for name.
+ */
+public Index.AnimEntry getAnimEntry(String aName)
+{
+    String name = FilePathUtils.getFileNameSimple(getName());
+    return Index.get().getAnim(name, aName);
+}
+
+/**
  * Returns whether anim image is present, but loading.
  */
 public boolean isAnimImageLoading(String aName)
@@ -211,29 +254,81 @@ public Image getAnimImage(String aName)
 public boolean setAnimImage(String aName, int aTime, int aFrame)
 {
     // Get image for name and cache old image
-    Image img = getAnimImage(aName); if(img==null) return false;
+    Index.AnimEntry anim = getAnimEntry(aName); if(anim==null) return false;
+    Image img = anim.getImage(); //getAnimImage(aName); if(img==null) return false;
+    
+    // Get old image and offset
     Image imgOld = getImage();
+    double offsetX = _offsetX;
     
     // Set image and size
-    setImage2(img); setFrame(0); //setWidth(getPrefWidth(-1)/2);
+    setImage(img, anim.getOffsetX());
     
     // Configure anim
     getAnim(_startTime).getAnim(_startTime+aTime).setValue("Frame", aFrame);
     getAnim(_startTime).getAnim(_startTime+aTime).setOnFinish(a -> {
-        setImage2(imgOld); setFrame(0); }); // setWidth(getPrefWidth(-1)/2);
+        setImage(imgOld, offsetX); });
     return true;
 }
 
 /**
  * Sets the image.
  */
-public void setImage2(Image anImg)
+public void setImage(Image anImg, double offsetX)
 {
-    Rect bnds = getBounds();
-    double bx = bnds.x - (anImg.getWidth()/2 - bnds.width)/2;
-    double by = bnds.y - (anImg.getHeight()/2 - bnds.height);
+    /// Get old/new offsets (corrected if scale is flipped)
+    double offOld = _offsetX, offNew = offsetX; if(getScaleX()<0) { offOld = -offOld; offNew = -offNew; }
+    
+    // Get old/new width & height
+    double oldW = getWidth(), oldH = getHeight();
+    double newW = anImg.getWidth()/2, newH = anImg.getHeight()/2;
+    
+    // Calculate new x/y
+    double bx = getX() + (oldW/2 + offOld) - (newW/2 + offNew);
+    double by = getY() - (newH - oldH);
+    
+    // Set new image, bounds, offset and reset frame
     super.setImage(anImg);
-    setBounds(bx, by, anImg.getWidth()/2, anImg.getHeight()/2);
+    setBounds(bx, by, newW, newH);
+    setFrame(0); _offsetX = offsetX;
+}
+
+/**
+ * Sets the x location.
+ */
+public void setLocX(HPos aPos, double aVal, ViewAnim anAnim)
+{
+    // Correct value for pos
+    double val = aVal;
+    if(aPos==HPos.CENTER) val = _stage.getWidth()/2 - getWidth()/2 + aVal;
+    else if(aPos==HPos.RIGHT) val = _stage.getWidth() - getWidth() - aVal;
+    
+    // Set in actor or in anim
+    if(anAnim==null) setX(val);
+    else anAnim.setX(val);
+}
+
+/**
+ * Sets the y location.
+ */
+public void setLocY(VPos aPos, double aVal, ViewAnim anAnim)
+{
+    // Correct value for pos
+    double val = aVal;
+    if(aPos==VPos.CENTER) val = _stage.getHeight()/2 - getHeight()/2 + aVal;
+    else if(aPos==VPos.BOTTOM) val = _stage.getHeight() - getHeight() - aVal;
+    
+    // Set in actor or in anim
+    if(anAnim==null) setY(val);
+    else anAnim.setY(val);
+}
+
+/**
+ * Sets the XY location.
+ */
+public void setLocXY(Pos aPos, double aX, double aY, ViewAnim anAnim)
+{
+    setLocX(aPos.getHPos(), aX, anAnim); setLocY(aPos.getVPos(), aY, anAnim);
 }
 
 }
