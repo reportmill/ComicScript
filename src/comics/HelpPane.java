@@ -18,9 +18,9 @@ public class HelpPane extends ViewOwner {
     String             _lastAdd;
     
     // Constants
-    String _starters[] = { "Title is", "Setting is", "Lady", "Car", "Cat", "Dog", "Trump", "Obama", "Duke" };
+    String _starters[] = { "Title is", "Setting is", "Lady", "Man", "Car", "Cat", "Dog", "Trump", "Obama", "Duke" };
     String _settings[] = { "Beach", "WhiteHouse", "OvalOffice" };
-    String _verbs[] = { "walks", "drops", "says", "grows", "flips", "explodes" };
+    String _verbs[] = { "walks", "waves", "jumps", "drops", "says", "grows", "flips", "explodes" };
     String _walks[] = { "in", "in from right", "out" };
  
 /**

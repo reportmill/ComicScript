@@ -230,8 +230,8 @@ private static void saveSpriteSheet(WebURL aURL)
     Image img = Image.get(url);
     
     // Scale image
-    if(img.getImageSet()!=null) img = img.getImageSet().getImageScaled(.434);
-    else img = img.getImageScaled(.434);
+    if(img.getImageSet()!=null) img = img.getImageSet().getImageScaled(.43);
+    else img = img.getImageScaled(.43);
     
     // Create sprite sheet image, get PNG bytes, set in file and save
     Image sheet = img.getImageSet()!=null? img.getImageSet().getSpriteSheetImage() : img;

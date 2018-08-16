@@ -56,6 +56,7 @@ public boolean run(String aCmd)
         case "explodes": runExplodes(); break;
         case "dances": runDance(); break;
         case "jumps": runJump(); break;
+        case "waves": runWave(); break;
         default: return false;
     }
     return true;
@@ -172,6 +173,16 @@ public void runJump()
 {
     if(isAnimImageLoading("Jump")) { _runTime = -1; return; }
     setAnimImage("Jump", 1000, 16);
+    _runTime = 1000;
+}
+
+/**
+ * Runs a wave command.
+ */
+public void runWave()
+{
+    if(isAnimImageLoading("Wave")) { _runTime = -1; return; }
+    setAnimImage("Wave", 1000, 17);
     _runTime = 1000;
 }
 
