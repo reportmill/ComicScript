@@ -34,7 +34,7 @@ public class ScriptLine {
  */
 public ScriptLine(Script aScript, String aStr)
 {
-    _script = aScript; _text = aStr.toLowerCase();
+    _script = aScript; _text = aStr;
 }
 
 /**
@@ -47,8 +47,14 @@ public String getText()  { return _text; }
  */
 public String[] getWords()
 {
+    // If already set, just return
     if(_words!=null) return _words;
-    return _words = getText().split("\\s");
+    
+    // Get text and words
+    String text = getText().toLowerCase();
+    String words[] = text.split("\\s");
+    for(int i=0;i<words.length;i++) words[i] = words[i].replace(",","").replace("\"","");
+    return _words = words;
 }
 
 /**

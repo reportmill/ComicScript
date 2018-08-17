@@ -160,23 +160,27 @@ public void runFlips()
 }
 
 /**
- * Runs a walk command.
+ * Runs a speak command.
  */
 public void runSays()
 {
-    String text2 = _scriptLine.getText();
-    int index = text2.indexOf("says,");
-    if(index<0) index = text2.indexOf("says"); if(index<0) return;
+    // Get text string
+    String textLine = _scriptLine.getText().replace(",","").replace("\"","");
+    int ind = textLine.indexOf("says"); if(ind<0) return;
+    String str = textLine.substring(ind+4).trim();
 
-    String str = text2.substring(index+4).trim();
-
-    TextArea text = new TextArea(); text.setFont(Font.Arial10.deriveFont(24)); text.setText(str);
-    text.setFill(Color.WHITE); text.setBorder(Color.BLACK,2); text.setAlign(Pos.CENTER);
-    text.setBounds(_stage.getWidth()/2-150, 100, 300,60);
-    text.scaleTextToFit();
-    text.setOpacity(0);
-    _stage.addChild(text);
-    text.getAnim(_startTime).getAnim(_startTime+500).setOpacity(1).getAnim(_startTime+500+2000).setOpacity(1)
+    // Create, configure and add SpeakView
+    SpeakView speakView = new SpeakView(); speakView.setText(str);
+    speakView.setBounds(_stage.getWidth()/2-150, 50, 300,60);
+    _stage.addChild(speakView);
+    
+    // Set speakView tail angle to point at actor head
+    Rect bnds = getBoundsParent();
+    speakView.setTailAngleByPoint(bnds.getMidX(),bnds.y+30);
+        
+    // Add SpeakView with anim to fade in/out
+    speakView.setOpacity(0);
+    speakView.getAnim(_startTime).getAnim(_startTime+500).setOpacity(1).getAnim(_startTime+500+2000).setOpacity(1)
         .getAnim(_startTime+500+2000+500).setOpacity(0);
     _runTime = 3000;
 }
