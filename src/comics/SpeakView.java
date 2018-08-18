@@ -35,6 +35,7 @@ public SpeakView()
     
     // Configure
     setFill(Color.WHITE);
+    setEffect(new ShadowEffect(6,Color.BLACK,0,0));
 }
 
 /**
@@ -85,16 +86,17 @@ public void setTailAngleByPoint(double aX, double aY)
     double dx = aX - r.getMidX(), dy = aY - r.getMidY();
     double angle = dx!=0? Math.toDegrees(Math.atan(dy/dx)) : 0; angle = MathUtils.mod(angle,90);
     if(dx<0) angle += 90; if(dy<0) angle += 180;
-    _tailAngle = angle;
+    setTailAngle(angle);
 }
 
 /**
- * Returns the tail point for given length.
+ * Returns the tail point for given length in local coords.
  */
 protected Point getTailPoint(double aLen)
 {
     double w = getWidth(), h = getHeight();
-    double tpx = w/2 + MathUtils.cos(_tailAngle)*aLen, tpy = h/2 + MathUtils.sin(_tailAngle)*aLen;
+    double tpx = w/2 + MathUtils.cos(_tailAngle)*aLen; tpx = Math.round(tpx);
+    double tpy = h/2 + MathUtils.sin(_tailAngle)*aLen; tpy = Math.round(tpy);
     return new Point(tpx,tpy);
 }
 
@@ -124,14 +126,14 @@ protected void paintBack(Painter aPntr)
 {
     // Create text shape and tail shape
     double w = getWidth(), h = getHeight();
-    _textShape = new RoundRect(0,0,w,h, 25);
+    _textShape = new Ellipse(0,0,w,h);
     double p0x = w/2-10, p0y = h/2, p1x = w/2+10, p1y = h/2;
     Point tp = getTailPoint(_tailLen);
     Shape tailShape = new Polygon(p0x,p0y,p1x,p1y,tp.x,tp.y);
     Shape all = Shape.add(_textShape, tailShape);
     
     aPntr.setPaint(getFill()); aPntr.fill(all);
-    aPntr.setColor(Color.BLACK); aPntr.setStroke(Stroke.Stroke2); aPntr.draw(all);
+    aPntr.setColor(Color.GRAY); aPntr.setStroke(Stroke.Stroke1); aPntr.draw(all);
 }
 
 }
