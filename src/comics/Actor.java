@@ -171,7 +171,7 @@ public void runSays()
 
     // Create, configure and add SpeakView
     SpeakView speakView = new SpeakView(); speakView.setText(str);
-    speakView.setBounds(_stage.getWidth()/2-150, 50, 300,60);
+    speakView.setBubbleBounds(_stage.getWidth()/2-150, 50, 250,80);
     _stage.addChild(speakView);
     
     // Set speakView tail angle to point at actor head

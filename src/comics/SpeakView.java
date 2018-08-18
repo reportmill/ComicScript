@@ -15,7 +15,10 @@ public class SpeakView extends ParentView {
     double      _tailAngle = 105;
     
     // The tail length from center
-    double      _tailLen = 80;
+    double      _tailLen = 90;
+    
+    // The bubble bounds in local coords
+    Rect        _bubbleBnds;
     
     // The text shape
     Shape       _textShape;
@@ -34,7 +37,7 @@ public SpeakView()
     addChild(_textArea);
     
     // Configure
-    setFill(Color.WHITE);
+    setFill(Color.WHITE); setBorder(Color.CLEAR, 1);
     setEffect(new ShadowEffect(6,Color.BLACK,0,0));
 }
 
@@ -53,19 +56,29 @@ public void setText(String aStr)
 }
 
 /**
- * Returns the rich text.
- */
-public RichText getRichText()  { return getTextBox().getRichText(); }
-
-/**
  * Returns the text area.
  */
 public TextArea getTextArea()  { return _textArea; }
 
 /**
- * Returns the text box.
+ * Returns the bubble bounds.
  */
-public TextBox getTextBox()  { return _textArea.getTextBox(); }
+public Rect getBubbleBounds()  { return localToParent(_bubbleBnds).getBounds(); }
+
+/**
+ * Sets the bubble bounds from given rect in parent coords.
+ */
+public void setBubbleBounds(Rect aRect)
+{
+    Rect bnds = getRectWithPointFromCenter(aRect, getTailAngle(), getTailLength());
+    setBounds(bnds);
+    _bubbleBnds = parentToLocal(aRect).getBounds();
+}
+
+/**
+ * Sets the bubble bounds from given rect in parent coords.
+ */
+public void setBubbleBounds(double aX, double aY, double aW, double aH)  { setBubbleBounds(new Rect(aX,aY,aW,aH)); }
 
 /**
  * Returns the tail angle.
@@ -75,14 +88,34 @@ public double getTailAngle()  { return _tailAngle; }
 /**
  * Sets the tail angle.
  */
-public void setTailAngle(double aValue)  { _tailAngle = aValue; }
+public void setTailAngle(double aValue)
+{
+    Rect bbnds = getBubbleBounds();
+    _tailAngle = aValue;
+    setBubbleBounds(bbnds);
+}
+
+/**
+ * Returns the tail length.
+ */
+public double getTailLength()  { return _tailLen; }
+
+/**
+ * Sets the tail length.
+ */
+public void setTailLength(double aValue)
+{
+    Rect bbnds = getBubbleBounds();
+    _tailLen = aValue;
+    setBubbleBounds(bbnds);
+}
 
 /**
  * Sets the tail angle by point in parent coords.
  */
 public void setTailAngleByPoint(double aX, double aY)
 {
-    Rect r = getBoundsParent();
+    Rect r = getBubbleBounds();
     double dx = aX - r.getMidX(), dy = aY - r.getMidY();
     double angle = dx!=0? Math.toDegrees(Math.atan(dy/dx)) : 0; angle = MathUtils.mod(angle,90);
     if(dx<0) angle += 90; if(dy<0) angle += 180;
@@ -90,33 +123,23 @@ public void setTailAngleByPoint(double aX, double aY)
 }
 
 /**
- * Returns the tail point for given length in local coords.
- */
-protected Point getTailPoint(double aLen)
-{
-    double w = getWidth(), h = getHeight();
-    double tpx = w/2 + MathUtils.cos(_tailAngle)*aLen; tpx = Math.round(tpx);
-    double tpy = h/2 + MathUtils.sin(_tailAngle)*aLen; tpy = Math.round(tpy);
-    return new Point(tpx,tpy);
-}
-
-/**
  * Actual method to layout children.
  */
 protected void layoutImpl()
 {
-    _textArea.setSize(getWidth(), getHeight());
+    // Reset text
+    _textArea.setBounds(_bubbleBnds);
     _textArea.scaleTextToFit();
-}
-
-/**
- * Override to extend paint to cover tail.
- */
-public void repaint()
-{
-    Point tp = getTailPoint(_tailLen+2);
-    Rect r = getBoundsLocal(); r.add(tp.x,tp.y);
-    repaint(r.x,r.y,r.width,r.height);
+    
+    // Reset text shape
+    double x = _bubbleBnds.x, y = _bubbleBnds.y, w = _bubbleBnds.width, h = _bubbleBnds.height;
+    _textShape = new Ellipse(x,y,w,h);
+    
+    // Reset background shape
+    double p0x = x + w/2 - 10, p0y = y + h/2, p1x = x + w/2 + 10, p1y = y + h/2;
+    Point tp = getTailPoint(_bubbleBnds, _tailAngle, _tailLen);
+    Shape tailShape = new Polygon(p0x,p0y,p1x,p1y,tp.x,tp.y);
+    _backShape = Shape.add(_textShape, tailShape);
 }
 
 /**
@@ -124,16 +147,29 @@ public void repaint()
  */
 protected void paintBack(Painter aPntr)
 {
-    // Create text shape and tail shape
-    double w = getWidth(), h = getHeight();
-    _textShape = new Ellipse(0,0,w,h);
-    double p0x = w/2-10, p0y = h/2, p1x = w/2+10, p1y = h/2;
-    Point tp = getTailPoint(_tailLen);
-    Shape tailShape = new Polygon(p0x,p0y,p1x,p1y,tp.x,tp.y);
-    Shape all = Shape.add(_textShape, tailShape);
-    
-    aPntr.setPaint(getFill()); aPntr.fill(all);
-    aPntr.setColor(Color.GRAY); aPntr.setStroke(Stroke.Stroke1); aPntr.draw(all);
+    aPntr.setPaint(getFill()); aPntr.fill(_backShape);
+    aPntr.setColor(Color.GRAY); aPntr.setStroke(Stroke.Stroke1); aPntr.draw(_backShape);
+}
+
+/**
+ * Returns the tail point for given length.
+ */
+protected static Point getTailPoint(Rect aRect, double anAngle, double aLen)
+{
+    double x = aRect.x, y = aRect.y, w = aRect.width, h = aRect.height;
+    double tpx = x + w/2 + MathUtils.cos(anAngle)*aLen; tpx = Math.round(tpx);
+    double tpy = y + h/2 + MathUtils.sin(anAngle)*aLen; tpy = Math.round(tpy);
+    return new Point(tpx,tpy);
+}
+
+/**
+ * Returns the expanded rect for given rect with point at angle and length from center of rect.
+ */
+private static Rect getRectWithPointFromCenter(Rect aRect, double anAngle, double aLen)
+{
+    Point tp = getTailPoint(aRect, anAngle, aLen);
+    Rect rect = aRect.clone(); rect.add(tp.x, tp.y);
+    return rect;
 }
 
 }
