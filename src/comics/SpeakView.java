@@ -127,12 +127,15 @@ public void setTailAngleByPoint(double aX, double aY)
  */
 protected void layoutImpl()
 {
-    // Reset text
+    // Reset text bounds, bounds path and scale text
     _textArea.setBounds(_bubbleBnds);
+    
+    // Reset text bounds path and scale text
+    double x = _bubbleBnds.x, y = _bubbleBnds.y, w = _bubbleBnds.width, h = _bubbleBnds.height;
+    _textArea.getTextBox().setBoundsPath(new Ellipse(0,0,w,h));
     _textArea.scaleTextToFit();
     
     // Reset text shape
-    double x = _bubbleBnds.x, y = _bubbleBnds.y, w = _bubbleBnds.width, h = _bubbleBnds.height;
     _textShape = new Ellipse(x,y,w,h);
     
     // Reset background shape
