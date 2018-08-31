@@ -15,6 +15,9 @@ public class StagePane extends ViewOwner {
     // The Stage box
     BoxView      _stageBox;
     
+    // The camera view
+    CameraView   _camera;
+    
     // The script text view
     TextView     _textView;
     
@@ -44,8 +47,10 @@ protected void initUI()
     _stage.setBorder(Color.BLACK, 1);
     _stage.setEffect(new ShadowEffect());
     
+    _camera = new CameraView(_stage);
+    
     _stageBox = new BoxView(); _stageBox.setPadding(10,10,10,10);
-    _stageBox.setContent(_stage);
+    _stageBox.setContent(_camera);
 
     ColView colView = getUI(ColView.class);
     colView.addChild(_stageBox, 1);
@@ -102,6 +107,7 @@ public void runScript(int lineIndex)
     if(lineIndex<_script._lineIndex) {
         _script._lineIndex = 0;
         _stage.removeChildren();
+        _camera.setZoom(1);
     }
     
     // Set Script Text and run to line

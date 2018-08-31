@@ -72,18 +72,24 @@ public int run(SnapScene aStage)
     // Handle setting
     if(word.equals("setting")) runSetting();
     
+    // Handle camera
+    else if(word.equals("camera")) {
+        CameraView camera = (CameraView)_stage.getParent();
+        camera.run(words[1], words);
+        _runTime = camera._runTime;
+    }
+    
     // Handle view
     else {
         
         // Get actor
         Actor actor = (Actor)getView(); if(actor==null) return 0;
-        actor._stage = _stage; actor._scriptLine = this; actor._words = words; actor._runTime = 0;
+        actor._stage = _stage; actor._scriptLine = this;
         if(!actor.getImage().isLoaded()) {
             ViewUtils.runDelayed(() -> run(aStage), 50, true); return 0; }
         
         // Run command
-        String cmd = words[1];
-        actor.run(cmd);
+        actor.run(words[1], words);
         if(actor._runTime<0) {
             ViewUtils.runDelayed(() -> run(aStage), 50, true); return 0; }
         _runTime = actor._runTime;

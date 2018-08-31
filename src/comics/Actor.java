@@ -54,8 +54,12 @@ void imageLoaded()
 /**
  * Runs the given command.
  */
-public boolean run(String aCmd)
+public boolean run(String aCmd, String theWords[])
 {
+    // Set words and reset runtime
+    _words = theWords; _runTime = 0;
+    
+    // Jump to specific command
     switch(aCmd) {
         case "walks": runWalks(); break;
         case "drops": runDrops(); break;
