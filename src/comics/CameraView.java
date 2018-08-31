@@ -72,6 +72,7 @@ public void run(String aCmd, String theWords[])
     
     // Jump to specific command
     switch(aCmd) {
+        case "zoom": runZooms(); break;
         case "zooms": runZooms(); break;
         case "blur": runBlurs(); break;
         case "blurs": runBlurs(); break;
