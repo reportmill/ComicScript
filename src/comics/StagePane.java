@@ -1,6 +1,5 @@
 package comics;
 import snap.gfx.Color;
-import snap.gfx.ShadowEffect;
 import snap.view.*;
 import snap.viewx.*;
 
@@ -45,7 +44,6 @@ protected void initUI()
     _stage = new SnapScene();
     _stage.setClipToBounds(true);
     _stage.setBorder(Color.BLACK, 1);
-    _stage.setEffect(new ShadowEffect());
     
     _camera = new CameraView(_stage);
     
@@ -108,6 +106,7 @@ public void runScript(int lineIndex)
         _script._lineIndex = 0;
         _stage.removeChildren();
         _camera.setZoom(1);
+        _camera.setBlur(0);
     }
     
     // Set Script Text and run to line

@@ -9,25 +9,28 @@ import snap.viewx.*;
 public class ScriptLine {
     
     // The Script
-    Script     _script;
+    Script      _script;
     
     // The line text
-    String     _text;
+    String      _text;
     
     // The words
-    String     _words[];
+    String      _words[];
     
     // The word index
-    int        _index;
+    int         _index;
+    
+    // The camera
+    CameraView  _camera;
     
     // The Stage
-    SnapScene  _stage;
+    SnapScene   _stage;
     
     // The start time
-    int        _startTime;
+    int         _startTime;
     
     // The run time
-    int        _runTime;
+    int         _runTime;
     
 /**
  * Creates a new ScriptLine with given text.
@@ -63,6 +66,7 @@ public String[] getWords()
 public int run(SnapScene aStage)
 {
     _stage = aStage;
+    _camera = _stage.getParent(CameraView.class);
     _startTime = 0;
     
     String words[] = getWords();
@@ -96,8 +100,8 @@ public int run(SnapScene aStage)
     }
     
     // Register for OnFinish callback and play
-    _stage.getAnim(0).getAnim(_runTime).setOnFinish(a -> ViewUtils.runLater(() -> runFinished(a)));
-    _stage.playAnimDeep();
+    _camera.getAnim(0).getAnim(_runTime).setOnFinish(a -> ViewUtils.runLater(() -> runFinished(a)));
+    _camera.playAnimDeep();
     
     return _runTime;
 }
@@ -108,6 +112,7 @@ public int run(SnapScene aStage)
 public void runFinished(ViewAnim anAnim)
 {
     // Clear all anims
+    _camera.getAnimCleared(0);
     _stage.getAnimCleared(0);
     for(View child : _stage.getChildren()) child.getAnimCleared(0);
     
