@@ -61,6 +61,7 @@ public boolean run(String aCmd, String theWords[])
     
     // Jump to specific command
     switch(aCmd) {
+        case "appears": runAppears(); break;
         case "walks": runWalks(); break;
         case "drops": runDrops(); break;
         case "grows": runGrows(); break;
@@ -73,6 +74,23 @@ public boolean run(String aCmd, String theWords[])
         default: return false;
     }
     return true;
+}
+
+/**
+ * Runs an appears command.
+ */
+public void runAppears()
+{
+    // Get anim for final destination
+    ViewAnim anim = getAnim(_startTime).getAnim(_startTime+2000);
+
+    // Handle walk in
+    setOpacity(0);
+    setLocX(HPos.CENTER, -60, null);
+    setLocY(VPos.BOTTOM, 10, null);
+    anim.setOpacity(1);
+    
+    _runTime = 2000;
 }
 
 /**

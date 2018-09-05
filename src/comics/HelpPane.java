@@ -86,15 +86,26 @@ protected void respondUI(ViewEvent anEvent)
         
         // Handle selection
         else {
-          _lastAdd = _listView.getSelItem();
-          if("  \u23CE".equals(_lastAdd)) doReturn();
-          else _stagePane._textView.replaceChars(_lastAdd + " ");
+            String str = _listView.getSelItem();
+            addToScript(str);
         }
     }
     
     // Handle ReturnButton
     if(anEvent.equals("ReturnButton"))
         doReturn();
+}
+
+public void addToScript(String aStr)
+{
+    // If return text, do return
+    if("  \u23CE".equals(aStr)) { doReturn(); return; }
+    
+    // Add string
+    _stagePane._textView.replaceChars(aStr + " ");
+    _stagePane._textView.requestFocus();
+    _lastAdd = aStr;
+    resetLater();
 }
 
 void doReturn()

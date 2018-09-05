@@ -1,5 +1,6 @@
 package comics;
 import snap.gfx.Color;
+import snap.util.FilePathUtils;
 import snap.view.*;
 import snap.viewx.*;
 
@@ -41,25 +42,31 @@ public void showStage()
  */
 protected void initUI()
 {
+    // Create configure stage
     _stage = new SnapScene();
     _stage.setClipToBounds(true);
     _stage.setBorder(Color.BLACK, 1);
+    enableEvents(_stage, MousePress);
     
+    // Create/configure camera
     _camera = new CameraView(_stage);
     
+    // Create/configure stage box
     _stageBox = new BoxView(); _stageBox.setPadding(10,10,10,10);
     _stageBox.setContent(_camera);
 
+    // Get master ColView and add StageBox
     ColView colView = getUI(ColView.class);
     colView.addChild(_stageBox, 1);
     
+    // Create script
     _script = new Script();
     
     // Install HelpPane
     RowView rowView = getView("TextRowView", RowView.class);
     rowView.addChild(_helpPane.getUI());
     
-    // Get TextView and configure
+    // Get/configure TextView
     _textView = getView("ScriptText", TextView.class);
     _textView.setText(_script.getText());
     _textView.setSel(_textView.length());
@@ -80,6 +87,28 @@ protected void respondUI(ViewEvent anEvent)
     if(anEvent.equals("RunButton")) {
         _script._lineIndex = 9999;
         runScript(999);
+    }
+    
+    // Handle AgainButton
+    if(anEvent.equals("AgainButton")) {
+        runScript(_script.getLineCount()-1);
+    }
+    
+    // Handle Stage MousePressed
+    if(anEvent.isMousePress())
+        selectSettingItem(anEvent.getX(), anEvent.getY());
+}
+
+/**
+ * Selects a setting item.
+ */
+public void selectSettingItem(double aX, double aY)
+{
+    // Get child at point
+    View child = _stage.getChildAt(aX, aY);
+    if(child instanceof Actor) {
+        String name = child.getName(); name = FilePathUtils.getFileNameSimple(name);
+        _helpPane.addToScript(name);
     }
 }
 

@@ -6,6 +6,11 @@
     <color value="#3dcece" />
     <Label image="Header.png" />
   </RowView>
+  <RowView Padding="4" GrowWidth="true" Spacing="4">
+    <Button Name="CameraButton" PrefWidth="80" Padding="2" text="Camera" />
+    <Button Name="AddButton" PrefWidth="80" Padding="2" text="Add..." />
+    <Button Name="AgainButton" PrefWidth="80" Padding="2" LeanX="RIGHT" text="Again" />
+  </RowView>
   <RowView Name="TextRowView" GrowHeight="true" FillHeight="true">
     <TextView Name="ScriptText" PrefHeight="300" Padding="5" GrowWidth="true">
       <font name="Arial" size="20" />

@@ -34,6 +34,11 @@ public void setText(String aStr)
 }
 
 /**
+ * Returns the number of lines.
+ */
+public int getLineCount()  { return getLines().size(); }
+
+/**
  * Returns the lines.
  */
 public List <ScriptLine> getLines()
