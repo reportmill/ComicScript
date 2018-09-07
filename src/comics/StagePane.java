@@ -71,21 +71,26 @@ protected void initUI()
     // Create/configure stage box
     _stageBox = new BoxView(); _stageBox.setPadding(10,10,10,10);
     _stageBox.setContent(_camera);
+    _stageBox.setClipToBounds(true);
 
     // Get master ColView and add StageBox
     ColView colView = getUI(ColView.class);
     colView.addChild(_stageBox, 1);
     
-    // Install HelpPane
+    // Get TextRowView
     RowView rowView = getView("TextRowView", RowView.class);
-    rowView.addChild(_helpPane.getUI());
+    rowView.removeChild(0);
     
     // Get/configure TextView
-    _textView = getView("ScriptText", TextView.class);
+    _textView = new ScriptView(this); //getView("ScriptText", TextView.class);
     _textView.setText(DEFAULT_SCRIPT);
     _textView.setSel(_textView.length());
     _textView.addEventFilter(e -> textViewReturnKey(e), KeyRelease);
     setFirstFocus(_textView.getTextArea());
+    rowView.addChild(_textView);
+    
+    // Install HelpPane
+    rowView.addChild(_helpPane.getUI());
 }
 
 /**
