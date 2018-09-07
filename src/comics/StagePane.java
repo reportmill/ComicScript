@@ -26,6 +26,9 @@ public class StagePane extends ViewOwner {
     
     // The Script
     Script       _script;
+    
+    // The default script text
+    static String  DEFAULT_SCRIPT = "Setting is beach\n";
 
 /**
  * Shows the stage.
@@ -34,7 +37,21 @@ public void showStage()
 {
     getWindow().setGrowWidth(true);
     setWindowVisible(true);
-    runLater(() -> runScript(1));
+    runLater(() -> getScript().runAll());
+}
+
+/**
+ * Returns the script.
+ */
+public Script getScript()  { return getScript(false); }
+
+/**
+ * Returns the script.
+ */
+public Script getScript(boolean doUpdate)
+{
+    if(_script==null || doUpdate) _script = new Script(this);
+    return _script;
 }
 
 /**
@@ -59,16 +76,13 @@ protected void initUI()
     ColView colView = getUI(ColView.class);
     colView.addChild(_stageBox, 1);
     
-    // Create script
-    _script = new Script();
-    
     // Install HelpPane
     RowView rowView = getView("TextRowView", RowView.class);
     rowView.addChild(_helpPane.getUI());
     
     // Get/configure TextView
     _textView = getView("ScriptText", TextView.class);
-    _textView.setText(_script.getText());
+    _textView.setText(DEFAULT_SCRIPT);
     _textView.setSel(_textView.length());
     _textView.addEventFilter(e -> textViewReturnKey(e), KeyRelease);
     setFirstFocus(_textView.getTextArea());
@@ -84,15 +98,12 @@ protected void respondUI(ViewEvent anEvent)
         _stage.removeChildren();
         
     // Handle RunButton
-    if(anEvent.equals("RunButton")) {
-        _script._lineIndex = 9999;
-        runScript(999);
-    }
+    if(anEvent.equals("RunButton"))
+        getScript(true).runAll();
     
     // Handle AgainButton
-    if(anEvent.equals("AgainButton")) {
-        runScript(_script.getLineCount()-1);
-    }
+    if(anEvent.equals("AgainButton"))
+        getScript(true).runLineCurrent();
     
     // Handle Stage MousePressed
     if(anEvent.isMousePress())
@@ -120,29 +131,18 @@ void textViewReturnKey(ViewEvent anEvent)
     // Handle EnterKey: Run to previous line
     if(anEvent==null || anEvent.isEnterKey()) {
         _helpPane.reset();
-        int lineIndex = _textView.getSel().getStartLine().getIndex() - 1;
-        getEnv().runLater(() -> runScript(lineIndex));
+        getScript(true).runLineCurrent();
     }
 }
 
 /**
- * Runs the script.
+ * Resets the stage.
  */
-public void runScript(int lineIndex)
+public void resetStage()
 {
-    // If running to line we've already hit, reset scene
-    if(lineIndex<_script._lineIndex) {
-        _script._lineIndex = 0;
-        _stage.removeChildren();
-        _camera.setZoom(1);
-        _camera.setBlur(0);
-    }
-    
-    // Set Script Text and run to line
-    String text = _textView.getText();
-    _script.setText(text);
-    _script.run(_stage, lineIndex);
+    _stage.removeChildren();
+    _camera.setZoom(1);
+    _camera.setBlur(0);
 }
-
 
 }
