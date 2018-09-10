@@ -158,6 +158,7 @@ public void setValue(String aPropName, Object aValue)
 {
     if(aPropName.equals("Value")) setZoom(SnapUtils.doubleValue(aValue));
     else if(aPropName.equals("Blur")) setBlur(SnapUtils.doubleValue(aValue));
+    else if(aPropName.equals("Zoom")) setZoom(SnapUtils.doubleValue(aValue));
     else super.setValue(aPropName, aValue);
 }
 
