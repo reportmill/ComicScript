@@ -155,6 +155,14 @@ protected void paintBack(Painter aPntr)
 }
 
 /**
+ * Override to return bounds shape as bubble.
+ */
+public Shape getBoundsShape()
+{
+    return _backShape!=null? _backShape : super.getBoundsShape();
+}
+
+/**
  * Returns the tail point for given length.
  */
 protected static Point getTailPoint(Rect aRect, double anAngle, double aLen)

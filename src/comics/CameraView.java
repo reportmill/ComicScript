@@ -31,6 +31,7 @@ public CameraView(View aContent)
 {
     super(aContent);
     setClipToBounds(true);
+    setFill(Color.WHITE);
     setEffect(new ShadowEffect());
 }
 
