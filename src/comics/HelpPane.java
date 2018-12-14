@@ -52,7 +52,6 @@ protected void initUI()
 {
     _listView = getView("ListView", ListView.class);
     _listView.getListArea().setFocusWhenPressed(false);
-    _listView.setFireActionOnRelease(true);
     
     Label label = getView("Label", Label.class);
     Label retButton = new Label("\u23CE"); retButton.setName("ReturnButton");
@@ -84,11 +83,11 @@ protected void respondUI(ViewEvent anEvent)
                 doReturn();
         }
         
-        // Handle selection
-        else {
+        // Handle selection (on mouse up)
+        else ViewUtils.runOnMouseUp(() -> {
             String str = _listView.getSelItem();
             addToScript(str);
-        }
+        });
     }
     
     // Handle ReturnButton
