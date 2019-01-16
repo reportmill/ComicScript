@@ -30,7 +30,7 @@ public class Index {
 public Index()
 {
     if(SnapUtils.isTeaVM) {
-        ROOT = "http://localhost/files/";
+        ROOT = snaptea.TVViewEnv.getScriptRoot() + "!/files/"; // Was "http://localhost/files/"
         snaptea.TVWebSite.addKnownPath("/files/index.json");
     }
     

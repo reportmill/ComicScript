@@ -1,6 +1,6 @@
 package comics;
 import snap.gfx.Color;
-import snap.util.FilePathUtils;
+import snap.util.*;
 import snap.view.*;
 import snap.viewx.*;
 
@@ -35,8 +35,8 @@ public class StagePane extends ViewOwner {
  */
 public void showStage()
 {
-    getWindow().setGrowWidth(true);
     setWindowVisible(true);
+    if(SnapUtils.isTeaVM) getWindow().setMaximized(true);
     runLater(() -> getScript().runAll());
 }
 
