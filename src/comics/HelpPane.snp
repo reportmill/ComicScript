@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<VBox PrefWidth="160" Spacing="2" Padding="5,5,5,5" FillWidth="true" >
+<ColView PrefWidth="180" Padding="5" Spacing="2" FillWidth="true">
   <font name="Arial" size="13" />
-  <Label name="Label" text="Vocabulary" Padding="3,3,3,3">
-    <font name="Arial Bold" size="13" />
+  <Label Name="Label" Padding="3" text="Vocabulary">
     <BevelBorder />
+    <font name="Arial Bold" size="13" />
   </Label>
-  <ListView name="ListView" GrowHeight="true" />
-</VBox>
+  <ListView Name="ListView" MinHeight="60" GrowHeight="true">
+    <LineBorder Color="#c0c0c0" />
+  </ListView>
+</ColView>

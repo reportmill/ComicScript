@@ -1,4 +1,5 @@
 package comics;
+import snap.gfx.Font;
 import snap.gfx.HPos;
 import snap.util.ArrayUtils;
 import snap.view.*;
@@ -52,6 +53,7 @@ protected void initUI()
 {
     _listView = getView("ListView", ListView.class);
     _listView.getListArea().setFocusWhenPressed(false);
+    _listView.setFont(Font.Arial16);
     
     Label label = getView("Label", Label.class);
     Label retButton = new Label("\u23CE"); retButton.setName("ReturnButton");
