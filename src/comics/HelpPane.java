@@ -52,7 +52,6 @@ public void reset()
 protected void initUI()
 {
     _listView = getView("ListView", ListView.class);
-    _listView.getListArea().setFocusWhenPressed(false);
     _listView.setFont(Font.Arial16);
     
     Label label = getView("Label", Label.class);
@@ -68,7 +67,6 @@ protected void initUI()
 protected void resetUI()
 {
     _listView.setItems(getWords());
-    enableEvents(_listView, MouseRelease);
 }
 
 /**
