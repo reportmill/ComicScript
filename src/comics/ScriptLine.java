@@ -47,4 +47,13 @@ public String[] getWords()
  */
 public int getIndex()  { return _script.getLines().indexOf(this); }
 
+/**
+ * Standard toString implementation.
+ */
+public String toString()
+{
+    String str = getText(); if(str.trim().length()==0) str = "(empty)";
+    return "SriptLine: " + str;
+}
+
 }

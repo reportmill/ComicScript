@@ -11,14 +11,14 @@ public class StagePane extends ViewOwner {
     // The PlayerView
     PlayerView   _player;
     
-    // The StageView
-    StageView    _stage;
-    
     // The script text view
-    TextView     _textView;
+    ScriptView   _textView;
     
     // The HelpPane
     HelpPane     _helpPane = new HelpPane(this);
+    
+    // Whether script needs to be reset
+    boolean      _resetScript;
     
     // The default script text
     static String  DEFAULT_SCRIPT = "Setting is beach\n";
@@ -34,23 +34,22 @@ public void showStage()
     String lines[] = Samples.getSample("Welcome");
     setScriptLines(lines);
     
-    //runLater(() -> getScript().runAll());
-    runLater(() -> setShowControls(true));
+    runLater(() -> getPlayer().runLine(0));
 }
 
 /**
  * Returns the PlayerView.
  */
-public PlayerView getPlayer()  { return getPlayer(false); }
-
-/**
- * Returns the PlayerView with option to update.
- */
-public PlayerView getPlayer(boolean doUpdate)
+public PlayerView getPlayer()
 {
-    if(doUpdate) _player.getScript().setText(_textView.getText());
+    if(_resetScript) { _player.getScript().setText(_textView.getText()); _resetScript = false; }
     return _player;
 }
+
+/**
+ * Returns the StageView.
+ */
+public StageView getStage()  { return getPlayer().getStage(); }
 
 /**
  * Sets the script lines.
@@ -59,17 +58,13 @@ public void setScriptLines(String theLines[])
 {
     String text = StringUtils.join(theLines, "\n");
     _textView.setText(text);
+    resetScript();
 }
 
 /**
- * Shows the controls.
+ * Resets the script.
  */
-public void setShowControls(boolean aValue)
-{
-    Controls.PlayButton pbtn = new Controls.PlayButton(); pbtn.setOwner(this);
-    _player.addChild(pbtn);
-    runCurrentLine();
-}
+protected void resetScript()  { _resetScript = true; }
 
 /**
  * Initialize the UI.
@@ -78,8 +73,11 @@ protected void initUI()
 {
     // Create PlayerView
     _player = new PlayerView();
-    _stage = _player.getStage();
-    enableEvents(_stage, MousePress);
+    _player.addPropChangeListener(pc -> playerRunLineChanged(), PlayerView.RunLine_Prop);
+    
+    // Watch for clicks on StageView
+    StageView stage = _player.getStage();
+    enableEvents(stage, MousePress);
     
     // Get master ColView and add StageBox
     ColView colView = getUI(ColView.class);
@@ -111,8 +109,8 @@ protected void respondUI(ViewEvent anEvent)
         getPlayer().resetStage();
         
     // Handle RunButton
-    if(anEvent.equals("RunButton"))
-        getPlayer(true).runAll();
+    if(anEvent.equals("RunButton")) { resetScript();
+        getPlayer().play(); }
     
     // Handle AgainButton
     if(anEvent.equals("AgainButton"))
@@ -121,10 +119,6 @@ protected void respondUI(ViewEvent anEvent)
     // Handle Stage MousePressed
     if(anEvent.isMousePress())
         selectSettingItem(anEvent.getX(), anEvent.getY());
-        
-    // Handle PlayButton
-    if(anEvent.equals("PlayButton"))
-        runLater(() -> getPlayer().runAll());
 }
 
 /**
@@ -139,7 +133,9 @@ public void runCurrentLine()
     
     // Run line at index
     int lineIndex = line.getIndex();
-    getPlayer(true).runLine(lineIndex);
+    resetScript();
+    getPlayer().stop();
+    getPlayer().runLine(lineIndex);
 }
 
 /**
@@ -148,11 +144,19 @@ public void runCurrentLine()
 public void selectSettingItem(double aX, double aY)
 {
     // Get child at point
-    View child = _stage.getChildAt(aX, aY);
+    View child = getStage().getChildAt(aX, aY);
     if(child instanceof Actor) {
         String name = child.getName(); name = FilePathUtils.getFileNameSimple(name);
         _helpPane.addToScript(name);
     }
+}
+
+/**
+ * Called when PlayerView.RunLine changes.
+ */
+void playerRunLineChanged()
+{
+    _textView.setRunLine(_player.getRunLine());
 }
 
 /**

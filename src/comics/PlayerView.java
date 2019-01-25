@@ -1,6 +1,7 @@
 package comics;
 import snap.gfx.Color;
 import snap.view.*;
+import comics.PlayerViewControls.PlayButton;
 
 /**
  * A View to play an animation. Encapsulates a CameraView, StageView and Script.
@@ -22,6 +23,12 @@ public class PlayerView extends BoxView {
     // Whether currenly running all lines
     boolean      _runAll;
     
+    // The play button
+    PlayButton   _playButton;
+    
+    // Constants for Property Changes
+    public static final String RunLine_Prop = "RunLine";
+    
 /**
  * Creates a PlayerView.
  */
@@ -42,6 +49,9 @@ public PlayerView()
     
     // Create Script (empty)
     _script = new Script(this, "");
+    
+    // Show Controls
+    setShowControls(true);
 }
 
 /**
@@ -60,9 +70,33 @@ public CameraView getCamera()  { return _camera; }
 public Script getScript()  { return _script; }
 
 /**
+ * Shows the controls.
+ */
+public boolean isShowControls()  { return _playButton!=null && _playButton.isShowing(); }
+
+/**
+ * Shows the controls.
+ */
+public void setShowControls(boolean aValue)
+{
+    if(aValue==isShowControls()) return;
+    if(_playButton==null) {
+        _playButton = new PlayButton();
+        _playButton.addEventHandler(e -> playButtonFired(), Action);
+    }
+    if(aValue) addChild(_playButton);
+    else removeChild(_playButton);
+}
+
+/**
+ * Returns the currently running line.
+ */
+public int getRunLine()  { return _runLine; }
+
+/**
  * Runs the script.
  */
-public void runAll()
+public void play()
 {
     // If no lines, just return
     if(_script.getLineCount()==0) return;
@@ -70,6 +104,14 @@ public void runAll()
     // Set RunAll and run first line
     _runAll = true;
     runLine(0);
+}
+
+/**
+ * Stops the script.
+ */
+public void stop()
+{
+    _runAll = false;
 }
 
 /**
@@ -81,7 +123,7 @@ public void runLine(int anIndex)
     if(!_runAll || anIndex==0) resetStage();
     
     // Update RunLine and call Script.runLine()
-    _runLine = anIndex;
+    firePropChange(RunLine_Prop, _runLine, _runLine = anIndex);
     _script.runLine(anIndex);
 }
 
@@ -98,7 +140,7 @@ protected void runLineDone()
     if(!_runAll) return;
     
     // If no more lines, just return
-    if(_runLine+1>=_script.getLineCount()) { _runAll = false; return; }
+    if(_runLine+1>=_script.getLineCount()) { stop(); return; }
     
     // Run next line
     runLine(_runLine+1);
@@ -112,6 +154,14 @@ public void resetStage()
     _stage.removeChildren();
     _camera.setZoom(1);
     _camera.setBlur(0);
+}
+
+/**
+ * Called when the PlayButton is pressed.
+ */
+void playButtonFired()
+{
+    play();
 }
 
 }

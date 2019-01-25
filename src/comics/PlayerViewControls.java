@@ -5,7 +5,7 @@ import snap.view.*;
 /**
  * A class to hold controls.
  */
-public class Controls {
+public class PlayerViewControls {
 
 /**
  * A PlayButton.
@@ -53,6 +53,7 @@ public static class PlayButton extends View {
     protected void animate()
     {
         if(getScale()>1) { setScale(1); setOpacity(1); return; }
+        setPickable(false);
         getAnimCleared(500).setScale(2).setOpacity(0).play();
     }
 }

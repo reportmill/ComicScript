@@ -12,6 +12,9 @@ public class ScriptView extends TextView {
     
     // The MarkView
     MarkView       _markView;
+    
+    // The current RunLine
+    int            _runLine;
 
 /**
  * Creates a ScriptView.
@@ -34,17 +37,35 @@ public ScriptView(StagePane aSP)
 }
 
 /**
+ * Returns the current marked run line.
+ */
+public int getRunLine()  { return _runLine; }
+
+/**
+ * Sets the current marked run line.
+ */
+public void setRunLine(int anIndex)
+{
+    _runLine = anIndex;
+    _markView.repaint();
+}
+
+/**
  * Called when selection changes.
  */
 protected void textSelChanged()
 {
-    _markView.repaint();
+    int ind = getSel().getLineStart();
+    setRunLine(ind);
 }
 
 /**
  * A custom view to draw current line marker.
  */
 private class MarkView extends View {
+    
+    // Vars
+    Color MARKER_COLOR = new Color(.2,.8,.2);
 
     /** Creates MarkView. */
     public MarkView()
@@ -57,10 +78,11 @@ private class MarkView extends View {
     /** Override to draw marker. */
     protected void paintFront(Painter aPntr)
     {
-        TextBoxLine line = getTextArea().getSel().getStartLine();
+        if(_runLine<0 || _runLine>=getTextArea().getLineCount()) return;
+        TextBoxLine line = getTextArea().getLine(_runLine);
         double y0 = line.getY(), y1 = line.getMaxY();
         
-        aPntr.setColor(new Color(.2,.8,.2));
+        aPntr.setColor(MARKER_COLOR);
         aPntr.fill(new Ellipse(4,y0+4,14,y1-y0-8));
     }
     

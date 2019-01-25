@@ -98,11 +98,15 @@ protected void runLine(ScriptLine aScriptLine, boolean doInstantly)
     
     // Get script words and first word
     String words[] = aScriptLine.getWords();
-    String word = words[0];
+    String word = words.length>=2? words[0] : null;
     int runTime = 0;
     
+    // Handle empty
+    if(word==null)
+        runTime = 0;
+    
     // Handle Setting command
-    if(word.equals("setting"))
+    else if(word.equals("setting"))
         runTime = runSetting(aScriptLine);
     
     // Handle Camera command
