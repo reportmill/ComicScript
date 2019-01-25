@@ -23,12 +23,6 @@ public class Script {
     // The Script lines
     List <ScriptLine>  _lines;
     
-    // The current line index
-    int                _lineIndex, _lineIndexMax;
-    
-    // The current runtime
-    int                _runTime;
-
 /**
  * Creates a script for given StagePane.
  */
@@ -79,44 +73,25 @@ public List <ScriptLine> getLines()
 /**
  * Runs the script.
  */
-public void runAll()
+public void runLine(int anIndex)
 {
-    // Reset stage
-    _player.resetStage();
-
-    // If no lines, just return
-    if(getLineCount()==0) return;
-    
-    // Run first line with anim
-    ScriptLine line0 = getLine(0); _lineIndexMax = getLineCount();
-    runLine(line0, false);
-}
-
-/**
- * Runs the script.
- */
-public void runLine(int lineIndex)
-{
-    // Reset stage
-    _player.resetStage();
-
     // If invalid line index, just return
-    if(lineIndex>=getLineCount()) return;
+    if(anIndex>=getLineCount()) { System.err.println("Script.runLine: Index beyond bounds."); return; }
     
     // Run previous lines instantly
-    for(int i=0;i<lineIndex;i++) { ScriptLine line = getLine(i);
-        runLine(line, true); }
+    if(!_player._runAll)
+        for(int i=0;i<anIndex;i++) { ScriptLine line = getLine(i);
+            runLine(line, true); }
 
     // Run requested line with anim
-    _lineIndexMax = Math.min(lineIndex+1, getLineCount());
-    ScriptLine line = getLine(lineIndex);
+    ScriptLine line = getLine(anIndex);
     runLine(line, false);
 }
 
 /**
  * Executes line for Stage.
  */
-protected int runLine(ScriptLine aScriptLine, boolean doInstantly)
+protected void runLine(ScriptLine aScriptLine, boolean doInstantly)
 {
     // Print which line
     System.out.println("Run Line " + getLines().indexOf(aScriptLine));
@@ -124,35 +99,28 @@ protected int runLine(ScriptLine aScriptLine, boolean doInstantly)
     // Get script words and first word
     String words[] = aScriptLine.getWords();
     String word = words[0];
+    int runTime = 0;
     
-    // Handle setting
-    if(word.equals("setting")) runSetting(aScriptLine);
+    // Handle Setting command
+    if(word.equals("setting"))
+        runTime = runSetting(aScriptLine);
     
-    // Handle camera
+    // Handle Camera command
     else if(word.equals("camera")) {
         _camera.run(words[1], words);
-        _runTime = _camera._runTime;
+        runTime = _camera._runTime;
     }
     
-    // Handle view
-    else {
-        
-        // Get actor
-        Actor actor = (Actor)getView(aScriptLine); if(actor==null) return 0;
-        actor._stage = _stage; actor._scriptLine = aScriptLine;
-        if(!actor.getImage().isLoaded()) {
-            ViewUtils.runDelayed(() -> runLine(aScriptLine, doInstantly), 50, true); return 0; }
-        
-        // Run command
-        actor.run(words[1], words);
-        if(actor._runTime<0) {
-            ViewUtils.runDelayed(() -> runLine(aScriptLine, doInstantly), 50, true); return 0; }
-        _runTime = actor._runTime;
-    }
+    // Handle Actor
+    else runTime = runActor(aScriptLine);
     
+    // If negative RunTime, come back when something is ready
+    if(runTime<0) {
+        ViewUtils.runDelayed(() -> runLine(aScriptLine, doInstantly), 50, true); return; }
+            
     // If run instantly, just set time to end
     if(doInstantly) {
-        _camera.setAnimTimeDeep(_runTime);
+        _camera.setAnimTimeDeep(runTime);
         _camera.getAnimCleared(0);
         _stage.getAnimCleared(0);
         for(View child : _stage.getChildren()) child.getAnimCleared(0);
@@ -160,43 +128,24 @@ protected int runLine(ScriptLine aScriptLine, boolean doInstantly)
     
     // Register for OnFinish callback and play
     else {
-        _camera.getAnim(0).getAnim(_runTime).setOnFinish(a -> ViewUtils.runLater(() -> runFinished(a)));
+        _camera.getAnim(0).getAnim(runTime).setOnFinish(a -> runLineDone());
         _camera.playAnimDeep();
     }
-    
-    // Update line index
-    _lineIndex = aScriptLine.getIndex() + 1;
-    
-    // Return runtime
-    return _runTime;
 }
 
 /**
- * Called when script line is finished.
+ * Called when a run ScriptLine is finished.
  */
-public void runFinished(ViewAnim anAnim)
-{
-    // Clear all anims
-    _camera.getAnimCleared(0);
-    _stage.getAnimCleared(0);
-    for(View child : _stage.getChildren()) child.getAnimCleared(0);
-    
-    // If at LineIndexMax, return
-    if(_lineIndex>=_lineIndexMax) return;
-
-    // Run next line with anim
-    ScriptLine sline = getLine(_lineIndex);
-    runLine(sline, false);
-}
+void runLineDone()  { ViewUtils.runLater(() -> _player.runLineDone()); }
 
 /**
- * Runs the setting.
+ * Runs a setting command.
  */
-public void runSetting(ScriptLine aScriptLine)
+protected int runSetting(ScriptLine aScriptLine)
 {
     // Get setting Image and ImageView
     String words[] = aScriptLine.getWords();
-    Image img = getNextImage(words, 0); if(img==null) return;
+    Image img = getNextImage(words, 0); if(img==null) return 0;
     ImageView iview = new ImageView(img, true, true); iview.setName(img.getName());
     iview.setSize(_stage.getWidth(), _stage.getHeight());
     iview.setName("Setting"); //iview.setOpacity(.5);
@@ -206,7 +155,33 @@ public void runSetting(ScriptLine aScriptLine)
     
     // Add new setting
     _stage.addChild(iview, 0);
-    _runTime = 1;
+    return 1;
+}
+
+/**
+ * Runs an Actor command.
+ */
+protected int runActor(ScriptLine aScriptLine)
+{
+    // Get actor
+    String words[] = aScriptLine.getWords(), word = words[0];
+    Actor actor = (Actor)getView(aScriptLine); if(actor==null) return 0;
+    actor._stage = _stage; actor._scriptLine = aScriptLine;
+    
+    // Run command
+    boolean didRun = actor.run(words[1], words);
+    //if(!didRun) { ViewUtils.runDelayed(() -> runLine(aScriptLine, doInstantly), 50, true); return; }
+    return didRun? actor._runTime : -1;
+}
+
+/**
+ * Runs a Camera command.
+ */
+protected int runCamera(ScriptLine aScriptLine)
+{
+    String words[] = aScriptLine.getWords(), word = words[0];
+    _camera.run(words[1], words);
+    return _camera._runTime;    
 }
 
 /**

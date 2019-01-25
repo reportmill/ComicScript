@@ -16,6 +16,12 @@ public class PlayerView extends BoxView {
     // The Script
     Script       _script;
     
+    // The current line being run
+    int          _runLine;
+    
+    // Whether currenly running all lines
+    boolean      _runAll;
+    
 /**
  * Creates a PlayerView.
  */
@@ -56,12 +62,47 @@ public Script getScript()  { return _script; }
 /**
  * Runs the script.
  */
-public void runAll()  { _script.runAll(); }
+public void runAll()
+{
+    // If no lines, just return
+    if(_script.getLineCount()==0) return;
+    
+    // Set RunAll and run first line
+    _runAll = true;
+    runLine(0);
+}
 
 /**
  * Runs the script.
  */
-public void runLine(int lineIndex)  { _script.runLine(lineIndex); }
+public void runLine(int anIndex)
+{
+    // If no called from runAll(), resetStage
+    if(!_runAll || anIndex==0) resetStage();
+    
+    // Update RunLine and call Script.runLine()
+    _runLine = anIndex;
+    _script.runLine(anIndex);
+}
+
+/**
+ * Called when runLine is done.
+ */
+protected void runLineDone()
+{
+    // Clear Stage, Camera and actor anims
+    _stage.getAnimCleared(0); _camera.getAnimCleared(0);
+    for(View child : _stage.getChildren()) child.getAnimCleared(0);
+    
+    // If not RunAll, just return
+    if(!_runAll) return;
+    
+    // If no more lines, just return
+    if(_runLine+1>=_script.getLineCount()) { _runAll = false; return; }
+    
+    // Run next line
+    runLine(_runLine+1);
+}
 
 /**
  * Resets the stage.

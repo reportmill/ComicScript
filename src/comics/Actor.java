@@ -56,6 +56,10 @@ void imageLoaded()
  */
 public boolean run(String aCmd, String theWords[])
 {
+    // If image not loaded yet, just return
+    if(!getImage().isLoaded()) {
+        _runTime = -1; return false; }
+        
     // Set words and reset runtime
     _words = theWords; _runTime = 0;
     
@@ -73,7 +77,9 @@ public boolean run(String aCmd, String theWords[])
         case "waves": runWave(); break;
         default: return false;
     }
-    return true;
+    
+    // Returns whether run was executed
+    return _runTime>=0;
 }
 
 /**
