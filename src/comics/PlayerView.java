@@ -13,6 +13,9 @@ public class PlayerView extends BoxView {
     // CameraView: the parent of StageView to control how stage is viewed
     CameraView   _camera;
     
+    // The Script
+    Script       _script;
+    
 /**
  * Creates a PlayerView.
  */
@@ -30,6 +33,9 @@ public PlayerView()
     setPadding(10,10,10,10);
     setContent(_camera);
     setClipToBounds(true);
+    
+    // Create Script (empty)
+    _script = new Script(this, "");
 }
 
 /**
@@ -41,6 +47,21 @@ public StageView getStage()  { return _stage; }
  * Returns the CameraView.
  */
 public CameraView getCamera()  { return _camera; }
+
+/**
+ * Returns the script.
+ */
+public Script getScript()  { return _script; }
+
+/**
+ * Runs the script.
+ */
+public void runAll()  { _script.runAll(); }
+
+/**
+ * Runs the script.
+ */
+public void runLine(int lineIndex)  { _script.runLine(lineIndex); }
 
 /**
  * Resets the stage.

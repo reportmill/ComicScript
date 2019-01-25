@@ -14,17 +14,11 @@ public class StagePane extends ViewOwner {
     // The StageView
     StageView    _stage;
     
-    // The camera view
-    CameraView   _camera;
-    
     // The script text view
     TextView     _textView;
     
     // The HelpPane
     HelpPane     _helpPane = new HelpPane(this);
-    
-    // The Script
-    Script       _script;
     
     // The default script text
     static String  DEFAULT_SCRIPT = "Setting is beach\n";
@@ -45,18 +39,17 @@ public void showStage()
 }
 
 /**
- * Returns the script.
+ * Returns the PlayerView.
  */
-public Script getScript()  { return getScript(false); }
+public PlayerView getPlayer()  { return getPlayer(false); }
 
 /**
- * Returns the script.
+ * Returns the PlayerView with option to update.
  */
-public Script getScript(boolean doUpdate)
+public PlayerView getPlayer(boolean doUpdate)
 {
-    if(_script!=null && !doUpdate) return _script;
-    _script = new Script(_player, _textView.getText());
-    return _script;
+    if(doUpdate) _player.getScript().setText(_textView.getText());
+    return _player;
 }
 
 /**
@@ -86,7 +79,6 @@ protected void initUI()
     // Create PlayerView
     _player = new PlayerView();
     _stage = _player.getStage();
-    _camera = _player.getCamera();
     enableEvents(_stage, MousePress);
     
     // Get master ColView and add StageBox
@@ -116,11 +108,11 @@ protected void respondUI(ViewEvent anEvent)
 {
     // Handle ResetButton
     if(anEvent.equals("ResetButton"))
-        _stage.removeChildren();
+        getPlayer().resetStage();
         
     // Handle RunButton
     if(anEvent.equals("RunButton"))
-        getScript(true).runAll();
+        getPlayer(true).runAll();
     
     // Handle AgainButton
     if(anEvent.equals("AgainButton"))
@@ -132,7 +124,7 @@ protected void respondUI(ViewEvent anEvent)
         
     // Handle PlayButton
     if(anEvent.equals("PlayButton"))
-        runLater(() -> getScript().runAll());
+        runLater(() -> getPlayer().runAll());
 }
 
 /**
@@ -147,7 +139,7 @@ public void runCurrentLine()
     
     // Run line at index
     int lineIndex = line.getIndex();
-    getScript(true).runLine(lineIndex);
+    getPlayer(true).runLine(lineIndex);
 }
 
 /**
