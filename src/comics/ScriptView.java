@@ -3,7 +3,7 @@ import snap.gfx.*;
 import snap.view.*;
 
 /**
- * A custom class.
+ * A TextView class to show script with line markers.
  */
 public class ScriptView extends TextView {
     
@@ -44,7 +44,7 @@ protected void textSelChanged()
 /**
  * A custom view to draw current line marker.
  */
-public class MarkView extends View {
+private class MarkView extends View {
 
     /** Creates MarkView. */
     public MarkView()
@@ -71,7 +71,7 @@ public class MarkView extends View {
             TextBoxLine line = getTextBox().getLineForY(anEvent.getY());
             int cindex = line.length()>0? line.getEnd()-1 : line.getEnd();
             getTextArea().setSel(cindex);
-            _stagePane.getScript(true).runLineCurrent();
+            _stagePane.runCurrentLine();
         }
     }
 }

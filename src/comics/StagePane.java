@@ -1,19 +1,18 @@
 package comics;
-import snap.gfx.Color;
+import snap.gfx.TextBoxLine;
 import snap.util.*;
 import snap.view.*;
-import snap.viewx.*;
 
 /**
  * A class to manage a stage and script.
  */
 public class StagePane extends ViewOwner {
     
-    // The StageView
-    SnapScene    _stage;
+    // The PlayerView
+    PlayerView   _player;
     
-    // The Stage box
-    BoxView      _stageBox;
+    // The StageView
+    StageView    _stage;
     
     // The camera view
     CameraView   _camera;
@@ -37,7 +36,12 @@ public void showStage()
 {
     setWindowVisible(true);
     if(SnapUtils.isTeaVM) getWindow().setMaximized(true);
-    runLater(() -> getScript().runAll());
+    
+    String lines[] = Samples.getSample("Welcome");
+    setScriptLines(lines);
+    
+    //runLater(() -> getScript().runAll());
+    runLater(() -> setShowControls(true));
 }
 
 /**
@@ -50,8 +54,28 @@ public Script getScript()  { return getScript(false); }
  */
 public Script getScript(boolean doUpdate)
 {
-    if(_script==null || doUpdate) _script = new Script(this);
+    if(_script!=null && !doUpdate) return _script;
+    _script = new Script(_player, _textView.getText());
     return _script;
+}
+
+/**
+ * Sets the script lines.
+ */
+public void setScriptLines(String theLines[])
+{
+    String text = StringUtils.join(theLines, "\n");
+    _textView.setText(text);
+}
+
+/**
+ * Shows the controls.
+ */
+public void setShowControls(boolean aValue)
+{
+    Controls.PlayButton pbtn = new Controls.PlayButton(); pbtn.setOwner(this);
+    _player.addChild(pbtn);
+    runCurrentLine();
 }
 
 /**
@@ -59,23 +83,15 @@ public Script getScript(boolean doUpdate)
  */
 protected void initUI()
 {
-    // Create configure stage
-    _stage = new SnapScene();
-    _stage.setClipToBounds(true);
-    _stage.setBorder(Color.BLACK, 1);
+    // Create PlayerView
+    _player = new PlayerView();
+    _stage = _player.getStage();
+    _camera = _player.getCamera();
     enableEvents(_stage, MousePress);
     
-    // Create/configure camera
-    _camera = new CameraView(_stage);
-    
-    // Create/configure stage box
-    _stageBox = new BoxView(); _stageBox.setPadding(10,10,10,10);
-    _stageBox.setContent(_camera);
-    _stageBox.setClipToBounds(true);
-
     // Get master ColView and add StageBox
     ColView colView = getUI(ColView.class);
-    colView.addChild(_stageBox, 1);
+    colView.addChild(_player, 1);
     
     // Get TextRowView
     RowView rowView = getView("TextRowView", RowView.class);
@@ -108,11 +124,30 @@ protected void respondUI(ViewEvent anEvent)
     
     // Handle AgainButton
     if(anEvent.equals("AgainButton"))
-        getScript(true).runLineCurrent();
+        runCurrentLine();
     
     // Handle Stage MousePressed
     if(anEvent.isMousePress())
         selectSettingItem(anEvent.getX(), anEvent.getY());
+        
+    // Handle PlayButton
+    if(anEvent.equals("PlayButton"))
+        runLater(() -> getScript().runAll());
+}
+
+/**
+ * Runs the current line.
+ */
+public void runCurrentLine()
+{
+    // Get current line (or first non empty line above)
+    TextBoxLine line = _textView.getSel().getStartLine();
+    while(line.getString().trim().length()==0 && line.getIndex()>0)
+        line = _textView.getTextArea().getLine(line.getIndex()-1);
+    
+    // Run line at index
+    int lineIndex = line.getIndex();
+    getScript(true).runLine(lineIndex);
 }
 
 /**
@@ -136,18 +171,8 @@ void textViewReturnKey(ViewEvent anEvent)
     // Handle EnterKey: Run to previous line
     if(anEvent==null || anEvent.isEnterKey()) {
         _helpPane.reset();
-        getScript(true).runLineCurrent();
+        runCurrentLine();
     }
-}
-
-/**
- * Resets the stage.
- */
-public void resetStage()
-{
-    _stage.removeChildren();
-    _camera.setZoom(1);
-    _camera.setBlur(0);
 }
 
 }

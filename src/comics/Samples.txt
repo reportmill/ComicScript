@@ -1,0 +1,19 @@
+
+Sample Welcome
+Setting is beach
+Lady walks in
+Man walks in from right
+Lady waves
+Man jumps
+Lady dances
+Man explodes
+
+Sample Meeting
+Setting is beach
+Lady walks in
+Man walks in from right
+Camera zooms in on Lady
+Lady says You're cute!
+Man says I feel sick
+Camera zooms out
+Man walks out

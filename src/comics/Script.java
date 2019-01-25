@@ -1,27 +1,22 @@
 package comics;
 import java.util.*;
 import snap.gfx.Image;
-import snap.gfx.TextBoxLine;
 import snap.view.*;
-import snap.viewx.SnapScene;
 
 /**
  * A class to represent the instructions.
  */
 public class Script {
     
-    // The StagePane
-    StagePane          _stagePane;
+    // The PlayerView
+    PlayerView         _player;
     
     // The StageView
-    SnapScene          _stageView;
+    StageView          _stage;
     
     // The CameraView
     CameraView         _camera;
 
-    // The TextView
-    TextView           _textView;
-    
     // The View text
     String             _text;
 
@@ -37,13 +32,12 @@ public class Script {
 /**
  * Creates a script for given StagePane.
  */
-public Script(StagePane aSP)
+public Script(PlayerView aPlayer, String aScriptStr)
 {
-    _stagePane = aSP;
-    _stageView = aSP._stage;
-    _camera = aSP._camera;
-    _textView = aSP._textView;
-    setText(_stagePane._textView.getText());
+    _player = aPlayer;
+    _stage = aPlayer.getStage();
+    _camera = aPlayer.getCamera();
+    setText(aScriptStr);
 }
 
 /**
@@ -83,27 +77,12 @@ public List <ScriptLine> getLines()
 }
 
 /**
- * Runs the current line.
- */
-public void runLineCurrent()
-{
-    // Get current line (or first non empty line above)
-    TextBoxLine line = _textView.getSel().getStartLine();
-    while(line.getString().trim().length()==0 && line.getIndex()>0)
-        line = _textView.getTextArea().getLine(line.getIndex()-1);
-    
-    // Run line at index
-    int lineIndex = line.getIndex();
-    runLine(lineIndex);
-}
-
-/**
  * Runs the script.
  */
 public void runAll()
 {
     // Reset stage
-    _stagePane.resetStage();
+    _player.resetStage();
 
     // If no lines, just return
     if(getLineCount()==0) return;
@@ -119,7 +98,7 @@ public void runAll()
 public void runLine(int lineIndex)
 {
     // Reset stage
-    _stagePane.resetStage();
+    _player.resetStage();
 
     // If invalid line index, just return
     if(lineIndex>=getLineCount()) return;
@@ -160,7 +139,7 @@ protected int runLine(ScriptLine aScriptLine, boolean doInstantly)
         
         // Get actor
         Actor actor = (Actor)getView(aScriptLine); if(actor==null) return 0;
-        actor._stage = _stageView; actor._scriptLine = aScriptLine;
+        actor._stage = _stage; actor._scriptLine = aScriptLine;
         if(!actor.getImage().isLoaded()) {
             ViewUtils.runDelayed(() -> runLine(aScriptLine, doInstantly), 50, true); return 0; }
         
@@ -175,8 +154,8 @@ protected int runLine(ScriptLine aScriptLine, boolean doInstantly)
     if(doInstantly) {
         _camera.setAnimTimeDeep(_runTime);
         _camera.getAnimCleared(0);
-        _stageView.getAnimCleared(0);
-        for(View child : _stageView.getChildren()) child.getAnimCleared(0);
+        _stage.getAnimCleared(0);
+        for(View child : _stage.getChildren()) child.getAnimCleared(0);
     }
     
     // Register for OnFinish callback and play
@@ -199,8 +178,8 @@ public void runFinished(ViewAnim anAnim)
 {
     // Clear all anims
     _camera.getAnimCleared(0);
-    _stageView.getAnimCleared(0);
-    for(View child : _stageView.getChildren()) child.getAnimCleared(0);
+    _stage.getAnimCleared(0);
+    for(View child : _stage.getChildren()) child.getAnimCleared(0);
     
     // If at LineIndexMax, return
     if(_lineIndex>=_lineIndexMax) return;
@@ -219,14 +198,14 @@ public void runSetting(ScriptLine aScriptLine)
     String words[] = aScriptLine.getWords();
     Image img = getNextImage(words, 0); if(img==null) return;
     ImageView iview = new ImageView(img, true, true); iview.setName(img.getName());
-    iview.setSize(_stageView.getWidth(), _stageView.getHeight());
+    iview.setSize(_stage.getWidth(), _stage.getHeight());
     iview.setName("Setting"); //iview.setOpacity(.5);
     
     // If old setting, remove
-    View oldStg = getView("Setting"); if(oldStg!=null) _stageView.removeChild(oldStg);
+    View oldStg = getView("Setting"); if(oldStg!=null) _stage.removeChild(oldStg);
     
     // Add new setting
-    _stageView.addChild(iview, 0);
+    _stage.addChild(iview, 0);
     _runTime = 1;
 }
 
@@ -246,7 +225,7 @@ public View getView(ScriptLine aScriptLine)
     // If actor not found, create
     if(child==null) {
         ImageView iview = new Actor(img); iview.setName(img.getName()); child = iview; iview.setX(-999);
-        _stageView.addChild(child);
+        _stage.addChild(child);
     }
     
     return child;
@@ -257,7 +236,7 @@ public View getView(ScriptLine aScriptLine)
  */
 public View getView(String aName)
 {
-    View child = aName!=null? _stageView.getChild(aName) : null;
+    View child = aName!=null? _stage.getChild(aName) : null;
     return child;
 }
 
