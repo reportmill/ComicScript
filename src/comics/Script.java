@@ -23,6 +23,12 @@ public class Script {
     // The Script lines
     List <ScriptLine>  _lines;
     
+    // A callback to be called when script is loaded
+    Runnable           _loadLsnr;
+    
+    // The runtimes
+    int                _runTimes[], _runTime;
+    
 /**
  * Creates a script for given StagePane.
  */
@@ -42,7 +48,7 @@ public String getText()  { return _text; }
 /**
  * Sets the text.
  */
-public void setText(String aStr)  { _text = aStr; _lines = null; }
+public void setText(String aStr)  { _text = aStr; _lines = null; _runTime = -1; }
 
 /**
  * Returns the number of lines.
@@ -71,17 +77,59 @@ public List <ScriptLine> getLines()
 }
 
 /**
+ * Returns whether script is loaded.
+ */
+public boolean isLoaded()  { return getRunTime()>=0; }
+
+/**
+ * Sets a load listener to be called when script is loaded.
+ */
+public void setLoadListener(Runnable aRun)
+{
+    if(isLoaded()) ViewUtils.runLater(aRun);
+    else _loadLsnr = aRun;
+}
+
+/**
+ * Returns the run time.
+ */
+public int getRunTime()
+{
+    // If already set, just return
+    if(_runTime>=0) return _runTime;
+    
+    // Iterate over lines and get runtimes (bail if any line not loaded)
+    int lineCount = getLineCount();
+    int runTimes[] = new int[lineCount], runTime = 0;
+    for(int i=0;i<lineCount;i++) { ScriptLine line = getLine(i);
+        int rt = runLine(line, true);
+        runTime += rt; runTimes[i] = rt;
+        if(rt<0) {
+            ViewUtils.runDelayed(() -> getRunTime(), 100, true); return -1; }
+    }
+    
+    // Set run times, call LoadLsnr and return
+    _runTime = runTime; _runTimes = runTimes;
+    if(_loadLsnr!=null) { _loadLsnr.run(); _loadLsnr = null; }
+    return _runTime;
+}
+
+/**
+ * Returns the run times.
+ */
+public int[] getRunTimes()  { getRunTime(); return _runTimes; }
+
+/**
  * Runs the script.
  */
 public void runLine(int anIndex)
 {
     // If invalid line index, just return
     if(anIndex>=getLineCount()) { System.err.println("Script.runLine: Index beyond bounds."); return; }
-    
+    System.out.println("Run Line " + anIndex);
+   
     // Run previous lines instantly
-    if(!_player._runAll)
-        for(int i=0;i<anIndex;i++) { ScriptLine line = getLine(i);
-            runLine(line, true); }
+    //if(!_player.isPlaying()) for(int i=0;i<anIndex;i++) { ScriptLine line = getLine(i); runLine(line, true); }
 
     // Run requested line with anim
     ScriptLine line = getLine(anIndex);
@@ -91,11 +139,8 @@ public void runLine(int anIndex)
 /**
  * Executes line for Stage.
  */
-protected void runLine(ScriptLine aScriptLine, boolean doInstantly)
+protected int runLine(ScriptLine aScriptLine, boolean doInstantly)
 {
-    // Print which line
-    System.out.println("Run Line " + getLines().indexOf(aScriptLine));
-    
     // Get script words and first word
     String words[] = aScriptLine.getWords();
     String word = words.length>=2? words[0] : null;
@@ -105,36 +150,31 @@ protected void runLine(ScriptLine aScriptLine, boolean doInstantly)
     if(word==null)
         runTime = 0;
     
-    // Handle Setting command
-    else if(word.equals("setting"))
-        runTime = runSetting(aScriptLine);
-    
-    // Handle Camera command
-    else if(word.equals("camera")) {
-        _camera.run(words[1], words);
-        runTime = _camera._runTime;
-    }
-    
-    // Handle Actor
+    // Handle commands: Setting, Camera, Actor
+    else if(word.equals("setting")) runTime = runSetting(aScriptLine);
+    else if(word.equals("camera")) runTime = runCamera(aScriptLine);
     else runTime = runActor(aScriptLine);
     
-    // If negative RunTime, come back when something is ready
-    if(runTime<0) {
-        ViewUtils.runDelayed(() -> runLine(aScriptLine, doInstantly), 50, true); return; }
+    // If negative RunTime, bail
+    if(runTime<0)
+        return -1;
             
     // If run instantly, just set time to end
-    if(doInstantly) {
-        _camera.setAnimTimeDeep(runTime);
-        _camera.getAnimCleared(0);
-        _stage.getAnimCleared(0);
+    /*if(doInstantly) {
+        _player.setAnimTimeDeep(runTime);
+        _player.getAnimCleared(0); _camera.getAnimCleared(0); _stage.getAnimCleared(0);
         for(View child : _stage.getChildren()) child.getAnimCleared(0);
     }
     
     // Register for OnFinish callback and play
     else {
-        _camera.getAnim(0).getAnim(runTime).setOnFinish(a -> runLineDone());
-        _camera.playAnimDeep();
-    }
+        _player.getAnim(0).getAnim(runTime).setOnFinish(a -> runLineDone());
+        _player.getAnim(0).setOnFrame(a -> _player.playerDidAnim());
+        _player.playAnimDeep();
+    }*/
+    
+    // REturn runtime
+    return runTime;
 }
 
 /**
@@ -174,7 +214,6 @@ protected int runActor(ScriptLine aScriptLine)
     
     // Run command
     boolean didRun = actor.run(words[1], words);
-    //if(!didRun) { ViewUtils.runDelayed(() -> runLine(aScriptLine, doInstantly), 50, true); return; }
     return didRun? actor._runTime : -1;
 }
 
