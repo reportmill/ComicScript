@@ -42,7 +42,7 @@ public void showStage()
  */
 public PlayerView getPlayer()
 {
-    if(_resetScript) { _player.getScript().setText(_textView.getText()); _resetScript = false; }
+    if(_resetScript) { _player.setScriptText(_textView.getText()); _resetScript = false; }
     return _player;
 }
 
@@ -105,12 +105,12 @@ protected void initUI()
 protected void respondUI(ViewEvent anEvent)
 {
     // Handle ResetButton
-    if(anEvent.equals("ResetButton"))
-        getPlayer().resetStage();
+    if(anEvent.equals("ResetButton")) {
+        getPlayer().stop(); getPlayer().setRunTime(0); }
         
     // Handle RunButton
     if(anEvent.equals("RunButton")) { resetScript();
-        getPlayer().play(); }
+        getPlayer().setRunTime(0); getPlayer().play(); }
     
     // Handle AgainButton
     if(anEvent.equals("AgainButton"))

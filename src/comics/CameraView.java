@@ -66,18 +66,21 @@ public void setBlur(double aValue)
 /**
  * Runs the words.
  */
-public void run(String aCmd, String theWords[])
+public void run(ScriptLine aScriptLine)
 {
     // Set words and reset runtime
-    _words = theWords; _runTime = 0;
+    _words = aScriptLine.getWords();
+    String cmd = _words[1];
     
     // Jump to specific command
-    switch(aCmd) {
+    switch(cmd) {
         case "zoom": runZooms(); break;
         case "zooms": runZooms(); break;
         case "blur": runBlurs(); break;
         case "blurs": runBlurs(); break;
     }
+    
+    aScriptLine.setRunTime(_runTime);
 }
 
 /**

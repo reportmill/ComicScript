@@ -54,17 +54,15 @@ void imageLoaded()
 /**
  * Runs the given command.
  */
-public boolean run(String aCmd, String theWords[])
+public boolean run(ScriptLine aScriptLine)
 {
-    // If image not loaded yet, just return
-    if(!getImage().isLoaded()) {
-        _runTime = -1; return false; }
-        
-    // Set words and reset runtime
-    _words = theWords; _runTime = 0;
-    
+    _stage = aScriptLine.getScript()._stage;
+    _scriptLine = aScriptLine;
+    _words = aScriptLine.getWords();
+    String cmd = _words[1];
+
     // Jump to specific command
-    switch(aCmd) {
+    switch(cmd) {
         case "appears": runAppears(); break;
         case "walks": runWalks(); break;
         case "drops": runDrops(); break;
@@ -78,6 +76,11 @@ public boolean run(String aCmd, String theWords[])
         default: return false;
     }
     
+    // If image not loaded yet, just return
+    if(!getImage().isLoaded()) {
+        aScriptLine.addUnloadedImage(getImage()); }
+    aScriptLine.setRunTime(_runTime);
+
     // Returns whether run was executed
     return _runTime>=0;
 }
@@ -108,7 +111,7 @@ public void runWalks()
     ViewAnim anim = getAnim(_startTime).getAnim(_startTime+2000);
 
     // Look for animation
-    if(isAnimImageLoading("Walk")) { _runTime = -1; return; }
+    _runTime = 2000;
     setAnimImage("Walk", 2000, 30);
 
     // Handle walk in from right
@@ -135,8 +138,6 @@ public void runWalks()
         //setXY(-getWidth(), _stage.getHeight() - getHeight() - 10);
         //anim.setX(_stage.getWidth()/2-getWidth()/2-60);
     }
-    
-    _runTime = 2000;
 }
 
 /**
@@ -227,9 +228,8 @@ public void runExplodes()
  */
 public void runDance()
 {
-    if(isAnimImageLoading("Dance")) { _runTime = -1; return; }
-    setAnimImage("Dance", 3000, 88);
     _runTime = 3000;
+    setAnimImage("Dance", 3000, 88);
 }
 
 /**
@@ -237,9 +237,8 @@ public void runDance()
  */
 public void runJump()
 {
-    if(isAnimImageLoading("Jump")) { _runTime = -1; return; }
-    setAnimImage("Jump", 1000, 16);
     _runTime = 1000;
+    setAnimImage("Jump", 1000, 16);
 }
 
 /**
@@ -247,9 +246,8 @@ public void runJump()
  */
 public void runWave()
 {
-    if(isAnimImageLoading("Wave")) { _runTime = -1; return; }
-    setAnimImage("Wave", 1000, 17);
     _runTime = 1000;
+    setAnimImage("Wave", 1000, 17);
 }
 
 /**
@@ -259,15 +257,6 @@ public Index.AnimEntry getAnimEntry(String aName)
 {
     String name = FilePathUtils.getFileNameSimple(getName());
     return Index.get().getAnim(name, aName);
-}
-
-/**
- * Returns whether anim image is present, but loading.
- */
-public boolean isAnimImageLoading(String aName)
-{
-    Image img = getAnimImage(aName);
-    return img!=null && !img.isLoaded();
 }
 
 /**
@@ -283,11 +272,15 @@ public Image getAnimImage(String aName)
 /**
  * Sets the animated image over given range (if found).
  */
-public boolean setAnimImage(String aName, int aTime, int aFrame)
+public void setAnimImage(String aName, int aTime, int aFrame)
 {
     // Get image for name and cache old image
-    Index.AnimEntry anim = getAnimEntry(aName); if(anim==null) return false;
+    Index.AnimEntry anim = getAnimEntry(aName); if(anim==null) return;
     Image img = anim.getImage(); //getAnimImage(aName); if(img==null) return false;
+    
+    // If image loading, just return
+    if(!img.isLoaded()) {
+        _scriptLine.addUnloadedImage(img); return; }
     
     // Get old image and offset
     Image imgOld = getImage();
@@ -300,7 +293,6 @@ public boolean setAnimImage(String aName, int aTime, int aFrame)
     getAnim(_startTime).getAnim(_startTime+aTime).setValue("Frame", aFrame);
     getAnim(_startTime).getAnim(_startTime+aTime).setOnFinish(a -> {
         setImage(imgOld, offsetX); });
-    return true;
 }
 
 /**

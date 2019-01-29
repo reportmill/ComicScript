@@ -3,8 +3,10 @@ Sample Welcome
 Setting is beach
 Lady walks in
 Man walks in from right
+Camera zooms in on Lady
 Lady waves
 Man jumps
+Camera zooms out
 Lady dances
 Man explodes
 

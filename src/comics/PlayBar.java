@@ -30,22 +30,23 @@ public PlayBar(PlayerView aPV)
  */
 protected void paintFront(Painter aPntr)
 {
-    aPntr.setColor(new Color(1,1,1,.4)); aPntr.fillRect(0,BAR_Y,getWidth(),BAR_HEIGHT);
+    double w = getWidth();
+    aPntr.setColor(new Color(1,1,1,.4)); aPntr.fillRect(0,BAR_Y,w,BAR_HEIGHT);
     
     // Draw progress bar background
-    int runTime = _player.getScript().getRunTime(); if(runTime<0) return;
-    int runTimes[] = _player.getScript().getRunTimes();
+    int runTime = _player.getScript().getRunTime();
+    int lineCount = _player.getScript().getLineCount();
     
     // Draw progress bar
     int runTimeNow = _player.getRunTime();
-    double lineX = runTimeNow*getWidth()/runTime;
+    double lineX = runTimeNow*w/runTime;
     aPntr.setColor(Color.RED); aPntr.fillRect(0,BAR_Y,lineX,BAR_HEIGHT);
     aPntr.fill(new Ellipse(lineX-4,BAR_Y+BAR_HEIGHT/2-4,8,8));
     
     // Draw progress bar frames
-    double rrt = 0; aPntr.setColor(MARK_COLOR);
-    for(int i=0;i<runTimes.length-1;i++) { int rt = runTimes[i]; rrt += rt;
-        double x = rrt/runTime * getWidth();
+    aPntr.setColor(MARK_COLOR);
+    for(int i=0;i<lineCount-1;i++) { int rt = _player.getLineEndTime(i);
+        double x = rt*w/runTime;
         aPntr.fillRect(x-3,BAR_Y,6,BAR_HEIGHT);
     }
     
@@ -58,9 +59,8 @@ protected void paintFront(Painter aPntr)
  */
 protected void processEvent(ViewEvent anEvent)
 {
-    if(anEvent.isMousePress() || anEvent.isMouseDrag())
-        if(anEvent.getY()<BAR_Y+BAR_HEIGHT+BAR_Y)
-            setRunTime(anEvent.getX());
+    if(anEvent.isMousePress() && anEvent.getY()<BAR_Y+BAR_HEIGHT+BAR_Y || anEvent.isMouseDrag())
+        setRunTime(anEvent.getX());
 }
 
 /**

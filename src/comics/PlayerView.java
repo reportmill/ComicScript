@@ -85,6 +85,72 @@ public CameraView getCamera()  { return _camera; }
 public Script getScript()  { return _script; }
 
 /**
+ * Sets the Script text.
+ */
+public void setScriptText(String aStr)
+{
+    if(aStr.equals(getScript().getText())) return;
+    getScript().setText(aStr);
+    _runLine = -1; setRunTime(0);
+}
+
+/**
+ * Returns the number of lines in script.
+ */
+public int getLineCount()  { return _script.getLineCount(); }
+
+/**
+ * Returns the run time for line at given index.
+ */
+public int getLineRunTime(int aLine)  { return _script.getLineRunTime(aLine); }
+
+/**
+ * Returns the start time for line at given index.
+ */
+public int getLineStartTime(int aLine)  { return _script.getLineStartTime(aLine); }
+
+/**
+ * Returns the end time for line at given index.
+ */
+public int getLineEndTime(int aLine)  { return _script.getLineEndTime(aLine); }
+
+/**
+ * Returns the run line for given run time.
+ */
+public int getLineForTime(int aTime)  { return _script.getLineForTime(aTime); }
+
+/**
+ * Returns how long the animation has been running.
+ */
+public int getRunTime()
+{
+    int runLine = getRunLine();
+    int runLineStartTime = getLineStartTime(runLine);
+    int runLineTime = runLineStartTime + getAnim(0).getTime();
+    return runLineTime;
+}
+
+/**
+ * Returns how long the animation has been running.
+ */
+public void setRunTime(int aTime)
+{
+    // Get RunLine and RunLine time for player time
+    int time = Math.min(aTime, getRunTimeMax());
+    int runLine = getLineForTime(time);
+    int lineTime = time - getLineStartTime(runLine);
+    
+    setRunLine(runLine);
+    setAnimTimeDeep(lineTime);
+    repaint();
+}
+
+/**
+ * Returns how long the animation has been running.
+ */
+public int getRunTimeMax()  { return _script.getRunTime(); }
+
+/**
  * Returns the currently running line.
  */
 public int getRunLine()  { return _runLine; }
@@ -105,7 +171,7 @@ public void setRunLine(int anIndex)
     
     // Otherwise, reset current line to end
     else {
-        setAnimTimeDeep(getRunLineLength(runLine));
+        setAnimTimeDeep(getLineRunTime(runLine));
         getAnimCleared(0); _camera.getAnimCleared(0); _stage.getAnimCleared(0);
         for(View child : _stage.getChildren()) child.getAnimCleared(0);
     }
@@ -113,135 +179,18 @@ public void setRunLine(int anIndex)
     // Configure and run lines up to index
     for(int i=runLine+1; i<=anIndex; i++) {
         _script.runLine(i); if(i==anIndex) break;
-        setAnimTimeDeep(getRunLineLength(i));
+        setAnimTimeDeep(getLineRunTime(i));
         getAnimCleared(0); _camera.getAnimCleared(0); _stage.getAnimCleared(0);
         for(View child : _stage.getChildren()) child.getAnimCleared(0);
     }
     
-    // Update RunLine and call Script.runLine()
-    firePropChange(RunLine_Prop, runLine, _runLine = anIndex);
-}
-
-/**
- * Returns the runtime for line.
- */
-public int getRunLineLength(int aLine)  { return _script.getRunTimes()[aLine]; }
-
-/**
- * Returns the runtime for line.
- */
-public int getRunLineStart(int aLine)  { int rt = 0; for(int i=0;i<aLine;i++) rt += getRunLineLength(i); return rt; }
-
-/**
- * Returns the runtime for line.
- */
-public int getRunLineEnd(int aLine)  { int rt = 0; for(int i=0;i<=aLine;i++) rt += getRunLineLength(i); return rt; }
-
-/**
- * Returns the run line for given run time.
- */
-public int getRunLineForTime(int aTime)
-{
-    int runTimes[] = _script.getRunTimes(), time = aTime;
-    for(int i=0;i<runTimes.length;i++) {
-        time -= runTimes[i]; if(time<0) return i; }
-    return runTimes.length -1;
-}
-
-/**
- * Returns how long the animation has been running.
- */
-public int getRunTime()
-{
-    int runLine = getRunLine(), runTimes[] = _script.getRunTimes();
-    int runLineTime0 = 0; for(int i=1;i<runLine;i++) runLineTime0 += runTimes[i];
-    int runLineTime2 = runLineTime0 + getAnim(0).getTime();
-    return runLineTime2;
-}
-
-/**
- * Returns how long the animation has been running.
- */
-public void setRunTime(int aTime)
-{
-    // Get RunLine and RunLine time for player time
-    int runLine = getRunLineForTime(aTime);
-    int lineTime = aTime - getRunLineStart(runLine);
-    
-    setRunLine(runLine);
-    setAnimTimeDeep(lineTime);
-    repaint();
-}
-
-/**
- * Returns how long the animation has been running.
- */
-public int getRunTimeMax()  { return _script.getRunTime(); }
-
-/**
- * Returns whether animation is playing.
- */
-public boolean isPlaying()  { return _playing; }
-
-/**
- * Sets whether animation is playing.
- */
-public void setPlaying(boolean aValue)
-{
-    if(aValue==isPlaying()) return;
-    firePropChange(Playing_Prop, _playing, _playing = aValue);
-}
-
-/**
- * Runs the script.
- */
-public void play()
-{
-    // If no lines, just return
-    if(_script.getLineCount()==0) return;
-    
-    // If script not loaded, come back
-    if(!_script.isLoaded()) {
-        setLoading(true, () -> play()); return; }
-    
-    // Set RunAll and run first line
-    setPlaying(true);
-    runLine(0);
-}
-
-/**
- * Stops the script.
- */
-public void stop()
-{
-    stopAnimDeep();
-    setPlaying(false);
-    resetShowingControls();
-}
-
-/**
- * Runs the script.
- */
-public void runLine(int anIndex)
-{
-    // Set RunLine
-    setRunLine(anIndex);
-    
-    // 
-    int runTime = getRunLineLength(anIndex);
+    // Configure PlayerView anim to call runLineDone() and playerDidAnim()
+    int runTime = getLineRunTime(anIndex);
     getAnim(0).getAnim(runTime).setOnFinish(a -> ViewUtils.runLater(() -> runLineDone()));
     getAnim(0).setOnFrame(a -> playerDidAnim());
-    playAnimDeep();
-
-    // If no called from runAll(), resetStage
-    //if(!_playing || anIndex==0) resetStage();
-    
-    // If script not loaded, come back when done
-    //if(!_script.isLoaded()) { setLoading(true, () -> runLine(anIndex)); return; }
     
     // Update RunLine and call Script.runLine()
-    //firePropChange(RunLine_Prop, _runLine, _runLine = anIndex);
-    //_script.runLine(anIndex);
+    firePropChange(RunLine_Prop, runLine, _runLine = anIndex);
 }
 
 /**
@@ -257,10 +206,71 @@ protected void runLineDone()
     if(!_playing) return;
     
     // If no more lines, just return
-    if(_runLine+1>=_script.getLineCount()) { stop(); return; }
+    if(_runLine+1>=getLineCount()) { stop(); return; }
     
     // Run next line
     runLine(_runLine+1);
+}
+
+/**
+ * Called when player does a frame of animation.
+ */
+protected void playerDidAnim()
+{
+    if(getPlayBar().isShowing()) {
+        getPlayBar().repaint();
+        resetShowingControls();
+    }
+}
+
+/**
+ * Returns whether animation is playing.
+ */
+public boolean isPlaying()  { return _playing; }
+
+/**
+ * Sets whether animation is playing.
+ */
+protected void setPlaying(boolean aValue)
+{
+    if(aValue==isPlaying()) return;
+    firePropChange(Playing_Prop, _playing, _playing = aValue);
+}
+
+/**
+ * Runs the script.
+ */
+public void play()
+{
+    // If no lines, just return
+    if(getLineCount()==0) return;
+    
+    // If script not loaded, come back
+    if(!_script.isLoaded()) { setLoading(true, () -> play()); return; }
+    
+    // Set RunAll and run first line
+    setPlaying(true);
+    playAnimDeep();
+}
+
+/**
+ * Stops the script.
+ */
+public void stop()
+{
+    stopAnimDeep();
+    setPlaying(false);
+    resetShowingControls();
+}
+
+/**
+ * Runs the script line at given index.
+ */
+public void runLine(int anIndex)
+{
+    int runTime = getLineStartTime(anIndex);
+    setRunTime(runTime);
+    playAnimDeep();
 }
 
 /**
@@ -277,7 +287,7 @@ protected void setLoading(boolean aValue, Runnable aRun)
     firePropChange(Loading_Prop, _loading, _loading = aValue);
     
     if(aValue) {
-        _script.setLoadListener(aRun);
+        _script._loadLsnr = aRun;
         ProgressBar pbar = new ProgressBar(); pbar.setIndeterminate(true); pbar.setSize(pbar.getPrefSize());
         pbar.setManaged(false); pbar.setLean(Pos.CENTER);
         _stage.addChild(pbar);
@@ -303,17 +313,6 @@ public void resetStage()
 void playButtonFired()
 {
     play();
-}
-
-/**
- * Called when player does a frame of animation.
- */
-protected void playerDidAnim()
-{
-    if(getPlayBar().isShowing()) {
-        getPlayBar().repaint();
-        resetShowingControls();
-    }
 }
 
 /**
