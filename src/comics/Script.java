@@ -135,7 +135,6 @@ public void runLine(int anIndex)
 {
     // If invalid line index, just return
     if(anIndex>=getLineCount()) { System.err.println("Script.runLine: Index beyond bounds."); return; }
-    System.out.println("Run Line " + anIndex);
 
     // Run requested line
     ScriptLine line = getLine(anIndex);

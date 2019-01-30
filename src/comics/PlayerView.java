@@ -95,29 +95,13 @@ public void setScriptText(String aStr)
 }
 
 /**
- * Returns the number of lines in script.
+ * Convenience methods for Script methods.
  */
-public int getLineCount()  { return _script.getLineCount(); }
-
-/**
- * Returns the run time for line at given index.
- */
-public int getLineRunTime(int aLine)  { return _script.getLineRunTime(aLine); }
-
-/**
- * Returns the start time for line at given index.
- */
-public int getLineStartTime(int aLine)  { return _script.getLineStartTime(aLine); }
-
-/**
- * Returns the end time for line at given index.
- */
-public int getLineEndTime(int aLine)  { return _script.getLineEndTime(aLine); }
-
-/**
- * Returns the run line for given run time.
- */
-public int getLineForTime(int aTime)  { return _script.getLineForTime(aTime); }
+int getLineCount()  { return _script.getLineCount(); }
+int getLineRunTime(int aLine)  { return _script.getLineRunTime(aLine); }
+int getLineStartTime(int aLine)  { return _script.getLineStartTime(aLine); }
+int getLineEndTime(int aLine)  { return _script.getLineEndTime(aLine); }
+int getLineForTime(int aTime)  { return _script.getLineForTime(aTime); }
 
 /**
  * Returns how long the animation has been running.
@@ -136,7 +120,7 @@ public int getRunTime()
 public void setRunTime(int aTime)
 {
     // Get RunLine and RunLine time for player time
-    int time = Math.min(aTime, getRunTimeMax());
+    int time = Math.min(aTime, getRunTimeMax()); if(time<0) time = 0;
     int runLine = getLineForTime(time);
     int lineTime = time - getLineStartTime(runLine);
     
@@ -146,7 +130,7 @@ public void setRunTime(int aTime)
 }
 
 /**
- * Returns how long the animation has been running.
+ * Returns the total run time for animation.
  */
 public int getRunTimeMax()  { return _script.getRunTime(); }
 
@@ -158,13 +142,16 @@ public int getRunLine()  { return _runLine; }
 /**
  * Runs the script.
  */
-public void setRunLine(int anIndex)
+protected void setRunLine(int anIndex)
 {
     // If already set just return
     if(anIndex==_runLine) return;
     
     // Get current RunLine and RunTimes
     int runLine = _runLine;
+    
+    // If empty index
+    if(anIndex<0) { resetStage(); _runLine = -1; return; }
     
     // If current line undefined or beyond new line, reset stage
     if(runLine<0 || runLine>anIndex) { resetStage(); runLine = -1; }
@@ -184,9 +171,7 @@ public void setRunLine(int anIndex)
         for(View child : _stage.getChildren()) child.getAnimCleared(0);
     }
     
-    // Configure PlayerView anim to call runLineDone() and playerDidAnim()
-    int runTime = getLineRunTime(anIndex);
-    getAnim(0).getAnim(runTime).setOnFinish(a -> ViewUtils.runLater(() -> runLineDone()));
+    // Configure PlayerView.Anim to call playerDidAnim() on each frame
     getAnim(0).setOnFrame(a -> playerDidAnim());
     
     // Update RunLine and call Script.runLine()
@@ -194,22 +179,46 @@ public void setRunLine(int anIndex)
 }
 
 /**
+ * Plays until end of current RunLine - which then calls playLineDone().
+ */
+protected void playLine()
+{
+    stopAnimDeep(); System.out.println("Play Line " + _runLine);
+    int runTime = getLineRunTime(getRunLine());
+    getAnim(runTime).setOnFinish(a -> ViewUtils.runLater(() -> playLineDone()));
+    playAnimDeep();
+}
+
+/**
+ * Runs the script line at given index.
+ */
+public void playLine(int anIndex)
+{
+    // If replaying line, reset RunLine
+    if(anIndex==getRunLine()) setRunLine(-1);
+    
+    // Set RunTime to Line.StartTime and playLine()
+    int runTime = getLineStartTime(anIndex);
+    setRunTime(runTime);
+    playLine();
+}
+
+/**
  * Called when runLine is done.
  */
-protected void runLineDone()
+protected void playLineDone()
 {
-    // Clear Stage, Camera and actor anims
-    getAnimCleared(0); _stage.getAnimCleared(0); _camera.getAnimCleared(0);
-    for(View child : _stage.getChildren()) child.getAnimCleared(0);
+    // Clear Anim.OnFinish so this this doesn't get called again
+    getAnim(0).setOnFinish(null);
     
-    // If not RunAll, just return
+    // If not Playing, just return
     if(!_playing) return;
     
     // If no more lines, just return
     if(_runLine+1>=getLineCount()) { stop(); return; }
     
     // Run next line
-    runLine(_runLine+1);
+    playLine(_runLine+1);
 }
 
 /**
@@ -229,28 +238,19 @@ protected void playerDidAnim()
 public boolean isPlaying()  { return _playing; }
 
 /**
- * Sets whether animation is playing.
- */
-protected void setPlaying(boolean aValue)
-{
-    if(aValue==isPlaying()) return;
-    firePropChange(Playing_Prop, _playing, _playing = aValue);
-}
-
-/**
  * Runs the script.
  */
 public void play()
 {
-    // If no lines, just return
-    if(getLineCount()==0) return;
+    // If is playing or no lines, just return
+    if(isPlaying()) return; if(getLineCount()==0) return;
     
     // If script not loaded, come back
     if(!_script.isLoaded()) { setLoading(true, () -> play()); return; }
     
-    // Set RunAll and run first line
-    setPlaying(true);
-    playAnimDeep();
+    // Start anim and firePropChange
+    playLine(); _playing = true;
+    firePropChange(Playing_Prop, !_playing, _playing);
 }
 
 /**
@@ -258,19 +258,15 @@ public void play()
  */
 public void stop()
 {
-    stopAnimDeep();
-    setPlaying(false);
+    // If already stopped, just return
+    if(!isPlaying()) return;
+    
+    // Stop anim and firePropChange
+    stopAnimDeep(); _playing = false;
+    firePropChange(Playing_Prop, !_playing, _playing);
+    
+    // Reset controls
     resetShowingControls();
-}
-
-/**
- * Runs the script line at given index.
- */
-public void runLine(int anIndex)
-{
-    int runTime = getLineStartTime(anIndex);
-    setRunTime(runTime);
-    playAnimDeep();
 }
 
 /**
@@ -302,6 +298,7 @@ protected void setLoading(boolean aValue, Runnable aRun)
  */
 public void resetStage()
 {
+    getAnimCleared(0); _camera.getAnimCleared(0); _stage.getAnimCleared(0);
     _stage.removeChildren();
     _camera.setZoom(1);
     _camera.setBlur(0);
@@ -332,7 +329,7 @@ public void setShowControls(boolean aValue)
 /**
  * Returns whether controls are showing.
  */
-public boolean isShowingControls()  { return _playButton!=null && _playButton.isShowing(); }
+public boolean isShowingControls()  { return _playBar!=null && _playBar.isShowing(); }
 
 /**
  * Sets whether controls are showing.
@@ -343,8 +340,8 @@ protected void setShowingControls(boolean aValue)
     if(aValue==isShowingControls()) return;
     
     // Add or remove PlayButton
-    if(aValue) addChild(getPlayButton());
-    else removeChild(getPlayButton());
+    //if(aValue) addChild(getPlayButton());
+    //else removeChild(getPlayButton());
     
     // Add or remove PlayBar
     if(aValue) addChild(getPlayBar());
@@ -360,8 +357,7 @@ protected void resetShowingControls()
     if(!_script.isLoaded()) { setLoading(true, () -> resetShowingControls()); return; }
     
     // If should never show controls, just return
-    if(!isShowControls()) {
-        setShowingControls(false); return; }
+    if(!isShowControls()) { setShowingControls(false); return; }
         
     // Get whether controls should be showing
     boolean shouldShow = false;

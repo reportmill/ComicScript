@@ -88,7 +88,7 @@ public static void explodePiece(View aView, int aRow, int aCol, int aStart)
     // Configure animation for piece and play
     ViewAnim anim = iview.getAnim(aStart).getAnim(aStart+time);
     anim.setX(nx).setY(ny).setRotate(rot).setOpacity(0).startFast();
-    anim.setOnFinish(a -> view.removeChild(iview)).play();
+    anim.setOnFinish(a -> view.removeChild(iview));//.play();
 }
 
 public static void main(String args[])

@@ -33,8 +33,8 @@ public void showStage()
     
     String lines[] = Samples.getSample("Welcome");
     setScriptLines(lines);
-    
-    runLater(() -> getPlayer().runLine(0));
+
+    runLater(() -> getPlayer());
 }
 
 /**
@@ -110,7 +110,7 @@ protected void respondUI(ViewEvent anEvent)
         
     // Handle RunButton
     if(anEvent.equals("RunButton")) { resetScript();
-        getPlayer().setRunTime(0); getPlayer().play(); }
+        getPlayer().play(); }
     
     // Handle AgainButton
     if(anEvent.equals("AgainButton"))
@@ -135,7 +135,7 @@ public void runCurrentLine()
     int lineIndex = line.getIndex();
     resetScript();
     getPlayer().stop();
-    getPlayer().runLine(lineIndex);
+    getPlayer().playLine(lineIndex);
 }
 
 /**
