@@ -9,20 +9,23 @@ import snap.view.*;
  */
 public class CameraView extends BoxView {
     
+    // The Player
+    PlayerView    _player;
+    
     // The zoom
-    double     _zoom = 1;
+    double        _zoom = 1;
     
     // The blur
-    double     _blur = 0;
+    double        _blur = 0;
     
     // The words
-    String     _words[];
+    String        _words[];
     
     // The start time
-    int        _startTime = 0;
+    int           _startTime = 0;
     
     // The runtime for last command
-    int        _runTime;
+    int           _runTime;
     
 /**
  * Creates a CameraView for content.
@@ -164,5 +167,26 @@ public void setValue(String aPropName, Object aValue)
     else if(aPropName.equals("Zoom")) setZoom(SnapUtils.doubleValue(aValue));
     else super.setValue(aPropName, aValue);
 }
+
+/**
+ * Override to paint PlayBar background shadow.
+ */
+protected void paintAbove(Painter aPntr)
+{
+    if(_player.getPlayBar().isShowing()) {
+        aPntr.clipRect(0,0,getWidth(),getHeight());
+        aPntr.drawImage(getPlayBarShadowImage(), -_rad3, getHeight() - _player.getPlayBar().getHeight() - _rad2);
+    }
+}
+
+Image getPlayBarShadowImage()
+{
+    if(_pbImg!=null && _pbImg.getWidth()==getWidth()+_rad6) return _pbImg;
+    Rect rect = new Rect(0,0,getWidth() + _rad2, _player.getPlayBar().getHeight() + _rad2);
+    return _pbImg = ShadowEffect.getShadowImage(rect, _rad, new Color(0,0,0,.25));
+}
+
+Image _pbImg;
+int _rad = 15, _rad2 = _rad*2, _rad3 = _rad*3, _rad4 = _rad*4, _rad6 = _rad*6;
 
 }

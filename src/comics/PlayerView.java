@@ -32,9 +32,6 @@ public class PlayerView extends BoxView {
     // The play button
     PlayButtonBig       _playButton;
     
-    // Whether mouse is over
-    boolean             _mouseOver;
-    
     // The run time for last mouse
     int                 _lastMouseRunTime;
     
@@ -54,7 +51,7 @@ public PlayerView()
     _stage.setBorder(Color.BLACK, 1);
     
     // Create/configure camera
-    _camera = new CameraView(_stage);
+    _camera = new CameraView(_stage); _camera._player = this;
     
     // Create/configure this view
     setPadding(10,10,10,10);
@@ -119,14 +116,22 @@ public int getRunTime()
  */
 public void setRunTime(int aTime)
 {
+    // If playing, stop anim
+    boolean playing = isPlaying();
+    if(playing) { getAnim(0).setOnFinish(null); stopAnimDeep(); }
+    
     // Get RunLine and RunLine time for player time
     int time = Math.min(aTime, getRunTimeMax()); if(time<0) time = 0;
     int runLine = getLineForTime(time);
     int lineTime = time - getLineStartTime(runLine);
     
+    // Set RunLine and LineTime for time
     setRunLine(runLine);
     setAnimTimeDeep(lineTime);
-    repaint();
+    
+    // If was playing, restart
+    if(playing)
+        playLine();
 }
 
 /**
@@ -248,6 +253,10 @@ public void play()
     // If script not loaded, come back
     if(!_script.isLoaded()) { setLoading(true, () -> play()); return; }
     
+    // If at end, reset to beginning
+    if(getRunTime()>=getRunTimeMax())
+        setRunTime(0);
+    
     // Start anim and firePropChange
     playLine(); _playing = true;
     firePropChange(Playing_Prop, !_playing, _playing);
@@ -267,6 +276,7 @@ public void stop()
     
     // Reset controls
     resetShowingControls();
+    repaint();
 }
 
 /**
@@ -362,9 +372,10 @@ protected void resetShowingControls()
     // Get whether controls should be showing
     boolean shouldShow = false;
     if(!isPlaying()) shouldShow = true;
-    else if(_mouseOver) {
+    else if(getPlayBar().isMouseOver()) shouldShow = true;
+    else if(_camera.isMouseOver()) {
         int idleTime = getRunTime() - _lastMouseRunTime;
-        if(idleTime<2500) shouldShow = true;
+        if(idleTime<1600) shouldShow = true;
     }
     
     // Set showing
@@ -413,8 +424,8 @@ protected void layoutImpl()
  */
 protected void processEvent(ViewEvent anEvent)
 {
-    if(anEvent.isMouseEnter()) { _mouseOver = true; resetShowingControls(); }
-    else if(anEvent.isMouseExit()) { _mouseOver = false; resetShowingControls(); }
+    if(anEvent.isMouseEnter()) resetShowingControls();
+    else if(anEvent.isMouseExit()) resetShowingControls();
     else if(anEvent.isMouseMove())  {
         _lastMouseRunTime = getRunTime(); resetShowingControls();
     }

@@ -12,6 +12,7 @@ public class PlayBar extends RowView {
     static final int BAR_Y = 4;
     static final int BAR_HEIGHT = 3;
     static final Color MARK_COLOR = new Color("#F4D64A");
+    static final Color BUTTON_COLOR = new Color(1,1,1, .8);
     
 /**
  * Creates a PlayBar.
@@ -69,7 +70,7 @@ protected void processEvent(ViewEvent anEvent)
 protected void setRunTime(double aX)
 {
     int runTime = (int)Math.round(aX/getWidth()*_player.getRunTimeMax());
-    _player.setRunTime(runTime);
+    _player.setRunTime(_player._lastMouseRunTime = runTime);
 }
 
 /**
@@ -103,7 +104,7 @@ public class PlayButton extends View {
             path.moveTo(w/2-pw*3/5, h/2-ph/2); path.lineBy(pw/5,0); path.lineBy(0,ph); path.lineBy(-pw/5,0);
             path.close();
         }
-        aPntr.setColor(new Color(1,1,1, .6)); aPntr.fill(path);
+        aPntr.setColor(BUTTON_COLOR); aPntr.fill(path);
     }
     
     /** Override to watch mouse. */
