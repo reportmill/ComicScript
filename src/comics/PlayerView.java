@@ -164,20 +164,18 @@ protected void setRunLine(int anIndex)
     // Otherwise, reset current line to end
     else {
         setAnimTimeDeep(getLineRunTime(runLine));
-        getAnimCleared(0); _camera.getAnimCleared(0); _stage.getAnimCleared(0);
-        for(View child : _stage.getChildren()) child.getAnimCleared(0);
+        clearAnims();
     }
     
     // Configure and run lines up to index
     for(int i=runLine+1; i<=anIndex; i++) {
         _script.runLine(i); if(i==anIndex) break;
         setAnimTimeDeep(getLineRunTime(i));
-        getAnimCleared(0); _camera.getAnimCleared(0); _stage.getAnimCleared(0);
-        for(View child : _stage.getChildren()) child.getAnimCleared(0);
+        clearAnims();
     }
     
     // Configure PlayerView.Anim to call playerDidAnim() on each frame
-    getAnim(0).setOnFrame(a -> playerDidAnim());
+    getAnim(0).setOnFrame(a -> playerDidFrame());
     
     // Update RunLine and call Script.runLine()
     firePropChange(RunLine_Prop, runLine, _runLine = anIndex);
@@ -229,10 +227,10 @@ protected void playLineDone()
 /**
  * Called when player does a frame of animation.
  */
-protected void playerDidAnim()
+protected void playerDidFrame()
 {
     if(getPlayBar().isShowing()) {
-        getPlayBar().repaint();
+        getPlayBar().playerDidFrame();
         resetShowingControls();
     }
 }
@@ -306,12 +304,21 @@ protected void setLoading(boolean aValue, Runnable aRun)
 /**
  * Resets the stage.
  */
-public void resetStage()
+protected void resetStage()
 {
-    getAnimCleared(0); _camera.getAnimCleared(0); _stage.getAnimCleared(0);
     _stage.removeChildren();
     _camera.setZoom(1);
     _camera.setBlur(0);
+    clearAnims();
+}
+
+/**
+ * Clears anims.
+ */
+protected void clearAnims()
+{
+    getAnimCleared(0); _camera.getAnimCleared(0); _stage.getAnimCleared(0);
+    for(View child : _stage.getChildren()) child.getAnimCleared(0);
 }
 
 /**
@@ -414,7 +421,7 @@ protected void layoutImpl()
     // If PlayBar showing, position at bottom-center of camera rect
     PlayBar pbar = getPlayBar();
     if(pbar.isShowing()) {
-        pbar.setBounds(getCamera().getX()+10, getCamera().getMaxY() - pbar.getHeight(), getCamera().getWidth()-20,
+        pbar.setBounds(getCamera().getX(), getCamera().getMaxY() - pbar.getHeight(), getCamera().getWidth(),
             pbar.getHeight());
     }
 }
