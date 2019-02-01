@@ -35,6 +35,9 @@ public class PlayerView extends BoxView {
     // The run time for last mouse
     int                 _lastMouseRunTime;
     
+    // The runnable to call playLineDone()
+    Runnable            _playLineDoneRun = () -> playLineDone();
+    
     // Constants for Property Changes
     public static final String RunLine_Prop = "RunLine";
     public static final String Playing_Prop = "Playing";
@@ -186,9 +189,9 @@ protected void setRunLine(int anIndex)
  */
 protected void playLine()
 {
-    _camera.stopAnimDeep(); System.out.println("Play Line " + _runLine);
+    _camera.stopAnimDeep(); //System.out.println("Play Line " + _runLine);
     int runTime = getLineRunTime(getRunLine());
-    _camera.getAnim(runTime).setOnFinish(a -> ViewUtils.runLater(() -> playLineDone()));
+    _camera.getAnim(runTime).setOnFinish(a -> ViewUtils.runLater(_playLineDoneRun));
     _camera.playAnimDeep();
 }
 
@@ -346,7 +349,7 @@ public void setShowControls(boolean aValue)
 /**
  * Returns whether controls are showing.
  */
-public boolean isShowingControls()  { return _playBar!=null && _playBar.isShowing(); }
+public boolean isShowingControls()  { return _playBarShowing; }//_playBar!=null && _playBar.isShowing(); }
 
 /**
  * Sets whether controls are showing.
@@ -355,15 +358,23 @@ protected void setShowingControls(boolean aValue)
 {
     // If value already set, just return
     if(aValue==isShowingControls()) return;
+    _playBarShowing = aValue;
     
     // Add or remove PlayButton
     //if(aValue) addChild(getPlayButton());
     //else removeChild(getPlayButton());
     
     // Add or remove PlayBar
-    if(aValue) addChild(getPlayBar());
-    else removeChild(getPlayBar());
-}
+    getPlayBar().getAnim(0).finish();
+    if(aValue) {
+        addChild(getPlayBar());
+        getPlayBar().setOpacity(0); getPlayBar().getAnimCleared(300).setOpacity(1).play();
+    }
+    else {
+        getPlayBar().setOpacity(1); getPlayBar().getAnimCleared(300).setOpacity(0).play();
+        getPlayBar().getAnim(0).setOnFinish(a -> removeChild(getPlayBar()));
+    }
+} boolean _playBarShowing;
 
 /**
  * Updates whether controls are showing.
@@ -382,7 +393,7 @@ protected void resetShowingControls()
     else if(getPlayBar().isMouseOver()) shouldShow = true;
     else if(_camera.isMouseOver()) {
         int idleTime = getRunTime() - _lastMouseRunTime;
-        if(idleTime<1600) shouldShow = true;
+        if(idleTime<1200) shouldShow = true;
     }
     
     // Set showing

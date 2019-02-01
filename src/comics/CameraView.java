@@ -175,6 +175,7 @@ protected void paintAbove(Painter aPntr)
 {
     if(_player.getPlayBar().isShowing()) {
         double h = _player.getPlayBar().getHeight() + 10, y = getHeight() - h;
+        aPntr.setOpacity(_player.getPlayBar().getOpacity());
         aPntr.setPaint(_grad); aPntr.fillRect(0, y, getWidth(), h);
     }
 }

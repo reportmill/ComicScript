@@ -65,6 +65,7 @@ void setMouseOverBar(boolean aValue)
 {
     if(aValue==_mouseOverBar) return;
     _mouseOverBar = aValue;
+    getAnim(0).finish();
     if(aValue) getAnimCleared(300).setValue(BarHeight_Prop, 5d).play();
     else getAnimCleared(300).setValue(BarHeight_Prop, 3d).play();
 }
