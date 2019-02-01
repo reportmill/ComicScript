@@ -107,7 +107,7 @@ public int getRunTime()
 {
     int runLine = getRunLine();
     int runLineStartTime = getLineStartTime(runLine);
-    int runLineTime = runLineStartTime + getAnim(0).getTime();
+    int runLineTime = runLineStartTime + _camera.getAnim(0).getTime();
     return runLineTime;
 }
 
@@ -118,7 +118,7 @@ public void setRunTime(int aTime)
 {
     // If playing, stop anim
     boolean playing = isPlaying();
-    if(playing) { getAnim(0).setOnFinish(null); stopAnimDeep(); }
+    if(playing) { _camera.getAnim(0).setOnFinish(null); _camera.stopAnimDeep(); }
     
     // Get RunLine and RunLine time for player time
     int time = Math.min(aTime, getRunTimeMax()); if(time<0) time = 0;
@@ -127,7 +127,7 @@ public void setRunTime(int aTime)
     
     // Set RunLine and LineTime for time
     setRunLine(runLine);
-    setAnimTimeDeep(lineTime);
+    _camera.setAnimTimeDeep(lineTime);
     
     // If was playing, restart
     if(playing)
@@ -163,19 +163,19 @@ protected void setRunLine(int anIndex)
     
     // Otherwise, reset current line to end
     else {
-        setAnimTimeDeep(getLineRunTime(runLine));
+        _camera.setAnimTimeDeep(getLineRunTime(runLine));
         clearAnims();
     }
     
     // Configure and run lines up to index
     for(int i=runLine+1; i<=anIndex; i++) {
         _script.runLine(i); if(i==anIndex) break;
-        setAnimTimeDeep(getLineRunTime(i));
+        _camera.setAnimTimeDeep(getLineRunTime(i));
         clearAnims();
     }
     
     // Configure PlayerView.Anim to call playerDidAnim() on each frame
-    getAnim(0).setOnFrame(a -> playerDidFrame());
+    _camera.getAnim(0).setOnFrame(a -> playerDidFrame());
     
     // Update RunLine and call Script.runLine()
     firePropChange(RunLine_Prop, runLine, _runLine = anIndex);
@@ -186,10 +186,10 @@ protected void setRunLine(int anIndex)
  */
 protected void playLine()
 {
-    stopAnimDeep(); System.out.println("Play Line " + _runLine);
+    _camera.stopAnimDeep(); System.out.println("Play Line " + _runLine);
     int runTime = getLineRunTime(getRunLine());
-    getAnim(runTime).setOnFinish(a -> ViewUtils.runLater(() -> playLineDone()));
-    playAnimDeep();
+    _camera.getAnim(runTime).setOnFinish(a -> ViewUtils.runLater(() -> playLineDone()));
+    _camera.playAnimDeep();
 }
 
 /**
@@ -212,7 +212,7 @@ public void playLine(int anIndex)
 protected void playLineDone()
 {
     // Clear Anim.OnFinish so this this doesn't get called again
-    getAnim(0).setOnFinish(null);
+    _camera.getAnim(0).setOnFinish(null);
     
     // If not Playing, just return
     if(!_playing) return;
@@ -269,7 +269,7 @@ public void stop()
     if(!isPlaying()) return;
     
     // Stop anim and firePropChange
-    stopAnimDeep(); _playing = false;
+    _camera.stopAnimDeep(); _playing = false;
     firePropChange(Playing_Prop, !_playing, _playing);
     
     // Reset controls
@@ -317,7 +317,7 @@ protected void resetStage()
  */
 protected void clearAnims()
 {
-    getAnimCleared(0); _camera.getAnimCleared(0); _stage.getAnimCleared(0);
+    _camera.getAnimCleared(0); _stage.getAnimCleared(0);
     for(View child : _stage.getChildren()) child.getAnimCleared(0);
 }
 
