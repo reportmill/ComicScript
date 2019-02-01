@@ -65,7 +65,7 @@ void setMouseOverBar(boolean aValue)
 {
     if(aValue==_mouseOverBar) return;
     _mouseOverBar = aValue;
-    if(aValue) getAnimCleared(300).setValue(BarHeight_Prop, 6d).play();
+    if(aValue) getAnimCleared(300).setValue(BarHeight_Prop, 5d).play();
     else getAnimCleared(300).setValue(BarHeight_Prop, 3d).play();
 }
 
@@ -74,7 +74,7 @@ void setMouseOverBar(boolean aValue)
  */
 protected void paintFront(Painter aPntr)
 {
-    double x = 10, w = getWidth() - x*2, barY = getBarY(), barH = getBarHeight(), btnH = Math.max(barH*2,8);
+    double x = 10, w = getWidth() - x*2, barY = getBarY(), barH = getBarHeight(), btnH = barH*2+2;
     aPntr.setColor(new Color(1,1,1,.4)); aPntr.fillRect(x, barY, w, barH);
     
     // Draw progress bar background

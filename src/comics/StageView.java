@@ -1,4 +1,5 @@
 package comics;
+import snap.gfx.Color;
 import snap.viewx.SnapScene;
 
 /**
@@ -6,6 +7,12 @@ import snap.viewx.SnapScene;
  */
 public class StageView extends SnapScene {
 
-
+/**
+ * Creates a StageView.
+ */
+public StageView()
+{
+    setFill(Color.BLACK);
+}
 
 }

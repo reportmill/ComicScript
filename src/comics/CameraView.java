@@ -174,19 +174,22 @@ public void setValue(String aPropName, Object aValue)
 protected void paintAbove(Painter aPntr)
 {
     if(_player.getPlayBar().isShowing()) {
-        aPntr.clipRect(0,0,getWidth(),getHeight());
-        aPntr.drawImage(getPlayBarShadowImage(), -_rad3, getHeight() - _player.getPlayBar().getHeight() - _rad2);
+        double h = _player.getPlayBar().getHeight() + 10, y = getHeight() - h;
+        aPntr.setPaint(_grad); aPntr.fillRect(0, y, getWidth(), h);
     }
 }
 
-Image getPlayBarShadowImage()
-{
+/** Gradient for  Bottom. */
+Color _c0 = Color.CLEAR, _c1 = new Color(0,0,0,.1), _c2 = new Color(0,0,0,.2), _c3 = new Color(0,0,0,.3);
+GradientPaint.Stop _stops[] = GradientPaint.getStops(0, _c0, .2, _c1, .35, _c2, 1, _c3);
+GradientPaint _grad = new GradientPaint(90, _stops);
+
+//aPntr.clipRect(0,0,getWidth(),getHeight());
+//aPntr.drawImage(getPlayBarShadowImage(), -_rad3, getHeight() - _player.getPlayBar().getHeight() - _rad2);
+/*Image getPlayBarShadowImage() {
     if(_pbImg!=null && _pbImg.getWidth()==getWidth()+_rad6) return _pbImg;
     Rect rect = new Rect(0,0,getWidth() + _rad2, _player.getPlayBar().getHeight() + _rad2);
-    return _pbImg = ShadowEffect.getShadowImage(rect, _rad, new Color(0,0,0,.25));
-}
-
-Image _pbImg;
-int _rad = 15, _rad2 = _rad*2, _rad3 = _rad*3, _rad4 = _rad*4, _rad6 = _rad*6;
+    return _pbImg = ShadowEffect.getShadowImage(rect, _rad, _c2); }
+Image _pbImg; int _rad = 15, _rad2 = _rad*2, _rad3 = _rad*3, _rad4 = _rad*4, _rad6 = _rad*6; */
 
 }
