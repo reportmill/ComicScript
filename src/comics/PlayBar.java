@@ -103,12 +103,13 @@ protected void paintFront(Painter aPntr)
  */
 protected void processEvent(ViewEvent anEvent)
 {
-    if(anEvent.isMousePress() && anEvent.getY()<=BAR_MAXY || anEvent.isMouseDrag())
+    if(anEvent.isMousePress() || anEvent.isMouseDrag())
         setRunTime(anEvent.getX());
         
     if(anEvent.isMouseExit()) setMouseOverBar(false);
     if(anEvent.isMouseEvent())
         setMouseOverBar(isMouseDown() || anEvent.getY()>=0 && anEvent.getY()<=BAR_MAXY);
+    anEvent.consume();
 }
 
 /**
@@ -205,11 +206,12 @@ public class PlayButton extends View {
 public static class PlayButtonBig extends View {
     
     // Whether mouse is over
-    boolean _mouseOver;
+    boolean _mouseOver, _playing;
     
     /** Creates a PlayButton. */
-    public PlayButtonBig()
+    public PlayButtonBig(boolean isPlaying)
     {
+        _playing = isPlaying;
         setSize(100,100); setName("PlayButtonBig");
         setManaged(false);
         setLean(Pos.CENTER);
@@ -227,9 +229,20 @@ public static class PlayButtonBig extends View {
         Shape c4 = Shape.subtract(c2, c3);
         aPntr.setColor(new Color(1,1,1,.3)); aPntr.fill(c4);
         
-        Path path = new Path(); double pw = 30, ph = 45;
-        path.moveTo(w/2-pw*1/3, h/2-ph/2); path.lineBy(pw,ph/2); path.lineBy(-pw,ph/2); path.close();
-        aPntr.setColor(new Color(1,1,1,_mouseOver? .6 : .3)); aPntr.fill(path);
+        if(_playing) {
+            Path path = new Path(); double pw = 40, ph = 40;
+            path.moveTo(w/2-pw*1.5/4, h/2-ph/2); path.lineBy(pw/4,0); path.lineBy(0,ph); path.lineBy(-pw/4,0);
+            path.close();
+            path.moveTo(w/2+pw*.5/4, h/2-ph/2); path.lineBy(pw/4,0); path.lineBy(0,ph); path.lineBy(-pw/4,0);
+            path.close();
+            aPntr.setColor(new Color(1,1,1,_mouseOver? .6 : .3)); aPntr.fill(path);
+        }
+     
+        else {   
+            Path path = new Path(); double pw = 30, ph = 45;
+            path.moveTo(w/2-pw*1/3, h/2-ph/2); path.lineBy(pw,ph/2); path.lineBy(-pw,ph/2); path.close();
+            aPntr.setColor(new Color(1,1,1,_mouseOver? .6 : .3)); aPntr.fill(path);
+        }
     }
     
     /** Override to watch mouse. */

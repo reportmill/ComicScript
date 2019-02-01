@@ -60,7 +60,7 @@ public PlayerView()
     setPadding(10,10,10,10);
     setContent(_camera);
     setClipToBounds(true);
-    enableEvents(MouseEnter, MouseExit, MouseMove);
+    enableEvents(MouseEnter, MouseExit, MouseMove, MousePress);
     
     // Create Script (empty)
     _script = new Script(this, "");
@@ -416,7 +416,7 @@ protected PlayBar getPlayBar()
 protected PlayButtonBig getPlayButton()
 {
     if(_playButton!=null) return _playButton;
-    _playButton = new PlayButtonBig();
+    _playButton = new PlayButtonBig(isPlaying());
     _playButton.addEventHandler(e -> playButtonFired(), Action);
     return _playButton;
 }
@@ -446,6 +446,12 @@ protected void processEvent(ViewEvent anEvent)
     else if(anEvent.isMouseExit()) resetShowingControls();
     else if(anEvent.isMouseMove())  {
         _lastMouseRunTime = getRunTime(); resetShowingControls();
+    }
+    else if(anEvent.isMousePress()) {
+        PlayButtonBig pb = new PlayButtonBig(isPlaying());
+        addChild(pb);
+        pb.animate(); pb.getAnim(0).setOnFinish(a -> removeChild(pb));
+        if(isPlaying()) stop(); else play();
     }
     else super.processEvent(anEvent);
 }

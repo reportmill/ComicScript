@@ -77,7 +77,7 @@ protected void initUI()
     
     // Watch for clicks on StageView
     StageView stage = _player.getStage();
-    enableEvents(stage, MousePress);
+    //enableEvents(stage, MousePress);
     
     // Get master ColView and add StageBox
     ColView colView = getUI(ColView.class);
@@ -117,8 +117,7 @@ protected void respondUI(ViewEvent anEvent)
         runCurrentLine();
     
     // Handle Stage MousePressed
-    if(anEvent.isMousePress())
-        selectSettingItem(anEvent.getX(), anEvent.getY());
+    //if(anEvent.isMousePress()) selectSettingItem(anEvent.getX(), anEvent.getY());
 }
 
 /**
