@@ -43,6 +43,11 @@ void addButton(double aX, double aY)
 public static void explode(View aView, int aStart)
 {
     aView.setOpacity(1);
+    
+    if(aView instanceof ImageView && !((ImageView)aView).getImage().isLoaded()) {
+        System.out.println("Image not loaded"); return; }
+    if(aView.getWidth()==0) {
+        System.out.println("Image width zero"); return; }
      
     // Create explode pieces
     for(int i=0;i<10;i++)

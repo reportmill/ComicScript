@@ -167,7 +167,7 @@ protected void runSetting(ScriptLine aScriptLine)
     // Get setting Image and ImageView
     String words[] = aScriptLine.getWords();
     Image img = getNextImage(words, 0); if(img==null) return;
-    ImageView iview = new ImageView(img, true, true); iview.setName(img.getName());
+    ImageView iview = new ImageView(img, true, true);
     iview.setSize(_stage.getWidth(), _stage.getHeight());
     iview.setName("Setting"); //iview.setOpacity(.5);
     
@@ -196,15 +196,15 @@ public View getView(ScriptLine aScriptLine)
 {
     // Get image for word
     String words[] = aScriptLine.getWords();
-    Image img = getNextImage(words, -1);
+    Asset asset = getNextAsset(words, -1);
     
     // Get actor for image
-    String name = img!=null? img.getName() : null;
+    String name = asset!=null? asset.getName() : null;
     View child = getView(name);
     
     // If actor not found, create
     if(child==null) {
-        ImageView iview = new Actor(img); iview.setName(img.getName()); child = iview; iview.setX(-999);
+        ImageView iview = new Actor(this,asset); child = iview; iview.setX(-999);
         _stage.addChild(child);
     }
     
@@ -225,17 +225,38 @@ public View getView(String aName)
  */
 public Image getNextImage(String theWords[], int aStart)
 {
+    Asset asset = getNextAsset(theWords, aStart);
+    Image img = asset!=null? asset.getImage() : null;
+    return img;
+}
+
+/**
+ * Returns the next image.
+ */
+public Asset getNextAsset(String theWords[], int aStart)
+{
     for(int i=aStart+1;i<theWords.length;i++) { String word = theWords[i];
         
         // Look for actor/setting
-        Image img = Index.get().getActorImage(word);
-        if(img==null) img = Index.get().getSettingImage(word);
+        Asset asset = AssetIndex.get().getActor(word);
+        if(asset==null) asset = AssetIndex.get().getSetting(word);
         
         // Get file from URL and load image
-        if(img!=null)
-            return img;
+        if(asset!=null)
+            return asset;
     }
     return null;
+}
+
+/**
+ * Returns the given feet size in points.
+ */
+public double feetToPoints(double aValue)
+{
+    double stageHeightPoints = _player.getStage().getHeight(), stageHeightFeet = 11.64;
+    double pointHeight = aValue*stageHeightPoints/stageHeightFeet;
+    pointHeight = Math.round(pointHeight);
+    return pointHeight;
 }
 
 }

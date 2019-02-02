@@ -3,6 +3,7 @@ import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.SnapScene;
+import comics.Asset.*;
 
 /**
  * A class to model actors.
@@ -11,6 +12,12 @@ public class Actor extends ImageView {
     
     // The stage
     SnapScene        _stage;
+    
+    // The Script
+    Script           _script;
+    
+    // The Asset
+    Asset            _asset;
     
     // The script line
     ScriptLine       _scriptLine;
@@ -33,13 +40,21 @@ public class Actor extends ImageView {
 /**
  * Create new actor.
  */
-public Actor(Image anImg)
+public Actor(Script aScript, Asset anAsset)
 {
-    super(anImg);
-    setFillHeight(true); setKeepAspect(true);
-    if(!anImg.isLoaded()) anImg.addPropChangeListener(_imgLoadLsnr = pce -> imageLoaded());
+    _script = aScript;
+    _asset = anAsset;
+    setName(anAsset.getName());
+    Image img = anAsset.getImage();
+    setImage(img);
+    setFillHeight(true); setFillWidth(true); //setKeepAspect(true);
+    if(!img.isLoaded()) img.addPropChangeListener(_imgLoadLsnr = pce -> imageLoaded());
     else imageLoaded();
     setEffect(new ShadowEffect(6, Color.BLACK, 0, 0));
+    
+    double heightFeet = _asset.getHeight(), widthFeet = heightFeet/2;
+    double w = _script.feetToPoints(widthFeet), h = _script.feetToPoints(heightFeet);
+    setSize(w,h);
 }
 
 /**
@@ -47,8 +62,45 @@ public Actor(Image anImg)
  */
 void imageLoaded()
 {
-    setSize(getPrefWidth(-1)/2, getPrefHeight(-1)/2);
+    setSizeForAsset(_asset);
     if(_imgLoadLsnr!=null) { getImage().removePropChangeListener(_imgLoadLsnr); _imgLoadLsnr = null; }
+}
+
+/**
+ * Returns the Asset.
+ */
+public Asset getAsset()  { return _asset; }
+
+/**
+ * Sets the Asset.
+ */
+//public void setAsset(Asset anAsset)  { }
+
+/**
+ * Returns the size for an asset.
+ */
+protected Size getAssetSize(Asset anAsset)
+{
+    Image img = anAsset.getImage();
+    if(!img.isLoaded()) {
+        double heightFeet = anAsset.getHeight(), widthFeet = heightFeet/2;
+        double w = _script.feetToPoints(widthFeet), h = _script.feetToPoints(heightFeet);
+        return new Size(w,h);
+    }
+    
+    double imageHeight = img.getHeight(), imageWidth = img.getWidth();
+    double heightFeet = anAsset.getHeight(), widthFeet = heightFeet*imageWidth/imageHeight;
+    double w = _script.feetToPoints(widthFeet), h = _script.feetToPoints(heightFeet);
+    return new Size(w,h);
+}
+
+/**
+ * Returns the size for an asset.
+ */
+protected void setSizeForAsset(Asset anAsset)
+{
+    Size size = getAssetSize(anAsset);
+    setSize(size);
 }
 
 /**
@@ -251,12 +303,12 @@ public void runWave()
 }
 
 /**
- * Returns an anim entry for name.
+ * Returns an anim asset for name.
  */
-public Index.AnimEntry getAnimEntry(String aName)
+public AnimImage getAnimImageAsset(String aName)
 {
     String name = FilePathUtils.getFileNameSimple(getName());
-    return Index.get().getAnim(name, aName);
+    return AssetIndex.get().getAnim(name, aName);
 }
 
 /**
@@ -265,7 +317,7 @@ public Index.AnimEntry getAnimEntry(String aName)
 public Image getAnimImage(String aName)
 {
     String name = FilePathUtils.getFileNameSimple(getName());
-    Image img = Index.get().getAnimImage(name, aName);
+    Image img = AssetIndex.get().getAnimImage(name, aName);
     return img;
 }
 
@@ -275,7 +327,7 @@ public Image getAnimImage(String aName)
 public void setAnimImage(String aName, int aTime, int aFrame)
 {
     // Get image for name and cache old image
-    Index.AnimEntry anim = getAnimEntry(aName); if(anim==null) return;
+    AnimImage anim = getAnimImageAsset(aName); if(anim==null) return;
     Image img = anim.getImage(); //getAnimImage(aName); if(img==null) return false;
     
     // If image loading, just return
@@ -283,36 +335,36 @@ public void setAnimImage(String aName, int aTime, int aFrame)
         _scriptLine.addUnloadedImage(img); return; }
     
     // Get old image and offset
-    Image imgOld = getImage();
     double offsetX = _offsetX;
     
     // Set image and size
-    setImage(img, anim.getOffsetX());
+    setAssetImage(anim, anim.getOffsetX()); //setImage(img, anim.getOffsetX());
     
     // Configure anim
     getAnim(_startTime).getAnim(_startTime+aTime).setValue("Frame", aFrame);
-    getAnim(_startTime).getAnim(_startTime+aTime).setOnFinish(a -> {
-        setImage(imgOld, offsetX); });
+    getAnim(0).setOnFinish(a -> { setAssetImage(_asset, offsetX); });
 }
 
 /**
- * Sets the image.
+ * Sets the image from given asset.
  */
-public void setImage(Image anImg, double offsetX)
+public void setAssetImage(Asset anAsset, double offsetX)
 {
     /// Get old/new offsets (corrected if scale is flipped)
     double offOld = _offsetX, offNew = offsetX; if(getScaleX()<0) { offOld = -offOld; offNew = -offNew; }
     
     // Get old/new width & height
     double oldW = getWidth(), oldH = getHeight();
-    double newW = anImg.getWidth()/2, newH = anImg.getHeight()/2;
+    Size size = getAssetSize(anAsset);
+    double newW = size.width, newH = size.height;
     
     // Calculate new x/y
     double bx = getX() + (oldW/2 + offOld) - (newW/2 + offNew);
     double by = getY() - (newH - oldH);
     
     // Set new image, bounds, offset and reset frame
-    super.setImage(anImg);
+    Image img = anAsset.getImage();
+    setImage(img);
     setBounds(bx, by, newW, newH);
     setFrame(0); _offsetX = offsetX;
 }
