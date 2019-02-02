@@ -19,3 +19,14 @@ Lady says You're cute!
 Man says I feel sick
 Camera zooms out
 Man walks out
+
+Sample AllActions
+Setting is beach
+Lady walks in
+Man walks in from right
+Lady waves
+Man waves
+Lady dances
+Man dances
+lady jumps
+man jumps
