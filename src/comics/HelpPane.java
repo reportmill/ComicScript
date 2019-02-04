@@ -9,8 +9,8 @@ import snap.view.*;
  */
 public class HelpPane extends ViewOwner {
 
-    // The StagePane
-    StagePane          _stagePane;
+    // The PlayerPane
+    PlayerPane         _playerPane;
     
     // The ListView
     ListView <String>  _listView;
@@ -25,9 +25,9 @@ public class HelpPane extends ViewOwner {
     String _walks[] = { "in", "in from right", "out" };
  
 /**
- * Creates a new HelpPane for StagePane.
+ * Creates a new HelpPane for PlayerPane.
  */   
-public HelpPane(StagePane aSP)  { _stagePane = aSP; }
+public HelpPane(PlayerPane aPP)  { _playerPane = aPP; }
 
 /**
  * Returns the list of words to use.
@@ -101,16 +101,16 @@ public void addToScript(String aStr)
     if("  \u23CE".equals(aStr)) { doReturn(); return; }
     
     // Add string
-    _stagePane._textView.replaceChars(aStr + " ");
-    _stagePane._textView.requestFocus();
+    _playerPane._textView.replaceChars(aStr + " ");
+    _playerPane._textView.requestFocus();
     _lastAdd = aStr;
     resetLater();
 }
 
 void doReturn()
 {
-    _stagePane._textView.replaceChars("\n");
-    _stagePane.textViewReturnKey(null);
+    _playerPane._textView.replaceChars("\n");
+    _playerPane.textViewReturnKey(null);
 }
 
 }

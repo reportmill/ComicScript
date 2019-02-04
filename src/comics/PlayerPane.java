@@ -4,9 +4,9 @@ import snap.util.*;
 import snap.view.*;
 
 /**
- * A class to manage a stage and script.
+ * A class to show a PlayerView and allow editing.
  */
-public class StagePane extends ViewOwner {
+public class PlayerPane extends ViewOwner {
     
     // The PlayerView
     PlayerView   _player;

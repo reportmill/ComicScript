@@ -7,8 +7,8 @@ import snap.view.*;
  */
 public class ScriptView extends TextView {
     
-    // The StagePane
-    StagePane      _stagePane;
+    // The PlayerPane
+    PlayerPane     _playerPane;
     
     // The MarkView
     MarkView       _markView;
@@ -19,9 +19,9 @@ public class ScriptView extends TextView {
 /**
  * Creates a ScriptView.
  */
-public ScriptView(StagePane aSP)
+public ScriptView(PlayerPane aPP)
 {
-    _stagePane = aSP;
+    _playerPane = aPP;
 
     setPrefHeight(300); setPadding(5,5,5,5); setGrowWidth(true);
     getTextArea().setGrowWidth(true); //getTextArea().setPadding(5,5,5,5);
@@ -93,7 +93,7 @@ private class MarkView extends View {
             TextBoxLine line = getTextBox().getLineForY(anEvent.getY());
             int cindex = line.length()>0? line.getEnd()-1 : line.getEnd();
             getTextArea().setSel(cindex);
-            _stagePane.runCurrentLine();
+            _playerPane.runCurrentLine();
         }
     }
 }
