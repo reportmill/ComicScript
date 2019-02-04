@@ -57,7 +57,7 @@ public PlayerView()
     _camera = new CameraView(_stage); _camera._player = this;
     
     // Create/configure this view
-    setPadding(10,10,10,10);
+    setPadding(10,10,10,10); setAlign(Pos.CENTER);
     setContent(_camera);
     setClipToBounds(true);
     enableEvents(MouseEnter, MouseExit, MouseMove, MousePress);

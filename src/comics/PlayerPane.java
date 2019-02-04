@@ -1,5 +1,5 @@
 package comics;
-import snap.gfx.TextBoxLine;
+import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;
 
@@ -11,6 +11,15 @@ public class PlayerPane extends ViewOwner {
     // The PlayerView
     PlayerView   _player;
     
+    // The TitleView at top of editor UI
+    View         _titleView;
+    
+    // The View that holds the PlayerView
+    ColView      _playerBox;
+    
+    // The View that holds editor UI
+    View         _editorView;
+    
     // The script text view
     ScriptView   _textView;
     
@@ -19,6 +28,9 @@ public class PlayerPane extends ViewOwner {
     
     // Whether script needs to be reset
     boolean      _resetScript;
+    
+    // Whether PlayerPane is showing editing UI
+    boolean      _editing;
     
     // The default script text
     static String  DEFAULT_SCRIPT = "Setting is beach\n";
@@ -67,6 +79,45 @@ public void setScriptLines(String theLines[])
 protected void resetScript()  { _resetScript = true; }
 
 /**
+ * Returns whether to show editor.
+ */
+public boolean isEditing()  { return _editing; }
+
+/**
+ * Sets whether to show editor.
+ */
+public void setEditing(boolean aValue)
+{
+    // If already set, just return
+    if(aValue==_editing) return;
+    _editing = aValue;
+    
+    // Fix TitleView, EditorView Visible
+    _titleView.setVisible(aValue);
+    _editorView.setVisible(aValue);
+    _playerBox.setGrowHeight(!aValue); // Don't grow playerbox when editing (should grow EditorView)
+    getPlayer().getPlayBar()._editButton.setText(aValue? "Player" : "Edit");
+    
+    // Enable Editing
+    if(aValue) {
+        if(!SnapUtils.isTeaVM) {
+            Size psize = getWindow().getPrefSize();
+            Rect screenRect = ViewEnv.getEnv().getScreenBoundsInset();
+            Rect maxRect = screenRect.getRectCenteredInside(psize.width, psize.height);
+            getWindow().setMaximizedBounds(maxRect);
+        }
+        _player.setPadding(20,20,20,20); _player.getCamera().setEffect(new ShadowEffect());
+        getWindow().setMaximized(true);
+    }
+    
+    // Disable ShowFull
+    else {
+        _player.setPadding(0,0,0,0); _player.getCamera().setEffect(null);
+        getWindow().setMaximized(false);
+    }
+}
+
+/**
  * Create UI.
  */
 protected View createUI()
@@ -92,11 +143,17 @@ protected void initUI()
     // Get master ColView and add StageBox
     SplitView splitView = getUI(SplitView.class);
     splitView.getDivider(0).setPrefSpan(10);
-    ColView colView = (ColView)splitView.getItem(0);
-    colView.addChild(_player);
+    _playerBox = (ColView)splitView.getItem(0);
+    _playerBox.addChild(_player);
     
-    // Configure title to be 800 wide so window will be
-    splitView.getItem(0).setPrefWidth(800);
+    // Get TitleView and configure to be 800 wide so window will be good size
+    _titleView = _playerBox.getChild(0);
+    _titleView.setPrefWidth(800);
+    _titleView.setVisible(false);
+    
+    // Get EditorView
+    _editorView = splitView.getItem(1);
+    _editorView.setVisible(false);
     
     // Get TextRowView and remove stand-in TextView
     RowView rowView = getView("TextRowView", RowView.class);
@@ -120,16 +177,18 @@ protected void initUI()
 protected void respondUI(ViewEvent anEvent)
 {
     // Handle ResetButton
-    if(anEvent.equals("ResetButton")) {
-        getPlayer().stop(); getPlayer().setRunTime(0); }
+    //if(anEvent.equals("ResetButton")) { getPlayer().stop(); getPlayer().setRunTime(0); }
         
     // Handle RunButton
     if(anEvent.equals("RunButton")) { resetScript();
         getPlayer().play(); }
+        
+    // Handle EditButton
+    if(anEvent.equals("EditButton")) {
+        setEditing(!isEditing()); anEvent.consume(); }
     
     // Handle AgainButton
-    if(anEvent.equals("AgainButton"))
-        runCurrentLine();
+    //if(anEvent.equals("AgainButton")) runCurrentLine();
     
     // Handle Stage MousePressed
     //if(anEvent.isMousePress()) selectSettingItem(anEvent.getX(), anEvent.getY());

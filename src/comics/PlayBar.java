@@ -13,6 +13,9 @@ public class PlayBar extends RowView {
     // The time label
     Label        _timeLabel;
     
+    // The edit button (label)
+    Label        _editButton;
+    
     // The Bar height
     double       _barHeight = 3;
     
@@ -38,9 +41,24 @@ public PlayBar(PlayerView aPV)
     setPadding(6,10,0,10); setAlign(HPos.LEFT); setSpacing(20);
     enableEvents(MouseMove, MousePress, MouseDrag, MouseExit);
     setCursor(Cursor.HAND);
+    
+    // Create/configure/add PlayButton
     addChild(new PlayButton());
+    
+    // Create/configure/add TimeLabel
     _timeLabel = new Label(); _timeLabel.setTextFill(Color.WHITE); _timeLabel.setFont(Font.Arial12);
     addChild(_timeLabel);
+    
+    // Create/configure/add EditButton
+    _editButton = new Label("Edit"); _editButton.setPadding(0,10,0,10);
+    _editButton.setLeanX(HPos.RIGHT); _editButton.setName("EditButton");
+    _editButton.setTextFill(Color.WHITE); _editButton.setFont(Font.Arial14);
+    _editButton.addEventHandler(e -> ViewUtils.fireActionEvent(_editButton, e), MousePress);
+    _editButton.addEventHandler(e -> e.consume(), MouseDrag, MouseRelease);
+    _editButton.addEventHandler(e -> _editButton.setFont(Font.Arial14.getBold()), MouseEnter);
+    _editButton.addEventHandler(e -> _editButton.setFont(Font.Arial14), MouseExit);
+    ViewUtils.enableEvents(_editButton, Action);
+    addChild(_editButton);
 }
 
 /**
