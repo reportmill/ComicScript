@@ -36,12 +36,12 @@ public class PlayerPane extends ViewOwner {
     static String  DEFAULT_SCRIPT = "Setting is beach\n";
 
 /**
- * Shows the stage.
+ * Shows the player.
  */
-public void showStage()
+public void showPlayer()
 {
     setWindowVisible(true);
-    if(SnapUtils.isTeaVM) getWindow().setMaximized(true);
+    //if(SnapUtils.isTeaVM) getWindow().setMaximized(true);
     
     String lines[] = Samples.getSample("Welcome");
     setScriptLines(lines);
@@ -132,8 +132,7 @@ protected View createUI()
 protected void initUI()
 {
     // Create PlayerView
-    _player = new PlayerView();
-    _player.setPadding(20,20,20,20); _player.setGrowHeight(true);
+    _player = new PlayerView(); _player.setGrowHeight(true);
     _player.addPropChangeListener(pc -> playerRunLineChanged(), PlayerView.RunLine_Prop);
     
     // Watch for clicks on StageView
@@ -142,7 +141,7 @@ protected void initUI()
     
     // Get master ColView and add StageBox
     SplitView splitView = getUI(SplitView.class);
-    splitView.getDivider(0).setPrefSpan(10);
+    splitView.getDivider(0).setPrefSpan(8);
     _playerBox = (ColView)splitView.getItem(0);
     _playerBox.addChild(_player);
     
@@ -160,7 +159,7 @@ protected void initUI()
     rowView.removeChild(0);
     
     // Get/configure TextView
-    _textView = new ScriptView(this); //getView("ScriptText", TextView.class);
+    _textView = new ScriptView(this); _textView.setPrefHeight(300);
     _textView.setText(DEFAULT_SCRIPT);
     _textView.setSel(_textView.length());
     _textView.addEventFilter(e -> textViewReturnKey(e), KeyRelease);
@@ -169,6 +168,8 @@ protected void initUI()
     
     // Install HelpPane
     rowView.addChild(_helpPane.getUI());
+    
+    if(!SnapUtils.isTeaVM) setEditing(true);
 }
 
 /**

@@ -3,6 +3,8 @@ Sample Welcome
 Setting is beach
 Lady walks in
 Man walks in from right
+Lady says, "Welcome to the ComicScript animator!"
+Man says, "Build animations with natural language!"
 Camera zooms in on Lady
 Lady waves
 Man jumps
