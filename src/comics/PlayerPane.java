@@ -67,12 +67,22 @@ public void setScriptLines(String theLines[])
 protected void resetScript()  { _resetScript = true; }
 
 /**
+ * Create UI.
+ */
+protected View createUI()
+{
+    ColView colView = (ColView)super.createUI();
+    return SplitView.makeSplitView(colView);
+}
+
+/**
  * Initialize the UI.
  */
 protected void initUI()
 {
     // Create PlayerView
     _player = new PlayerView();
+    _player.setPadding(20,20,20,20); _player.setGrowHeight(true);
     _player.addPropChangeListener(pc -> playerRunLineChanged(), PlayerView.RunLine_Prop);
     
     // Watch for clicks on StageView
@@ -80,10 +90,15 @@ protected void initUI()
     //enableEvents(stage, MousePress);
     
     // Get master ColView and add StageBox
-    ColView colView = getUI(ColView.class);
-    colView.addChild(_player, 1);
+    SplitView splitView = getUI(SplitView.class);
+    splitView.getDivider(0).setPrefSpan(10);
+    ColView colView = (ColView)splitView.getItem(0);
+    colView.addChild(_player);
     
-    // Get TextRowView
+    // Configure title to be 800 wide so window will be
+    splitView.getItem(0).setPrefWidth(800);
+    
+    // Get TextRowView and remove stand-in TextView
     RowView rowView = getView("TextRowView", RowView.class);
     rowView.removeChild(0);
     

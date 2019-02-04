@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ColView PrefWidth="800" Spacing="5" FillWidth="true">
   <font name="Arial" size="15" />
-  <RowView Align="CENTER" Padding="4" GrowWidth="true" Spacing="4">
-    <BevelBorder />
-    <color value="#3dcece" />
-    <Label image="Header.png" />
-  </RowView>
-  <RowView Padding="4" GrowWidth="true" Spacing="4">
-    <Button Name="CameraButton" PrefWidth="80" Padding="2" text="Camera" />
-    <Button Name="AddButton" PrefWidth="80" Padding="2" text="Add..." />
-    <Button Name="AgainButton" PrefWidth="80" Padding="2" LeanX="RIGHT" text="Again" />
-  </RowView>
-  <RowView Name="TextRowView" GrowHeight="true" FillHeight="true">
-    <TextView Name="ScriptText" PrefHeight="300" Padding="5" GrowWidth="true">
-      <font name="Arial" size="20" />
-    </TextView>
-  </RowView>
-  <RowView Padding="3" Spacing="5">
-    <Button Name="GifButton" PrefWidth="100" text="Make GIF" />
-    <Button Name="RunButton" PrefWidth="100" LeanX="RIGHT" text="Run" />
-  </RowView>
+  <ColView FillWidth="true">
+    <RowView Align="CENTER" Padding="4" GrowWidth="true" Spacing="4">
+      <BevelBorder />
+      <color value="#3dcece" />
+      <Label image="Header.png" />
+    </RowView>
+  </ColView>
+  <ColView Padding="4" GrowHeight="true" FillWidth="true">
+    <RowView Name="TextRowView" GrowHeight="true" FillHeight="true">
+      <TextView Name="ScriptText" PrefHeight="300" Padding="5" GrowWidth="true">
+        <font name="Arial" size="11" />
+      </TextView>
+    </RowView>
+  </ColView>
 </ColView>

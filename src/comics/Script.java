@@ -33,14 +33,14 @@ public class Script {
     int                _runTimes[], _runTime;
     
 /**
- * Creates a script for given StagePane.
+ * Creates a script for given PlayerView.
  */
-public Script(PlayerView aPlayer, String aScriptStr)
+public Script(PlayerView aPlayer, String aScript)
 {
     _player = aPlayer;
     _stage = aPlayer.getStage();
     _camera = aPlayer.getCamera();
-    setText(aScriptStr);
+    setText(aScript);
 }
 
 /**
