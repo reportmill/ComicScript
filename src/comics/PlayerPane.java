@@ -106,7 +106,7 @@ public void setEditing(boolean aValue)
             Rect maxRect = screenRect.getRectCenteredInside(psize.width, psize.height);
             getWindow().setMaximizedBounds(maxRect);
         }
-        _player.setPadding(20,20,20,20); _player.getCamera().setEffect(new ShadowEffect());
+        _player.setPadding(20,20,20,20); _player.getCamera().setEffect(new ShadowEffect().copySimple());
         getWindow().setMaximized(true);
     }
     
