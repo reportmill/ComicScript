@@ -184,7 +184,7 @@ public class PlayButton extends View {
     public PlayButton()
     {
         setPrefSize(24,24); setName("PlayButton");
-        enableEvents(MousePress, Action);
+        enableEvents(MousePress, MouseDrag, Action);
     }
     
     /** Override to paint button. */
@@ -208,13 +208,14 @@ public class PlayButton extends View {
     protected void processEvent(ViewEvent anEvent)
     {
         if(anEvent.isMousePress()) fireActionEvent(anEvent);
+        else if(anEvent.isMouseDrag()) anEvent.consume();
         repaint();
     }
     
     protected void fireActionEvent(ViewEvent anEvent)
     {
         if(_player.isPlaying()) _player.stop();
-        else _player.play();
+        else _player.play(); anEvent.consume();
     }
 }
 
