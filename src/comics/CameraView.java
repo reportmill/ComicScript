@@ -7,7 +7,7 @@ import snap.view.*;
 /**
  * A view to represent camera.
  */
-public class CameraView extends BoxView {
+public class CameraView extends ScaleBox {
     
     // The Player
     PlayerView    _player;
@@ -47,7 +47,7 @@ public double getZoom()  { return _zoom; }
 public void setZoom(double aValue)
 {
     _zoom = aValue;
-    getContent().setScale(aValue);
+    relayout(); //getContent().setScale(aValue);
 }
 
 /**
@@ -127,22 +127,60 @@ public void runBlurs()
 }
 
 /**
- * Calculates the preferred width.
+ * Copied from ScaleBox.
  */
-protected double getPrefWidthImpl(double aH)  { return getContent().getPrefWidth(); }
+protected double getPrefWidthImpl(double aH)
+{
+    if(aH>=0 && (isFillHeight() || aH<getPrefHeight(-1))) return aH*getAspect();
+    return super.getPrefWidthImpl(aH);
+}
 
 /**
- * Calculates the preferred height.
+ * Copied from ScaleBox.
  */
-protected double getPrefHeightImpl(double aW)  { return getContent().getPrefHeight(); }
+protected double getPrefHeightImpl(double aW)
+{
+    if(aW>=0 && (isFillWidth() || aW<getPrefWidth(-1))) return aW/getAspect();
+    return super.getPrefHeightImpl(aW);
+}
 
 /**
- * Actual method to layout children.
+ * Copied from ScaleBox.
  */
 protected void layoutImpl()
 {
-    View cont = getContent();
-    cont.setBounds(0, 0, getWidth(), getHeight());
+    // If no child, just return
+    ParentView aPar = this; View aChild = getContent(); if(aChild==null) return;
+    Insets theIns = null; boolean isFillWidth = false; boolean isFillHeight = false;
+    
+    // Get parent bounds for insets (just return if empty)
+    Insets ins = theIns!=null? theIns : aPar.getInsetsAll();
+    double px = ins.left, py = ins.top;
+    double pw = aPar.getWidth() - px - ins.right; if(pw<0) pw = 0; if(pw<=0) return;
+    double ph = aPar.getHeight() - py - ins.bottom; if(ph<0) ph = 0; if(ph<=0) return;
+    
+    // Get content width/height
+    double cw = aChild.getBestWidth(-1);
+    double ch = aChild.getBestHeight(cw);
+    
+    // Handle ScaleToFit: Set content bounds centered, calculate scale and set
+    if(isFillWidth || isFillHeight || cw>pw || ch>ph)  {
+        double cx = px + (pw-cw)/2, cy = py + (ph-ch)/2;
+        aChild.setBounds(cx, cy, cw, ch);
+        double sx = isFillWidth || cw>pw? pw/cw : 1;
+        double sy = isFillHeight || ch>ph? ph/ch : 1;
+        if(isFillWidth && isFillHeight) sx = sy = Math.min(sx,sy); // KeepAspect?
+        aChild.setScaleX(sx*_zoom); aChild.setScaleY(sy*_zoom);
+        return;
+    }
+    
+    // Handle normal layout
+    if(cw>pw) cw = pw; if(ch>ph) ch = ph;
+    double dx = pw - cw, dy = ph - ch;
+    double sx = aChild.getLeanX()!=null? ViewUtils.getLeanX(aChild) : ViewUtils.getAlignX(aPar);
+    double sy = aChild.getLeanY()!=null? ViewUtils.getLeanY(aChild) : ViewUtils.getAlignY(aPar);
+    aChild.setBounds(px+dx*sx, py+dy*sy, cw, ch);
+    aChild.setScaleX(_zoom); aChild.setScaleY(_zoom);
 }
 
 /**
