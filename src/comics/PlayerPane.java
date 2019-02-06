@@ -143,6 +143,7 @@ protected void initUI()
     SplitView splitView = getUI(SplitView.class);
     splitView.getDivider(0).setPrefSpan(8);
     _playerBox = (ColView)splitView.getItem(0);
+    _playerBox.setGrowHeight(true);
     _playerBox.addChild(_player);
     
     // Get TitleView and configure to be 800 wide so window will be good size

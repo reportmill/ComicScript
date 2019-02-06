@@ -26,9 +26,9 @@ public static void main(String args[])
     
     // Get args
     String arg0 = getMainArg0();
-    String arg1 = getMainArg0();
+    String arg1 = getMainArg1();
     
-    if("showEditor".equals(arg0))
+    if(arg0!=null && arg0.equals("showEditor"))
         showEditor(arg1);
     else show(arg0, null);
 }
@@ -42,7 +42,8 @@ public static void show(String anEmtId, Object theParams)
     _player = _players[_playerCount++] = new PlayerPane();
     
     // If name provided, set as Window.Name
-    if(anEmtId!=null) _player.getWindow().setName(anEmtId);
+    if(anEmtId!=null && anEmtId.length()>0) _player.getWindow().setName(anEmtId);
+    else { _player.getUI(); _player.setEditing(true); }
     
     // Show Player
     _player.showPlayer();
@@ -65,10 +66,10 @@ public static void showEditor(String anEmtId)
         _player.setEditing(!_player.isEditing());
 }
 
-@JSBody(params = { }, script = "return CSMainArg0;")
+@JSBody(params = { }, script = "return CSMainArg0!=null? CSMainArg0 : '';")
 public static native String getMainArg0();
 
-@JSBody(params = { }, script = "return CSMainArg1;")
+@JSBody(params = { }, script = "return CSMainArg1!=null? CSMainArg1 : '';")
 public static native String getMainArg1();
 
 }
