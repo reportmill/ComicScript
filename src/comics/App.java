@@ -56,9 +56,10 @@ public static void showEditor(String anEmtId)
 {
     // If ElementId provided, toggle editing for player with for that element id
     if(anEmtId!=null) {
-        for(PlayerPane player : _players)
+        for(int i=0;i<_playerCount;i++) { PlayerPane player = _players[i];
             if(anEmtId.equals(player.getWindow().getName()))
                 player.setEditing(!player.isEditing());
+        }
     }
     
     // If no element id, toggle Player.Editing for last player
