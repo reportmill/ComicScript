@@ -8,11 +8,7 @@
       <Label image="Header.png" />
     </RowView>
   </ColView>
-  <ColView Padding="4" GrowHeight="true" FillWidth="true">
-    <RowView Name="TextRowView" GrowHeight="true" FillHeight="true">
-      <TextView Name="ScriptText" PrefHeight="300" Padding="5" GrowWidth="true">
-        <font name="Arial" size="11" />
-      </TextView>
-    </RowView>
+  <ColView Padding="8,4,4,4" PrefHeight="400" GrowHeight="true" FillWidth="true">
+    <font name="Arial" size="14" />
   </ColView>
 </ColView>

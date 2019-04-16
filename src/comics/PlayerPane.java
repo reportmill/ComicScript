@@ -9,28 +9,31 @@ import snap.view.*;
 public class PlayerPane extends ViewOwner {
     
     // The PlayerView
-    PlayerView   _player;
+    PlayerView      _player;
     
     // The TitleView at top of editor UI
-    View         _titleView;
+    View            _titleView;
     
     // The View that holds the PlayerView
-    ColView      _playerBox;
+    ColView         _playerBox;
     
     // The View that holds editor UI
-    View         _editorView;
+    ColView         _editorBox;
+    
+    // The EditorPane
+    EditorPane      _editorPane;
     
     // The script text view
-    ScriptView   _textView;
+    ScriptView      _textView;
     
     // The HelpPane
-    HelpPane     _helpPane = new HelpPane(this);
+    HelpPane        _helpPane = new HelpPane(this);
     
     // Whether script needs to be reset
-    boolean      _resetScript;
+    boolean         _resetScript;
     
     // Whether PlayerPane is showing editing UI
-    boolean      _editing;
+    boolean         _editing;
     
     // The default script text
     static String  DEFAULT_SCRIPT = "Setting is beach\n";
@@ -54,7 +57,7 @@ public void showPlayer()
  */
 public PlayerView getPlayer()
 {
-    if(_resetScript) { _player.setScriptText(_textView.getText()); _resetScript = false; }
+    if(_resetScript) { _player.setScriptText(_textView.getText()); _editorPane.updateScript(); _resetScript = false; }
     return _player;
 }
 
@@ -92,9 +95,9 @@ public void setEditing(boolean aValue)
     if(aValue==_editing) return;
     _editing = aValue;
     
-    // Fix TitleView, EditorView Visible
+    // Fix TitleView, TabView Visible
     _titleView.setVisible(aValue);
-    _editorView.setVisible(aValue);
+    _editorBox.setVisible(aValue);
     _playerBox.setGrowHeight(!aValue); // Don't grow playerbox when editing (should grow EditorView)
     getPlayer().getPlayBar()._editButton.setText(aValue? "Player" : "Edit");
     
@@ -151,24 +154,29 @@ protected void initUI()
     _titleView.setPrefWidth(800);
     _titleView.setVisible(false);
     
-    // Get EditorView
-    _editorView = splitView.getItem(1);
-    _editorView.setVisible(false);
+    // Get EditorBox
+    _editorBox = (ColView)splitView.getItem(1);
+    _editorBox.setVisible(false);
+    
+    // Add EditorPane
+    _editorPane = new EditorPane(this);
+    _editorBox.addChild(_editorPane.getUI());
     
     // Get TextRowView and remove stand-in TextView
-    RowView rowView = getView("TextRowView", RowView.class);
-    rowView.removeChild(0);
+    //RowView rowView = getView("TextRowView", RowView.class);
+    //rowView.removeChild(0);
     
     // Get/configure TextView
-    _textView = new ScriptView(this); _textView.setPrefHeight(300);
-    _textView.setText(DEFAULT_SCRIPT);
-    _textView.setSel(_textView.length());
-    _textView.addEventFilter(e -> textViewReturnKey(e), KeyRelease);
-    setFirstFocus(_textView.getTextArea());
-    rowView.addChild(_textView);
+    _textView = _editorPane._scriptView;
+    //_textView = new ScriptView(this); _textView.setPrefHeight(300);
+    //_textView.setText(DEFAULT_SCRIPT);
+    //_textView.setSel(_textView.length());
+    //_textView.addEventFilter(e -> textViewReturnKey(e), KeyRelease);
+    //setFirstFocus(_textView.getTextArea());
+    //rowView.addChild(_textView);
     
     // Install HelpPane
-    rowView.addChild(_helpPane.getUI());
+    //rowView.addChild(_helpPane.getUI());
     
     if(!SnapUtils.isTeaVM) setEditing(true);
 }

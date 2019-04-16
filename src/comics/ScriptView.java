@@ -23,9 +23,9 @@ public ScriptView(PlayerPane aPP)
 {
     _playerPane = aPP;
 
-    setPadding(5,5,5,5); setGrowWidth(true);
+    setGrowWidth(true);
     getTextArea().setGrowWidth(true);
-    setFont(new Font("Arial", 20));
+    setFont(new Font("Arial", 18));
     
     _markView = new MarkView();
     

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RowView GrowHeight="true" FillHeight="true">
+  <ColView PrefWidth="180" Spacing="2" FillWidth="true">
+    <font name="Arial" size="13" />
+    <Label Name="Label" Padding="3" text="Actions">
+      <BevelBorder />
+      <font name="Arial Bold" size="13" />
+    </Label>
+    <ListView Name="ListView" MinHeight="60" GrowHeight="true">
+      <LineBorder Color="#c0c0c0" />
+    </ListView>
+  </ColView>
+</RowView>
