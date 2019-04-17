@@ -1,4 +1,5 @@
-package comics;
+package comics.app;
+import comics.script.Samples;
 import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;
@@ -25,9 +26,6 @@ public class PlayerPane extends ViewOwner {
     
     // The script text view
     ScriptView      _textView;
-    
-    // The HelpPane
-    HelpPane        _helpPane = new HelpPane(this);
     
     // Whether script needs to be reset
     boolean         _resetScript;
@@ -214,11 +212,11 @@ public void runCurrentLine()
 public void selectSettingItem(double aX, double aY)
 {
     // Get child at point
-    View child = getStage().getChildAt(aX, aY);
+    /*View child = getStage().getChildAt(aX, aY);
     if(child instanceof Actor) {
         String name = child.getName(); name = FilePathUtils.getFileNameSimple(name);
         _helpPane.addToScript(name);
-    }
+    }*/
 }
 
 /**
@@ -227,18 +225,6 @@ public void selectSettingItem(double aX, double aY)
 void playerRunLineChanged()
 {
     _textView.setRunLine(_player.getRunLine());
-}
-
-/**
- * Called when user hits Enter Key in TextView.
- */
-void textViewReturnKey(ViewEvent anEvent)
-{
-    // Handle EnterKey: Run to previous line
-    if(anEvent==null || anEvent.isEnterKey()) {
-        _helpPane.reset();
-        runCurrentLine();
-    }
 }
 
 }

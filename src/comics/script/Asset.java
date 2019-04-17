@@ -1,4 +1,4 @@
-package comics;
+package comics.script;
 import java.util.*;
 import snap.gfx.Image;
 import snap.util.*;
@@ -22,7 +22,7 @@ public class Asset {
     double          _height;
     
     // The Index Root
-    static String ROOT = Index.ROOT;
+    static String ROOT = AssetIndex.ROOT;
     
 /**
  * Creates an Asset for map.

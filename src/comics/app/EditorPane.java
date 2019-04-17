@@ -1,4 +1,5 @@
-package comics;
+package comics.app;
+import comics.script.*;
 import snap.view.*;
 import snap.viewx.TransitionPane;
 

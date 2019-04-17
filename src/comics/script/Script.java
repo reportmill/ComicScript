@@ -1,4 +1,5 @@
-package comics;
+package comics.script;
+import comics.app.*;
 import java.util.*;
 import snap.gfx.Image;
 import snap.view.*;
@@ -27,7 +28,7 @@ public class Script {
     boolean            _loaded;
     
     // A callback to be called when script is loaded
-    Runnable           _loadLsnr;
+    public Runnable    _loadLsnr;
     
     // The runtimes
     int                _runTimes[], _runTime;

@@ -1,9 +1,9 @@
-package comics;
+package comics.script;
 import java.util.*;
 import snap.gfx.Image;
 import snap.util.*;
 import snap.web.*;
-import comics.Asset.*;
+import comics.script.Asset.*;
 
 /**
  * A class to manage animation assets (images).

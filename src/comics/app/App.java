@@ -1,4 +1,4 @@
-package comics;
+package comics.app;
 import org.teavm.jso.JSBody;
 import snap.util.SnapUtils;
 

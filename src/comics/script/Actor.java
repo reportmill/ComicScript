@@ -1,9 +1,10 @@
-package comics;
+package comics.script;
+import comics.app.*;
 import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.SnapScene;
-import comics.Asset.*;
+import comics.script.Asset.*;
 
 /**
  * A class to model actors.

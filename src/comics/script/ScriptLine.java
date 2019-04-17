@@ -1,4 +1,4 @@
-package comics;
+package comics.script;
 import snap.gfx.Image;
 import snap.util.PropChangeListener;
 

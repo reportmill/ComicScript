@@ -1,4 +1,4 @@
-package comics;
+package comics.script;
 import java.util.*;
 import snap.web.WebURL;
 

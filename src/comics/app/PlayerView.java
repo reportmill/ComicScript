@@ -1,7 +1,8 @@
-package comics;
+package comics.app;
+import comics.script.*;
 import snap.gfx.*;
 import snap.view.*;
-import comics.PlayBar.*;
+import comics.app.PlayBar.*;
 
 /**
  * A View to play an animation. Encapsulates a CameraView, StageView and Script.
