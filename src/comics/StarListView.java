@@ -5,12 +5,12 @@ import snap.view.*;
 import java.util.*;
 
 /**
- * A view to hold list of subjects in current script (Camera, Actors, Setting).
+ * A view to hold list of stars in current script (Camera, Actors, Setting).
  */
-public class SubjectsView extends ParentView {
+public class StarListView extends ParentView {
     
     // The EditorPane
-    EditorPane           _editorPane;
+    ScriptLineEditor     _lineEditor;
 
     // The Player
     PlayerView           _player;
@@ -28,12 +28,12 @@ public class SubjectsView extends ParentView {
     static Effect SELECT_EFFECT = new ShadowEffect(8, SELECT_COLOR, 0, 0);
 
 /**
- * Creates a SubjectsView.
+ * Creates a StarListView.
  */
-public SubjectsView(EditorPane aEP)
+public StarListView(ScriptLineEditor aLE)
 {
-    _editorPane = aEP;
-    _player = aEP._player;
+    _lineEditor = aLE;
+    _player = aLE._editorPane._player;
     setGrowWidth(true);
     setBorder(Border.createLoweredBevelBorder());
     setPadding(7,5,5,12);
@@ -42,26 +42,40 @@ public SubjectsView(EditorPane aEP)
 }
 
 /**
- * Returns the selected SubjectView.
+ * Returns the selected Subject index.
  */
-public SubjectView getSelSubjectView()  { return _selIndex>=0? (SubjectView)getChild(_selIndex) : null; }
+public int getSelIndex()  { return _selIndex; }
 
 /**
- * Selects the given SubjectView.
+ * Selects the given Subject index.
  */
-public void setSelSubjectView(SubjectView aAV)
+public void setSelIndex(int anIndex)
 {
-    SubjectView oldView = getSelSubjectView();
-    if(oldView!=null) oldView.setEffect(null);
-    _selIndex = ArrayUtils.indexOf(getChildren(), aAV);
-    if(aAV!=null) aAV.setEffect(SELECT_EFFECT);
-    _editorPane.resetLater();
+    StarView sv = anIndex>=0? (StarView)getChild(anIndex) : null;
+    setSelStarView(sv);
 }
 
 /**
- * Returns the selected SubjectView name.
+ * Returns the selected StarView.
  */
-public String getSelName()  { return getSelSubjectView()!=null? getSelSubjectView()._name : null; }
+public StarView getSelStarView()  { return _selIndex>=0? (StarView)getChild(_selIndex) : null; }
+
+/**
+ * Selects the given StarView.
+ */
+public void setSelStarView(StarView aAV)
+{
+    StarView oldView = getSelStarView();
+    if(oldView!=null) oldView.setEffect(null);
+    _selIndex = ArrayUtils.indexOf(getChildren(), aAV);
+    if(aAV!=null) aAV.setEffect(SELECT_EFFECT);
+    _lineEditor.resetLater();
+}
+
+/**
+ * Returns the selected StarView name.
+ */
+public String getSelName()  { return getSelStarView()!=null? getSelStarView()._name : null; }
 
 /**
  * Updates the list of Subjects.
@@ -71,9 +85,9 @@ public void updateSubjects()
     Script script = _player.getScript();
     removeChildren();
     
-    SubjectView setting = new SubjectView(_setting, "Setting");
+    StarView setting = new StarView(_setting, "Setting");
     addChild(setting);
-    SubjectView cam = new SubjectView(_camera, "Camera");
+    StarView cam = new StarView(_camera, "Camera");
     addChild(cam);
    
     // Iterate over lines
@@ -82,7 +96,7 @@ public void updateSubjects()
         Asset asset = getActor(sline); if(asset==null) continue;
         if(assets.contains(asset)) continue;
         
-        SubjectView sview = new SubjectView(asset);
+        StarView sview = new StarView(asset);
         addChild(sview);
         assets.add(asset);
     }
@@ -128,27 +142,27 @@ protected void layoutImpl()  { RowView.layout(this, null, null, false, SPACING);
 protected void processEvent(ViewEvent anEvent)
 {
     if(anEvent.isMousePress())
-        setSelSubjectView(null);
+        setSelStarView(null);
 }
     
 /**
- * A view to hold a Subject.
+ * A view to hold a Star.
  */
-public class SubjectView extends ImageView {
+public class StarView extends ImageView {
     
     // Name
     String _name;
     
-    /** Create an SubjectView. */
-    public SubjectView(Image anImg, String aName)
+    /** Create an StarView. */
+    public StarView(Image anImg, String aName)
     {
         super(anImg); _name = aName;
         setPrefSize(64,64); setKeepAspect(true); setPadding(3,3,14,3);
         enableEvents(MouseEnter, MouseExit, MousePress);
     }
     
-    /** Create an SubjectView. */
-    public SubjectView(Asset anAsset)  { this(anAsset.getImage(), anAsset.getName()); }
+    /** Create an StarView. */
+    public StarView(Asset anAsset)  { this(anAsset.getImage(), anAsset.getName()); }
     
     /** Override to customize paint. */
     protected void paintFront(Painter aPntr)
@@ -171,7 +185,7 @@ public class SubjectView extends ImageView {
     protected void processEvent(ViewEvent anEvent)
     {
         if(anEvent.isMousePress())
-            setSelSubjectView(this);
+            setSelStarView(this);
         if(anEvent.isMouseEnter() || anEvent.isMouseExit()) repaint();
         anEvent.consume();
     }

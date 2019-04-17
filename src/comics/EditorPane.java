@@ -1,6 +1,6 @@
 package comics;
-import snap.gfx.Font;
 import snap.view.*;
+import snap.viewx.TransitionPane;
 
 /**
  * A class to manage UI for editing scripts.
@@ -8,25 +8,20 @@ import snap.view.*;
 public class EditorPane extends ViewOwner {
     
     // The PlayerPane
-    PlayerPane       _playerPane;
+    PlayerPane        _playerPane;
     
     // The PlayerView
-    PlayerView       _player;
+    PlayerView        _player;
     
-    // The ScriptView
-    ScriptView       _scriptView;
+    // TransitionPane
+    TransitionPane    _transPane;
     
-    // The SubjectsView
-    SubjectsView       _subjectsView;
-
-    // The ListView
-    ListView <String>  _listView;
+    // The ScriptEditor
+    ScriptEditor      _scriptEditor = new ScriptEditor(this);
     
-    // Actions
-    String _camActions[] = { "zooms", "blurs" };
-    String _settingActions[] = { "beach", "ovaloffice", "whitehouse" };
-    String _actorActions[] = { "walks", "waves", "jumps", "dances", "drops", "says", "grows", "flips", "explodes" };
-
+    // The ScriptLineEditor
+    ScriptLineEditor  _lineEditor = new ScriptLineEditor(this);
+    
 /**
  * Creates an EditorPane.
  */
@@ -37,11 +32,47 @@ public EditorPane(PlayerPane aPlayerPane)
 }
 
 /**
+ * Returns the Script.
+ */
+public Script getScript()  { return _player.getScript(); }
+
+/**
+ * Returns the ScriptLine.
+ */
+public ScriptLine getScriptLine()
+{
+    Script script = getScript();
+    int index = _player.getRunLine();
+    return script.getLine(index);
+}
+
+/**
+ * Sets the line editor.
+ */
+public void showLineEditor()
+{
+    _transPane.setTransition(TransitionPane.MoveUp);
+    _transPane.setContent(_lineEditor.getUI());
+    updateScript();
+}
+
+/**
+ * Sets the script editor.
+ */
+public void showScriptEditor()
+{
+    _transPane.setTransition(TransitionPane.MoveDown);
+    _transPane.setContent(_scriptEditor.getUI());
+    updateScript();
+}
+
+/**
  * Updates the script.
  */
 public void updateScript()
 {
-    _subjectsView.updateSubjects();
+    _scriptEditor.updateScript();
+    _lineEditor.updateScript();
 }
 
 /**
@@ -49,48 +80,30 @@ public void updateScript()
  */
 protected View createUI()
 {
-    // Get/configure ScriptView
-    _scriptView = new ScriptView(_playerPane); _scriptView.setPrefHeight(180);
-    _scriptView.setText(PlayerPane.DEFAULT_SCRIPT);
-    _scriptView.setSel(_scriptView.length());
-    _scriptView.addEventFilter(e -> scriptViewReturnKey(e), KeyRelease);
-    setFirstFocus(_scriptView.getTextArea());
-    
-    // Create/configure SubjectsView
-    _subjectsView = new SubjectsView(this);
+    // Create TransPane
+    _transPane = new TransitionPane(); _transPane.setGrowHeight(true); //_transPane.setBorder(Color.PINK,1);
+    _transPane.setContent(_scriptEditor.getUI());
     
     //<ColView Padding="8,4,4,4" GrowHeight="true" FillWidth="true" Title="Cast" />
-    ColView colView = new ColView(); colView.setPadding(8,5,5,5); colView.setSpacing(5);
+    ColView colView = new ColView(); colView.setPadding(4,4,4,4);
     colView.setGrowHeight(true); colView.setFillWidth(true);
-    
-    colView.addChild(_scriptView);
-    colView.addChild(_subjectsView);
-    
-    RowView rowView = (RowView)super.createUI();
-    colView.addChild(rowView);
+    colView.addChild(_transPane);
     
     return colView;
 }
 
 /**
- * Initialize UI.
+ * Respond to UI.
  */
-protected void initUI()
+protected void respondUI(ViewEvent anEvent)
 {
-    _listView = getView("ListView", ListView.class);
-    _listView.setFont(Font.Arial16);
-}
-
-/**
- * Reset UI.
- */
-protected void resetUI()
-{
-    String selName = _subjectsView.getSelName();
-    if(selName==null) _listView.setItems((String[])null);
-    else if(selName.equals("Camera")) _listView.setItems(_camActions);
-    else if(selName.equals("Setting")) _listView.setItems(_settingActions);
-    else _listView.setItems(_actorActions);
+    /*if(anEvent.equals("EditLineButton")) {
+        boolean isScript = _transPane.getContent()==_scriptEditor.getUI();
+        View view = isScript? _lineEditor.getUI() : _scriptEditor.getUI();
+        _transPane.setTransition(isScript? TransitionPane.MoveUp : TransitionPane.MoveDown);
+        _transPane.setContent(view);
+        updateScript();
+    }*/
 }
 
 /**

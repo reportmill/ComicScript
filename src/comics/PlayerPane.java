@@ -162,21 +162,8 @@ protected void initUI()
     _editorPane = new EditorPane(this);
     _editorBox.addChild(_editorPane.getUI());
     
-    // Get TextRowView and remove stand-in TextView
-    //RowView rowView = getView("TextRowView", RowView.class);
-    //rowView.removeChild(0);
-    
     // Get/configure TextView
-    _textView = _editorPane._scriptView;
-    //_textView = new ScriptView(this); _textView.setPrefHeight(300);
-    //_textView.setText(DEFAULT_SCRIPT);
-    //_textView.setSel(_textView.length());
-    //_textView.addEventFilter(e -> textViewReturnKey(e), KeyRelease);
-    //setFirstFocus(_textView.getTextArea());
-    //rowView.addChild(_textView);
-    
-    // Install HelpPane
-    //rowView.addChild(_helpPane.getUI());
+    _textView = _editorPane._scriptEditor._scriptView;
     
     if(!SnapUtils.isTeaVM) setEditing(true);
 }
