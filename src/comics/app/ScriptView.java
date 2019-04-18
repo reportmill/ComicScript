@@ -7,8 +7,8 @@ import snap.view.*;
  */
 public class ScriptView extends TextView {
     
-    // The PlayerPane
-    PlayerPane     _playerPane;
+    // The ScriptEditor
+    ScriptEditor   _scriptEditor;
     
     // The MarkView
     MarkView       _markView;
@@ -19,9 +19,9 @@ public class ScriptView extends TextView {
 /**
  * Creates a ScriptView.
  */
-public ScriptView(PlayerPane aPP)
+public ScriptView(ScriptEditor aSE)
 {
-    _playerPane = aPP;
+    _scriptEditor = aSE;
 
     setGrowWidth(true);
     getTextArea().setGrowWidth(true);
@@ -46,8 +46,10 @@ public int getRunLine()  { return _runLine; }
  */
 public void setRunLine(int anIndex)
 {
+    if(anIndex==_runLine) return;
     _runLine = anIndex;
     _markView.repaint();
+    _scriptEditor.setPlayerRunTimeToLineEnd(anIndex); //_scriptEditor.runCurrentLine();
 }
 
 /**
@@ -55,8 +57,17 @@ public void setRunLine(int anIndex)
  */
 protected void textSelChanged()
 {
-    int ind = getSel().getLineStart();
+    int ind = getSelStartLineIndex();
     setRunLine(ind);
+}
+
+/**
+ * Returns the index of the selection start.
+ */
+public int getSelStartLineIndex()
+{
+    TextBoxLine line = getSel().getStartLine();
+    return line.getIndex();
 }
 
 /**
@@ -93,7 +104,7 @@ private class MarkView extends View {
             TextBoxLine line = getTextBox().getLineForY(anEvent.getY());
             int cindex = line.length()>0? line.getEnd()-1 : line.getEnd();
             getTextArea().setSel(cindex);
-            _playerPane.runCurrentLine();
+            _scriptEditor.runCurrentLine();
         }
     }
 }

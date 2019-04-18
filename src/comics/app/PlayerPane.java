@@ -24,12 +24,6 @@ public class PlayerPane extends ViewOwner {
     // The EditorPane
     EditorPane      _editorPane;
     
-    // The script text view
-    ScriptView      _textView;
-    
-    // Whether script needs to be reset
-    boolean         _resetScript;
-    
     // Whether PlayerPane is showing editing UI
     boolean         _editing;
     
@@ -44,40 +38,22 @@ public void showPlayer()
     setWindowVisible(true);
     //if(SnapUtils.isTeaVM) getWindow().setMaximized(true);
     
-    String lines[] = Samples.getSample("Welcome");
-    setScriptLines(lines);
-
-    runLater(() -> getPlayer());
+    runLater(() -> {
+        String scriptText = Samples.getSample("Welcome");
+        _player.setScriptText(scriptText);
+        _editorPane.scriptChanged();
+    });
 }
 
 /**
  * Returns the PlayerView.
  */
-public PlayerView getPlayer()
-{
-    if(_resetScript) { _player.setScriptText(_textView.getText()); _editorPane.updateScript(); _resetScript = false; }
-    return _player;
-}
+public PlayerView getPlayer()  { return _player; }
 
 /**
  * Returns the StageView.
  */
 public StageView getStage()  { return getPlayer().getStage(); }
-
-/**
- * Sets the script lines.
- */
-public void setScriptLines(String theLines[])
-{
-    String text = StringUtils.join(theLines, "\n");
-    _textView.setText(text);
-    resetScript();
-}
-
-/**
- * Resets the script.
- */
-protected void resetScript()  { _resetScript = true; }
 
 /**
  * Returns whether to show editor.
@@ -109,6 +85,7 @@ public void setEditing(boolean aValue)
         }
         _player.setPadding(20,20,20,20); _player.getCamera().setEffect(new ShadowEffect().copySimple());
         getWindow().setMaximized(true);
+        _editorPane.resetLater();
     }
     
     // Disable ShowFull
@@ -134,7 +111,6 @@ protected void initUI()
 {
     // Create PlayerView
     _player = new PlayerView(); _player.setGrowHeight(true);
-    _player.addPropChangeListener(pc -> playerRunLineChanged(), PlayerView.RunLine_Prop);
     
     // Watch for clicks on StageView
     StageView stage = _player.getStage();
@@ -160,9 +136,6 @@ protected void initUI()
     _editorPane = new EditorPane(this);
     _editorBox.addChild(_editorPane.getUI());
     
-    // Get/configure TextView
-    _textView = _editorPane._scriptEditor._scriptView;
-    
     if(!SnapUtils.isTeaVM) setEditing(true);
 }
 
@@ -175,8 +148,7 @@ protected void respondUI(ViewEvent anEvent)
     //if(anEvent.equals("ResetButton")) { getPlayer().stop(); getPlayer().setRunTime(0); }
         
     // Handle RunButton
-    if(anEvent.equals("RunButton")) { resetScript();
-        getPlayer().play(); }
+    //if(anEvent.equals("RunButton")) { resetScript(); getPlayer().play(); }
         
     // Handle EditButton
     if(anEvent.equals("EditButton")) {
@@ -190,23 +162,6 @@ protected void respondUI(ViewEvent anEvent)
 }
 
 /**
- * Runs the current line.
- */
-public void runCurrentLine()
-{
-    // Get current line (or first non empty line above)
-    TextBoxLine line = _textView.getSel().getStartLine();
-    while(line.getString().trim().length()==0 && line.getIndex()>0)
-        line = _textView.getTextArea().getLine(line.getIndex()-1);
-    
-    // Run line at index
-    int lineIndex = line.getIndex();
-    resetScript();
-    getPlayer().stop();
-    getPlayer().playLine(lineIndex);
-}
-
-/**
  * Selects a setting item.
  */
 public void selectSettingItem(double aX, double aY)
@@ -217,14 +172,6 @@ public void selectSettingItem(double aX, double aY)
         String name = child.getName(); name = FilePathUtils.getFileNameSimple(name);
         _helpPane.addToScript(name);
     }*/
-}
-
-/**
- * Called when PlayerView.RunLine changes.
- */
-void playerRunLineChanged()
-{
-    _textView.setRunLine(_player.getRunLine());
 }
 
 }

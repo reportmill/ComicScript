@@ -111,7 +111,7 @@ public int getRunTime()  { return _runTime; }
 /**
  * Returns the run time of line at index.
  */
-public int getLineRunTime(int anIndex)  { return getLine(anIndex).getRunTime(); }
+public int getLineRunTime(int anIndex)  { return anIndex<getLineCount()? getLine(anIndex).getRunTime() : 0; }
 
 /**
  * Returns the runtime for line.

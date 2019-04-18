@@ -44,9 +44,9 @@ public Script getScript()  { return _editorPane.getScript(); }
 public ScriptLine getScriptLine()  { return _editorPane.getScriptLine(); }
 
 /**
- * Updates the script.
+ * Called when Script text changes.
  */
-public void updateScript()
+protected void scriptChanged()
 {
     if(_starsView==null) return;
     _starsView.updateSubjects();
@@ -62,7 +62,7 @@ protected View createUI()
     RowView toolBar = new RowView(); toolBar.setSpacing(4);
     Label label = new Label("Line:"); label.setFont(MAIN_FONT.getBold());
     TextField text = new TextField(); text.setName("LineText"); text.setGrowWidth(true); text.setFont(MAIN_FONT);
-    text.setText("Setting is beach");
+    text.setText("Setting is beach"); setFirstFocus(text);
     Button btn = new Button("Edit Script"); btn.setName("EditScriptButton");
     btn.setLeanX(HPos.RIGHT); btn.setPrefSize(95,26);
     toolBar.setChildren(label, text, btn);

@@ -86,12 +86,18 @@ public CameraView getCamera()  { return _camera; }
 public Script getScript()  { return _script; }
 
 /**
+ * Returns the Script text.
+ */
+public String getScriptText()  { return getScript().getText(); }
+
+/**
  * Sets the Script text.
  */
 public void setScriptText(String aStr)
 {
     if(aStr.equals(getScript().getText())) return;
     getScript().setText(aStr);
+    getScript().getLines();
     _runLine = -1; setRunTime(0);
 }
 

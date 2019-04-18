@@ -33,6 +33,11 @@ public EditorPane(PlayerPane aPlayerPane)
 }
 
 /**
+ * Returns the PlayerView.
+ */
+public PlayerView getPlayer()  { return _player; }
+
+/**
  * Returns the Script.
  */
 public Script getScript()  { return _player.getScript(); }
@@ -54,7 +59,7 @@ public void showLineEditor()
 {
     _transPane.setTransition(TransitionPane.MoveUp);
     _transPane.setContent(_lineEditor.getUI());
-    updateScript();
+    _lineEditor.resetLater();
 }
 
 /**
@@ -64,16 +69,16 @@ public void showScriptEditor()
 {
     _transPane.setTransition(TransitionPane.MoveDown);
     _transPane.setContent(_scriptEditor.getUI());
-    updateScript();
+    _scriptEditor.resetLater();
 }
 
 /**
  * Updates the script.
  */
-public void updateScript()
+protected void scriptChanged()
 {
-    _scriptEditor.updateScript();
-    _lineEditor.updateScript();
+    _scriptEditor.scriptChanged();
+    _lineEditor.scriptChanged();
 }
 
 /**
@@ -94,29 +99,12 @@ protected View createUI()
 }
 
 /**
- * Respond to UI.
+ * Reset UI.
  */
-protected void respondUI(ViewEvent anEvent)
+protected void resetUI()
 {
-    /*if(anEvent.equals("EditLineButton")) {
-        boolean isScript = _transPane.getContent()==_scriptEditor.getUI();
-        View view = isScript? _lineEditor.getUI() : _scriptEditor.getUI();
-        _transPane.setTransition(isScript? TransitionPane.MoveUp : TransitionPane.MoveDown);
-        _transPane.setContent(view);
-        updateScript();
-    }*/
-}
-
-/**
- * Called when user hits Enter Key in ScriptView.
- */
-void scriptViewReturnKey(ViewEvent anEvent)
-{
-    // Handle EnterKey: Run to previous line
-    if(anEvent==null || anEvent.isEnterKey()) {
-        //_helpPane.reset();
-        _playerPane.runCurrentLine();
-    }
+    if(_scriptEditor.getUI().isShowing()) _scriptEditor.resetLater();
+    if(_lineEditor.getUI().isShowing()) _lineEditor.resetLater();
 }
 
 }

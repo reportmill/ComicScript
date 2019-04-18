@@ -1,5 +1,6 @@
 package comics.script;
 import java.util.*;
+import snap.util.StringUtils;
 import snap.web.WebURL;
 
 /**
@@ -41,8 +42,13 @@ public static Map <String,String[]> getSamples()
 }
 
 /**
- * Returns the Samples array.
+ * Returns the Samples text.
  */
-public static String[] getSample(String aName)  { return getSamples().get(aName); }
+public static String getSample(String aName)
+{
+    String lines[] = getSamples().get(aName);
+    String text = StringUtils.join(lines, "\n");
+    return text;
+}
 
 }
