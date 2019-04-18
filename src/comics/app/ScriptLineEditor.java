@@ -15,12 +15,12 @@ public class ScriptLineEditor extends ViewOwner {
     StarListView       _starsView;
 
     // The ListView
-    ListView <String>  _listView;
+    ListView <String>  _actionListView;
     
     // Actions
     String _camActions[] = { "zooms", "blurs" };
-    String _settingActions[] = { "beach", "ovaloffice", "whitehouse" };
-    String _actorActions[] = { "walks", "waves", "jumps", "dances", "drops", "says", "grows", "flips", "explodes" };
+    String _setActions[] = { "beach", "ovaloffice", "whitehouse" };
+    String _actActions[] = { "walks", "waves", "jumps", "dances", "drops", "says", "grows", "flips", "explodes" };
     
     // Constants
     Font     MAIN_FONT = new Font("Arial", 20);
@@ -50,7 +50,6 @@ public void updateScript()
 {
     if(_starsView==null) return;
     _starsView.updateSubjects();
-    _starsView.setSelIndex(0);
     resetLater();
 }
 
@@ -89,8 +88,8 @@ protected View createUI()
  */
 protected void initUI()
 {
-    _listView = getView("ListView", ListView.class);
-    _listView.setFont(Font.Arial16);
+    _actionListView = getView("ListView", ListView.class);
+    _actionListView.setFont(Font.Arial16);
 }
 
 /**
@@ -98,14 +97,22 @@ protected void initUI()
  */
 protected void resetUI()
 {
+    // Get selected script line and star
     ScriptLine line = getScriptLine();
+    Star star = line.getStar(); if(star==null) return;
     
+    // Update LineText
     setViewText("LineText", line.getText());
-    String selName = _starsView.getSelName();
-    if(selName==null) _listView.setItems((String[])null);
-    else if(selName.equals("Camera")) _listView.setItems(_camActions);
-    else if(selName.equals("Setting")) _listView.setItems(_settingActions);
-    else _listView.setItems(_actorActions);
+    
+    // Update StarsView
+    _starsView.setSelStar(star);
+    
+    // Update ListView
+    String starName = star.getStarName();
+    if(starName==null) _actionListView.setItems((String[])null);
+    else if(starName.equals("Camera")) _actionListView.setItems(_camActions);
+    else if(starName.equals("Setting")) _actionListView.setItems(_setActions);
+    else _actionListView.setItems(_actActions);
 }
 
 /**

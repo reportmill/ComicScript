@@ -1,7 +1,6 @@
 package comics.app;
 import comics.script.*;
 import snap.gfx.*;
-import snap.util.ArrayUtils;
 import snap.view.*;
 import java.util.*;
 
@@ -16,12 +15,15 @@ public class StarListView extends ParentView {
     // The Player
     PlayerView           _player;
     
+    // The list of Stars
+    List <Star>          _stars = new ArrayList();
+    
     // The selected index
     int                  _selIndex = -1;
     
     //
-    Image                _camera = Image.get(getClass(), "Camera.png");
-    Image                _setting = Image.get(getClass(), "Setting.png");
+    Image                _camImg = Image.get(getClass(), "Camera.png");
+    Image                _setImg = Image.get(getClass(), "Setting.png");
     
     // Constants
     int SPACING = 12;
@@ -52,31 +54,47 @@ public int getSelIndex()  { return _selIndex; }
  */
 public void setSelIndex(int anIndex)
 {
-    StarView sv = anIndex>=0? (StarView)getChild(anIndex) : null;
-    setSelStarView(sv);
-}
-
-/**
- * Returns the selected StarView.
- */
-public StarView getSelStarView()  { return _selIndex>=0? (StarView)getChild(_selIndex) : null; }
-
-/**
- * Selects the given StarView.
- */
-public void setSelStarView(StarView aAV)
-{
-    StarView oldView = getSelStarView();
-    if(oldView!=null) oldView.setEffect(null);
-    _selIndex = ArrayUtils.indexOf(getChildren(), aAV);
-    if(aAV!=null) aAV.setEffect(SELECT_EFFECT);
+    // If already set, just return
+    if(anIndex==_selIndex) return;
+    
+    // Set SelIndex and StarView effect
+    StarView sv = getSelStarView(); if(sv!=null) sv.setEffect(null);
+    _selIndex = anIndex;
+    StarView sv2 = getSelStarView(); if(sv2!=null) sv2.setEffect(SELECT_EFFECT);
+    
+    // Reset LineEditor UI
     _lineEditor.resetLater();
 }
 
 /**
- * Returns the selected StarView name.
+ * Returns the selected StarV.
  */
-public String getSelName()  { return getSelStarView()!=null? getSelStarView()._name : null; }
+public Star getSelStar()  { return getStar(_selIndex); }
+
+/**
+ * Selects the given Star.
+ */
+public void setSelStar(Star aStar)  { int ind = getStarIndex(aStar); setSelIndex(ind); }
+
+/**
+ * Returns the Star at given index.
+ */
+protected Star getStar(int anIndex)  { return anIndex>=0? _stars.get(anIndex) : null; }
+
+/**
+ * Returns the index of given Star.
+ */
+protected int getStarIndex(Star aStar)  { return _stars.indexOf(aStar); }
+
+/**
+ * Returns the StarView at given index.
+ */
+protected StarView getStarView(int anIndex)  { return anIndex>=0? (StarView)getChild(anIndex) : null; }
+
+/**
+ * Returns the selected StarView.
+ */
+protected StarView getSelStarView()  { return getStarView(_selIndex); }
 
 /**
  * Updates the list of Subjects.
@@ -84,42 +102,21 @@ public String getSelName()  { return getSelStarView()!=null? getSelStarView()._n
 public void updateSubjects()
 {
     Script script = _player.getScript();
-    removeChildren();
+    removeChildren(); _stars.clear();
     
-    StarView setting = new StarView(_setting, "Setting");
-    addChild(setting);
-    StarView cam = new StarView(_camera, "Camera");
-    addChild(cam);
+    StarView set = new StarView(script.getSetting(), _setImg);
+    addChild(set); _stars.add(set.getStar());
+    StarView cam = new StarView(_player.getCamera(), _camImg);
+    addChild(cam); _stars.add(cam.getStar());
    
     // Iterate over lines
-    List <Asset> assets = new ArrayList();
     for(ScriptLine sline : script.getLines()) {
-        Asset asset = getActor(sline); if(asset==null) continue;
-        if(assets.contains(asset)) continue;
+        Star star = sline.getStar(); if(star==null) continue;
+        if(_stars.contains(star)) continue;
         
-        StarView sview = new StarView(asset);
-        addChild(sview);
-        assets.add(asset);
+        StarView sview = new StarView(star, star.getStarImage());
+        addChild(sview); _stars.add(star);
     }
-}
-
-/**
- * Returns the actor for ScriptLine.
- */
-Asset getActor(ScriptLine aSline)
-{
-    // Get script words and first word
-    String words[] = aSline.getWords();
-    String word = words.length>=2? words[0] : null;
-    
-    // Handle empty
-    if(word==null) return null;
-    
-    // Handle commands: Setting, Camera, Actor
-    if(word.equals("setting")) return null;
-    if(word.equals("camera")) return null;
-    Actor actor = (Actor)_player.getScript().getView(aSline);
-    return actor!=null? actor.getAsset() : null;
 }
 
 /**
@@ -143,7 +140,7 @@ protected void layoutImpl()  { RowView.layout(this, null, null, false, SPACING);
 protected void processEvent(ViewEvent anEvent)
 {
     if(anEvent.isMousePress())
-        setSelStarView(null);
+        setSelStar(null);
 }
     
 /**
@@ -151,19 +148,22 @@ protected void processEvent(ViewEvent anEvent)
  */
 public class StarView extends ImageView {
     
-    // Name
-    String _name;
+    // Star
+    Star   _star;
     
     /** Create an StarView. */
-    public StarView(Image anImg, String aName)
+    public StarView(Star aStar)  { this(aStar, aStar.getStarImage()); }
+    
+    /** Create an StarView. */
+    public StarView(Star aStar, Image anImg)
     {
-        super(anImg); _name = aName;
+        super(anImg); _star = aStar;
         setPrefSize(64,64); setKeepAspect(true); setPadding(3,3,14,3);
         enableEvents(MouseEnter, MouseExit, MousePress);
     }
     
-    /** Create an StarView. */
-    public StarView(Asset anAsset)  { this(anAsset.getImage(), anAsset.getName()); }
+    /** Returns the star. */
+    public Star getStar()  { return _star; }
     
     /** Override to customize paint. */
     protected void paintFront(Painter aPntr)
@@ -177,16 +177,16 @@ public class StarView extends ImageView {
         aPntr.setColor(isMouseOver() || getEffect()!=null? Color.BLUE : Color.GRAY); aPntr.draw(rrect);
         aPntr.clipRect(0,h-12,w,12); aPntr.fill(rrect);
         aPntr.setColor(Color.WHITE);
-        Font font = Font.Arial10; aPntr.setFont(font);
-        double sw = font.getStringAdvance(_name);
-        aPntr.drawString(_name, Math.round((w-sw)/2), h-3);
+        String name = _star.getStarName(); Font font = Font.Arial10; aPntr.setFont(font);
+        double sw = font.getStringAdvance(name);
+        aPntr.drawString(name, Math.round((w-sw)/2), h-3);
     }
     
     /** Override to handle events. */
     protected void processEvent(ViewEvent anEvent)
     {
         if(anEvent.isMousePress())
-            setSelStarView(this);
+            setSelStar(_star);
         if(anEvent.isMouseEnter() || anEvent.isMouseExit()) repaint();
         anEvent.consume();
     }

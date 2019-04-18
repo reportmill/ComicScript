@@ -8,7 +8,7 @@ import snap.view.*;
 /**
  * A view to represent camera.
  */
-public class CameraView extends ScaleBox {
+public class CameraView extends ScaleBox implements Star {
     
     // The Player
     PlayerView    _player;
@@ -66,9 +66,19 @@ public void setBlur(double aValue)
 }
 
 /**
+ * Returns the name.
+ */
+public String getStarName()  { return "Camera"; }
+
+/**
+ * Returns the image.
+ */
+public Image getStarImage()  { return null; }
+
+/**
  * Runs the words.
  */
-public void run(ScriptLine aScriptLine)
+public void runScriptLine(ScriptLine aScriptLine)
 {
     // Set words and reset runtime
     _words = aScriptLine.getWords();

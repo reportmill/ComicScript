@@ -9,7 +9,7 @@ import comics.script.Asset.*;
 /**
  * A class to model actors.
  */
-public class Actor extends ImageView {
+public class Actor extends ImageView implements Star {
     
     // The stage
     SnapScene        _stage;
@@ -57,6 +57,16 @@ public Actor(Script aScript, Asset anAsset)
     double w = _script.feetToPoints(widthFeet), h = _script.feetToPoints(heightFeet);
     setSize(w,h);
 }
+
+/**
+ * Returns the star name.
+ */
+public String getStarName()  { return _asset.getName(); }
+
+/**
+ * Returns the star image.
+ */
+public Image getStarImage()  { return getImage(); }
 
 /**
  * Called when image is loaded.
@@ -107,7 +117,7 @@ protected void setSizeForAsset(Asset anAsset)
 /**
  * Runs the given command.
  */
-public boolean run(ScriptLine aScriptLine)
+public void runScriptLine(ScriptLine aScriptLine)
 {
     _stage = aScriptLine.getScript()._stage;
     _scriptLine = aScriptLine;
@@ -126,7 +136,7 @@ public boolean run(ScriptLine aScriptLine)
         case "dances": runDance(); break;
         case "jumps": runJump(); break;
         case "waves": runWave(); break;
-        default: return false;
+        default: return;// false;
     }
     
     // If image not loaded yet, just return
@@ -135,7 +145,7 @@ public boolean run(ScriptLine aScriptLine)
     aScriptLine.setRunTime(_runTime);
 
     // Returns whether run was executed
-    return _runTime>=0;
+    //return _runTime>=0;
 }
 
 /**

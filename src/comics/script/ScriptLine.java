@@ -65,6 +65,26 @@ public String[] getWords()
 public int getIndex()  { return _script.getLines().indexOf(this); }
 
 /**
+ * Returns the Star of this line.
+ */
+public Star getStar()
+{
+    // Get script words and first word
+    String words[] = getWords();
+    String word = words.length>1? words[0] : null;
+    
+    // Handle empty
+    if(word==null) { setRunTime(0); return null; }
+    
+    // Handle Setting, Camera, Actor
+    if(word.equals("setting"))
+        return _script._setting;
+    if(word.equals("camera"))
+        return _script._player.getCamera();
+    return (Actor)_script.getView(this);
+}
+
+/**
  * Returns the runtime of this ScriptLine.
  */
 public int getRunTime()  { return _runTime; }

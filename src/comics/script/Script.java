@@ -15,9 +15,6 @@ public class Script {
     // The StageView
     StageView          _stage;
     
-    // The CameraView
-    CameraView         _camera;
-
     // The View text
     String             _text;
 
@@ -31,7 +28,10 @@ public class Script {
     public Runnable    _loadLsnr;
     
     // The runtimes
-    int                _runTimes[], _runTime;
+    int                _runTime;
+    
+    // The Setting
+    Setting            _setting = new Setting(this);
     
 /**
  * Creates a script for given PlayerView.
@@ -40,9 +40,13 @@ public Script(PlayerView aPlayer, String aScript)
 {
     _player = aPlayer;
     _stage = aPlayer.getStage();
-    _camera = aPlayer.getCamera();
     setText(aScript);
 }
+
+/**
+ * Returns the setting.
+ */
+public Setting getSetting()  { return _setting; }
 
 /**
  * Returns the Script text.
@@ -147,47 +151,9 @@ public void runLine(int anIndex)
  */
 protected void runLine(ScriptLine aScriptLine)
 {
-    // Get script words and first word
-    String words[] = aScriptLine.getWords();
-    String word = words.length>=2? words[0] : null;
-    
-    // Handle empty
-    if(word==null) aScriptLine.setRunTime(0);
-    
-    // Handle commands: Setting, Camera, Actor
-    else if(word.equals("setting")) runSetting(aScriptLine);
-    else if(word.equals("camera")) _camera.run(aScriptLine);
-    else runActor(aScriptLine);
-}
-
-/**
- * Runs a setting command.
- */
-protected void runSetting(ScriptLine aScriptLine)
-{
-    // Get setting Image and ImageView
-    String words[] = aScriptLine.getWords();
-    Image img = getNextImage(words, 0); if(img==null) return;
-    ImageView iview = new ImageView(img, true, true);
-    iview.setSize(_stage.getWidth(), _stage.getHeight());
-    iview.setName("Setting"); //iview.setOpacity(.5);
-    
-    // If old setting, remove
-    View oldStg = getView("Setting"); if(oldStg!=null) _stage.removeChild(oldStg);
-    
-    // Add new setting
-    _stage.addChild(iview, 0);
-    aScriptLine.setRunTime(1);
-}
-
-/**
- * Runs an Actor command.
- */
-protected void runActor(ScriptLine aScriptLine)
-{
-    Actor actor = (Actor)getView(aScriptLine); if(actor==null) return;
-    actor._stage = _stage; actor._scriptLine = aScriptLine;
-    actor.run(aScriptLine);
+    Star star = aScriptLine.getStar();
+    if(star!=null)
+        star.runScriptLine(aScriptLine);
 }
 
 /**
