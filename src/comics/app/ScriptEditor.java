@@ -81,9 +81,8 @@ protected void scriptChanged()
  */
 void playerRunLineChanged()
 {
-    resetLater();
-    if(_scriptView.isSettingSel()) return;
     _scriptView.setSelIndex(getPlayer().getRunLine());
+    resetLater();
 }
 
 /**

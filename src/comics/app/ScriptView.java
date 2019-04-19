@@ -17,9 +17,6 @@ public class ScriptView extends ParentView {
     // The selected index
     int             _selIndex = -1;
     
-    // Whether the ScriptView is changing selection
-    boolean         _settingSel;
-    
     // The last text from script
     String          _text;
     
@@ -94,8 +91,6 @@ public void setSelIndex(int anIndex)
     _selIndex = anIndex;
     LineView lv1 = getSelLineView(); if(lv1!=null) lv1.setEffect(SELECT_EFFECT);
     
-    _settingSel = true;
-    _scriptEditor.runCurrentLine(); _settingSel = false;
     _scriptEditor.resetLater();
     
     View lview = getSelLineView();
@@ -107,11 +102,6 @@ public void setSelIndex(int anIndex)
  * Returns the selected ScriptLine.
  */
 public ScriptLine getSelLine()  { return _selIndex>=0? getScript().getLine(_selIndex) : null; }
-
-/**
- * Returns whether this ScriptView is setting selection.
- */
-public boolean isSettingSel()  { return _settingSel; }
 
 /**
  * Returns the selected index.
@@ -172,10 +162,14 @@ private class LineView extends Label {
     /** Handle Events. */
     protected void processEvent(ViewEvent anEvent)
     {
-        int index = getParent().indexOfChild(this);
-        if(index==getSelIndex()) _scriptEditor.runCurrentLine();
-        else setSelIndex(index);
-        anEvent.consume();
+        if(anEvent.isMouseRelease()) {
+            _scriptEditor.getPlayer().stop();
+            int index = getParent().indexOfChild(this);
+            setSelIndex(index);
+            _scriptEditor.runCurrentLine();
+            anEvent.consume();
+            _scriptEditor._inputText.requestFocus();
+        }
     }
     
     /** Override to fix paint problem. */
