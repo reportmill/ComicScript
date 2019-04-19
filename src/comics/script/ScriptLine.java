@@ -45,6 +45,14 @@ public Script getScript()  { return _script; }
 public String getText()  { return _text; }
 
 /**
+ * Sets the text.
+ */
+protected void setText(String aStr)
+{
+    _text = aStr; _words = null;
+}
+
+/**
  * Returns the words.
  */
 public String[] getWords()

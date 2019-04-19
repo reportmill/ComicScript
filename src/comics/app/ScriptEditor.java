@@ -39,9 +39,14 @@ public PlayerView getPlayer()  { return _editorPane.getPlayer(); }
 public Script getScript()  { return _editorPane.getScript(); }
 
 /**
- * Returns the ScriptLine.
+ * Returns the selected ScriptLine index.
  */
-public ScriptLine getScriptLine()  { return _editorPane.getScriptLine(); }
+public int getSelIndex()  { return _scriptView.getSelIndex(); }
+
+/**
+ * Returns the selected ScriptLine.
+ */
+public ScriptLine getSelLine()  { return _scriptView.getSelLine(); }
 
 /**
  * Runs the current line.
@@ -49,21 +54,16 @@ public ScriptLine getScriptLine()  { return _editorPane.getScriptLine(); }
 public void runCurrentLine()
 {
     // Run line at index
-    int lineIndex = _scriptView.getSelIndex();
+    int lineIndex = getSelIndex();
+    if(lineIndex<0) lineIndex = 1 - lineIndex;
     getPlayer().stop();
     getPlayer().playLine(lineIndex);
 }
 
-/**
- * Sets player to line end.
- */
-public void setPlayerRunTimeToLineEnd(int aLineIndex)
-{
+/** Sets player to line end. */
+/*public void setPlayerRunTimeToLineEnd(int aLineIndex) {
     int time = getPlayer().getLineEndTime(aLineIndex); if(time>0) time--;
-    getPlayer().stop();
-    getPlayer().setRunTime(time);
-    getPlayer().playLine();
-}
+    getPlayer().stop(); getPlayer().setRunTime(time); getPlayer().playLine(); }*/
 
 /**
  * Called when Script text changes.
@@ -71,7 +71,9 @@ public void setPlayerRunTimeToLineEnd(int aLineIndex)
 protected void scriptChanged()
 {
     if(_scriptView==null) return;
-    _scriptView.setScript(getPlayer().getScript());
+    String scriptText = getScript().getText();
+    if(!scriptText.equals(_scriptView.getText()))
+        _scriptView.setScript(getScript());
 }
 
 /**
@@ -79,6 +81,8 @@ protected void scriptChanged()
  */
 void playerRunLineChanged()
 {
+    resetLater();
+    if(_scriptView.isSettingSel()) return;
     _scriptView.setSelIndex(getPlayer().getRunLine());
 }
 
@@ -101,7 +105,7 @@ protected View createUI()
     
     // Create/configure InputText
     _inputText = new TextField(); _inputText.setName("InputText"); _inputText.setGrowWidth(true);
-    _inputText.setFont(new Font("Arial", 20)); _inputText.setRadius(10);
+    _inputText.setFont(new Font("Arial", 16)); _inputText.setRadius(10);
     setFirstFocus(_inputText);
     
     // Create/configure InputText
@@ -131,10 +135,12 @@ protected void initUI()
  */
 protected void resetUI()
 {
-    // Update ScriptView text if changed externally
-    String scriptText = getPlayer().getScriptText();
-    if(!scriptText.equals(_scriptView.getText()))
-        _scriptView.setText(scriptText);
+    // Get seleccted ScriptLine
+    ScriptLine sline = getSelLine();
+
+    // Update InputText
+    _inputText.setText(sline!=null? sline.getText() : "");
+    _inputText.selectAll();
 }
 
 /**
@@ -142,8 +148,25 @@ protected void resetUI()
  */
 protected void respondUI(ViewEvent anEvent)
 {
+    // Handle EditLineButton
     if(anEvent.equals("EditLineButton"))
         _editorPane.showLineEditor();
+        
+    // Handle InputText
+    if(anEvent.equals("InputText")) {
+        int ind = getSelIndex(); String str = anEvent.getStringValue().trim();
+        if(ind>=0) {
+            getScript().setLineText(str, ind);
+            scriptChanged();
+        }
+        else {
+            ind = 1 - ind; ind = getScript().getLineCount();
+            getScript().addLineText(str, ind);
+            scriptChanged();
+            _scriptView.setSelIndex(ind);
+        }
+        runCurrentLine();
+    }
 }
 
 }

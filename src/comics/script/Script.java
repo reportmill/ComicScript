@@ -91,6 +91,54 @@ public List <ScriptLine> getLines()
 }
 
 /**
+ * Adds a line to script.
+ */
+public void addLineText(String aStr, int anIndex)
+{
+    List <ScriptLine> lines = getLines();
+    ScriptLine sline = new ScriptLine(this, aStr);
+    lines.add(anIndex, sline);
+    resetTextFromLines();
+}
+
+/**
+ * Sets a line in script to new string.
+ */
+public void setLineText(String aStr, int anIndex)
+{
+    ScriptLine sline = getLine(anIndex);
+    sline.setText(aStr);
+    resetTextFromLines();
+}
+
+/**
+ * Removes a line.
+ */
+public ScriptLine removeLine(int anIndex)
+{
+    List <ScriptLine> lines = getLines();
+    ScriptLine sline = lines.remove(anIndex);
+    resetTextFromLines();
+    return sline;
+}
+
+/**
+ * Sets the text from lines.
+ */
+void resetTextFromLines()
+{
+    List <ScriptLine> lines = getLines();
+    StringBuffer sb = new StringBuffer();
+    for(ScriptLine sl : lines) {
+        String str = sl.getText();
+        if(str.trim().length()>0)
+            sb.append(str).append('\n');
+    }
+    String text = sb.toString().trim();
+    setText(text);
+}
+
+/**
  * Returns whether script is loaded.
  */
 public boolean isLoaded()
