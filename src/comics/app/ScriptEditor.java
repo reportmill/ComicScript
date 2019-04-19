@@ -54,8 +54,7 @@ public ScriptLine getSelLine()  { return _scriptView.getSelLine(); }
 public void runCurrentLine()
 {
     // Run line at index
-    int lineIndex = getSelIndex();
-    if(lineIndex<0) lineIndex = 1 - lineIndex;
+    int lineIndex = getSelIndex(); if(lineIndex<0) lineIndex = ScriptView.negateIndex(lineIndex);
     getPlayer().stop();
     getPlayer().playLine(lineIndex);
 }
@@ -86,6 +85,17 @@ void playerRunLineChanged()
 }
 
 /**
+ * Called when InputText does KeyRelease to catch delete.
+ */
+void inputTextDidKeyPress(ViewEvent anEvent)
+{
+    if((anEvent.isDeleteKey() || anEvent.isBackSpaceKey()) && _inputText.length()==0) {
+        ViewUtils.fireActionEvent(_inputText, anEvent);
+        anEvent.consume();
+    }
+}
+
+/**
  * Creates UI.
  */
 protected View createUI()
@@ -105,6 +115,7 @@ protected View createUI()
     // Create/configure InputText
     _inputText = new TextField(); _inputText.setName("InputText"); _inputText.setGrowWidth(true);
     _inputText.setFont(new Font("Arial", 16)); _inputText.setRadius(10);
+    _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
     setFirstFocus(_inputText);
     
     // Create/configure InputText
@@ -153,18 +164,39 @@ protected void respondUI(ViewEvent anEvent)
         
     // Handle InputText
     if(anEvent.equals("InputText")) {
+        
+        // Get selected line index and new string
         int ind = getSelIndex(); String str = anEvent.getStringValue().trim();
+        
+        // If selected line
         if(ind>=0) {
+            
+            // If text hasn't changed, select new
+            if(getScript().getLine(ind).getText().equals(str)) { ind = ScriptView.negateIndex(ind) - 1;
+               _scriptView.setSelIndex(ind); return; }
+               
+            // Set line to new text
             getScript().setLineText(str, ind);
             scriptChanged();
         }
+        
+        // If new line
         else {
-            ind = 1 - ind; ind = getScript().getLineCount();
+            
+            // If no new text, select prev line
+            if(str.length()==0) { ind = ScriptView.negateIndex(ind);
+                if(ind>=getScript().getLineCount()) ind = 0;
+                _scriptView.setSelIndex(ind);
+                runCurrentLine(); return;
+            }
+                
+            // Add new line
+            ind = ScriptView.negateIndex(ind);
             getScript().addLineText(str, ind);
             scriptChanged();
             _scriptView.setSelIndex(ind);
         }
-        runCurrentLine();
+        runLater(() -> runCurrentLine()); // Shouldn't have to runlater
     }
 }
 
