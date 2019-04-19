@@ -14,6 +14,9 @@ public class ScriptEditor extends ViewOwner {
     // The ScriptView
     ScriptView       _scriptView;
     
+    // The InputText
+    TextField        _inputText;
+    
     // The Script line count
     int              _scriptLineCount;
     
@@ -45,13 +48,8 @@ public ScriptLine getScriptLine()  { return _editorPane.getScriptLine(); }
  */
 public void runCurrentLine()
 {
-    // Get current line (or first non empty line above)
-    TextBoxLine line = _scriptView.getSel().getStartLine();
-    while(line.getString().trim().length()==0 && line.getIndex()>0)
-        line = _scriptView.getTextArea().getLine(line.getIndex()-1);
-    
     // Run line at index
-    int lineIndex = line.getIndex();
+    int lineIndex = _scriptView.getSelIndex();
     getPlayer().stop();
     getPlayer().playLine(lineIndex);
 }
@@ -73,8 +71,7 @@ public void setPlayerRunTimeToLineEnd(int aLineIndex)
 protected void scriptChanged()
 {
     if(_scriptView==null) return;
-    _scriptView.setText(getPlayer().getScriptText());
-    _scriptLineCount = _scriptView.getTextArea().getLineCount();
+    _scriptView.setScript(getPlayer().getScript());
 }
 
 /**
@@ -82,7 +79,7 @@ protected void scriptChanged()
  */
 void playerRunLineChanged()
 {
-    _scriptView.setRunLine(getPlayer().getRunLine());
+    _scriptView.setSelIndex(getPlayer().getRunLine());
 }
 
 /**
@@ -97,19 +94,26 @@ protected View createUI()
     btn.setLeanX(HPos.RIGHT); btn.setPrefSize(95,26);
     toolBar.setChildren(label, btn);
     
-    // Get/configure ScriptView
+    // Create/configure ScriptView
     _scriptView = new ScriptView(this);
-    _scriptView.setGrowHeight(true); _scriptView.setPrefHeight(180);
-    _scriptView.setText(PlayerPane.DEFAULT_SCRIPT);
-    _scriptView.setSel(_scriptView.length());
-    _scriptView.addEventFilter(e -> scriptViewDidKeyRelease(e), KeyRelease);
-    setFirstFocus(_scriptView.getTextArea());
+    ScrollView scriptScrollView = new ScrollView(_scriptView);
+    scriptScrollView.setGrowHeight(true); scriptScrollView.setPrefHeight(180);
+    
+    // Create/configure InputText
+    _inputText = new TextField(); _inputText.setName("InputText"); _inputText.setGrowWidth(true);
+    _inputText.setFont(new Font("Arial", 20)); _inputText.setRadius(10);
+    setFirstFocus(_inputText);
+    
+    // Create/configure InputText
+    RowView inputRow = new RowView(); inputRow.setPadding(4,4,4,4);
+    inputRow.addChild(_inputText);
     
     //<ColView Padding="8,4,4,4" GrowHeight="true" FillWidth="true" Title="Cast" />
     ColView colView = new ColView(); colView.setPadding(8,5,5,5); colView.setSpacing(4);
     colView.setGrowHeight(true); colView.setFillWidth(true);
     colView.addChild(toolBar);
-    colView.addChild(_scriptView);
+    colView.addChild(scriptScrollView);
+    colView.addChild(inputRow);
     
     return colView;
 }
@@ -140,18 +144,6 @@ protected void respondUI(ViewEvent anEvent)
 {
     if(anEvent.equals("EditLineButton"))
         _editorPane.showLineEditor();
-}
-
-/**
- * Called when user hits Key in ScriptView.
- */
-void scriptViewDidKeyRelease(ViewEvent anEvent)
-{
-    if(_scriptLineCount!=_scriptView.getTextArea().getLineCount()) { 
-        _scriptLineCount = _scriptView.getTextArea().getLineCount();
-        getPlayer().setScriptText(_scriptView.getText());
-        runCurrentLine();
-    }
 }
 
 }

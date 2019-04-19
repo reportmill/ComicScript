@@ -1,20 +1,27 @@
 package comics.app;
+import comics.script.*;
 import snap.gfx.*;
 import snap.view.*;
 
 /**
  * A TextView class to show script with line markers.
  */
-public class ScriptView extends TextView {
+public class ScriptView extends ParentView {
     
     // The ScriptEditor
-    ScriptEditor   _scriptEditor;
+    ScriptEditor    _scriptEditor;
     
-    // The MarkView
-    MarkView       _markView;
+    // The Script
+    Script          _script;
     
-    // The current RunLine
-    int            _runLine;
+    // The selected index
+    int             _selIndex = -1;
+    
+    // Constants
+    static int SPACING = 6;
+    static Color LINE_FILL = new Color(.9d);
+    static Color    SELECT_COLOR = Color.get("#039ed3");
+    static Effect SELECT_EFFECT = new ShadowEffect(8, SELECT_COLOR, 0, 0);
 
 /**
  * Creates a ScriptView.
@@ -23,90 +30,102 @@ public ScriptView(ScriptEditor aSE)
 {
     _scriptEditor = aSE;
 
-    setGrowWidth(true);
-    getTextArea().setGrowWidth(true);
-    setFont(new Font("Arial", 20));
-    
-    _markView = new MarkView();
-    
-    RowView box = new RowView(); box.setFillHeight(true);
-    box.setChildren(_markView, getTextArea());
-    getScrollView().setContent(box);
-    
-    getTextArea().addPropChangeListener(pc -> textSelChanged(), TextArea.Selection_Prop);
+    setPadding(8,8,8,12);
+    setGrowWidth(true); setGrowHeight(true);
+    setFont(new Font("Arial", 15));
+    setFill(Color.WHITE); //setBorder(Border.createLoweredBevelBorder());
 }
 
 /**
- * Returns the current marked run line.
+ * Sets the script.
  */
-public int getRunLine()  { return _runLine; }
-
-/**
- * Sets the current marked run line.
- */
-public void setRunLine(int anIndex)
+public void setScript(Script aScript)
 {
-    if(anIndex==_runLine) return;
-    _runLine = anIndex;
-    _markView.repaint();
-    _scriptEditor.setPlayerRunTimeToLineEnd(anIndex); //_scriptEditor.runCurrentLine();
-}
-
-/**
- * Called when selection changes.
- */
-protected void textSelChanged()
-{
-    int ind = getSelStartLineIndex();
-    setRunLine(ind);
-}
-
-/**
- * Returns the index of the selection start.
- */
-public int getSelStartLineIndex()
-{
-    TextBoxLine line = getSel().getStartLine();
-    return line.getIndex();
-}
-
-/**
- * A custom view to draw current line marker.
- */
-private class MarkView extends View {
+    removeChildren();
     
-    // Vars
-    Color MARKER_COLOR = new Color(.2,.8,.2);
+    for(ScriptLine sline : aScript.getLines()) {
+        
+        LineView lview = new LineView(sline);
+        addChild(lview);
+    }
+}
 
-    /** Creates MarkView. */
-    public MarkView()
+/**
+ * Returns the selected index.
+ */
+public int getSelIndex()  { return _selIndex; }
+
+/**
+ * Sets the selected index.
+ */
+public void setSelIndex(int anIndex)
+{
+    if(anIndex==_selIndex) return;
+    if(anIndex>=getChildCount()) return;
+    LineView lv0 = getSelLineView(); if(lv0!=null) lv0.setEffect(null);
+    _selIndex = anIndex;
+    LineView lv1 = getSelLineView(); if(lv1!=null) lv1.setEffect(SELECT_EFFECT);
+    
+    _scriptEditor.runCurrentLine();
+}
+
+/**
+ * Returns the selected index.
+ */
+LineView getLineView(int anIndex)  { return (LineView)getChild(anIndex); }
+
+/**
+ * Returns the selected index.
+ */
+LineView getSelLineView()  { return _selIndex>=0? getLineView(_selIndex) : null; }
+
+/**
+ * Returns the preferred width.
+ */
+protected double getPrefWidthImpl(double aH)  { return ColView.getPrefWidth(this, null, aH); }
+
+/**
+ * Returns the preferred height.
+ */
+protected double getPrefHeightImpl(double aW)  { return ColView.getPrefHeight(this, null, SPACING, aW); }
+
+/**
+ * Layout children.
+ */
+protected void layoutImpl()  { ColView.layout(this, null, null, false, SPACING); }
+
+/**
+ * A class to hold a script line.
+ */
+private class LineView extends Label {
+    
+    // The ScriptLine
+    ScriptLine  _line;
+    
+    /** Create LineView. */
+    public LineView(ScriptLine aLine)
     {
-        setFill(new Color(.93));
-        setPrefWidth(22);
+        _line = aLine;
+        setText(aLine.getText());
+        setPadding(5,10,5,10);
+        setFont(ScriptView.this.getFont());
+        setFill(LINE_FILL);
         enableEvents(MouseRelease);
     }
+
+    /** Returns bounds shape as rounded rect. */
+    public Shape getBoundsShape()  { return new RoundRect(0,0,getWidth(),getHeight(),10); }
     
-    /** Override to draw marker. */
-    protected void paintFront(Painter aPntr)
-    {
-        if(_runLine<0 || _runLine>=getTextArea().getLineCount()) return;
-        TextBoxLine line = getTextArea().getLine(_runLine);
-        double y0 = line.getY(), y1 = line.getMaxY();
-        
-        aPntr.setColor(MARKER_COLOR);
-        aPntr.fill(new Ellipse(4,y0+4,14,y1-y0-8));
-    }
-    
-    /** Override to update selection. */
+    /** Handle Events. */
     protected void processEvent(ViewEvent anEvent)
     {
-        if(anEvent.isMouseClick()) {
-            TextBoxLine line = getTextBox().getLineForY(anEvent.getY());
-            int cindex = line.length()>0? line.getEnd()-1 : line.getEnd();
-            getTextArea().setSel(cindex);
-            _scriptEditor.runCurrentLine();
-        }
+        int index = getParent().indexOfChild(this);
+        if(index==getSelIndex()) _scriptEditor.runCurrentLine();
+        else setSelIndex(index);
     }
+    
+    /** Override to fix paint problem. */
+    public void setEffect(Effect anEff)  { super.setEffect(anEff); repaint(-10,-10,getWidth()+20,getHeight()+20); }
 }
 
 }
