@@ -89,6 +89,13 @@ void playerRunLineChanged()
  */
 void inputTextDidKeyPress(ViewEvent anEvent)
 {
+    if(anEvent.isTabKey() && getScript().getLineCount()>0) {
+        int ind = getSelIndex(); if(ind<0) ind = ScriptView.negateIndex(ind);
+        ind = (ind+1) % getScript().getLineCount();
+        _scriptView.setSelIndex(ind);
+        runCurrentLine();
+    }
+    
     if((anEvent.isDeleteKey() || anEvent.isBackSpaceKey()) && _inputText.length()==0) {
         ViewUtils.fireActionEvent(_inputText, anEvent);
         anEvent.consume();
@@ -196,7 +203,7 @@ protected void respondUI(ViewEvent anEvent)
             scriptChanged();
             _scriptView.setSelIndex(ind);
         }
-        runLater(() -> runCurrentLine()); // Shouldn't have to runlater
+        runCurrentLine(); runCurrentLine(); // This sucks
     }
 }
 
