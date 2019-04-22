@@ -214,41 +214,8 @@ protected void respondUI(ViewEvent anEvent)
         runLater(() -> ViewUtils.fireActionEvent(_inputText, anEvent));
         
     // Handle InputText
-    if(anEvent.equals("InputText")) {
-        
-        // Get selected line index and new string
-        int ind = getSelIndex(); String str = anEvent.getStringValue().trim();
-        
-        // If selected line
-        if(ind>=0) {
-            
-            // If text hasn't changed, select new
-            if(getScript().getLine(ind).getText().equals(str)) { ind = ScriptView.negateIndex(ind) - 1;
-               _scriptView.setSelIndex(ind); return; }
-               
-            // Set line to new text
-            getScript().setLineText(str, ind);
-            scriptChanged();
-        }
-        
-        // If new line
-        else {
-            
-            // If no new text, select prev line
-            if(str.length()==0) { ind = ScriptView.negateIndex(ind);
-                if(ind>=getScript().getLineCount()) ind = 0;
-                _scriptView.setSelIndex(ind);
-                runCurrentLine(); return;
-            }
-                
-            // Add new line
-            ind = ScriptView.negateIndex(ind);
-            getScript().addLineText(str, ind);
-            scriptChanged();
-            _scriptView.setSelIndex(ind);
-        }
-        runCurrentLine(); runCurrentLine(); // This sucks
-    }
+    if(anEvent.equals("InputText"))
+        modifyScript(anEvent.getStringValue().trim());
 }
 
 /**
@@ -257,7 +224,6 @@ protected void respondUI(ViewEvent anEvent)
 void resetHelpListView()
 {
     ScriptLine line = getSelLine();
-    System.out.println("ResetHelpList: " + (line!=null? line.getText() : line));
     
     // If no line or no star, set list of stars
     if(line==null || line.getStar()==null) {
