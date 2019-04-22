@@ -82,7 +82,9 @@ public void runScriptLine(ScriptLine aScriptLine)
 {
     // Set words and reset runtime
     _words = aScriptLine.getWords();
-    String cmd = _words[1];
+    String cmd = _words.length>1? _words[1] : null;
+    if(cmd==null)
+        return;
     
     // Jump to specific command
     switch(cmd) {
@@ -90,6 +92,7 @@ public void runScriptLine(ScriptLine aScriptLine)
         case "zooms": runZooms(); break;
         case "blur": runBlurs(); break;
         case "blurs": runBlurs(); break;
+        default: return;
     }
     
     aScriptLine.setRunTime(_runTime);

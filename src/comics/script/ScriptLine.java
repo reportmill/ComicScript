@@ -79,10 +79,10 @@ public Star getStar()
 {
     // Get script words and first word
     String words[] = getWords();
-    String word = words.length>1? words[0] : null;
+    String word = words.length>0? words[0] : null;
     
     // Handle empty
-    if(word==null) { setRunTime(0); return null; }
+    if(word==null || word.length()==0) { setRunTime(0); return null; }
     
     // Handle Setting, Camera, Actor
     if(word.equals("setting"))

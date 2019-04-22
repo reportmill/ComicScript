@@ -36,6 +36,7 @@ public void runScriptLine(ScriptLine aScriptLine)
     
     // Get setting Image and ImageView
     String words[] = aScriptLine.getWords();
+    String iname = words.length>1? words[1] : null; if(iname==null) return;
     Image img = _script.getNextImage(words, 0); if(img==null) return;
     ImageView iview = new ImageView(img, true, true);
     iview.setSize(stage.getWidth(), stage.getHeight());

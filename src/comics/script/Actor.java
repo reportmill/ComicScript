@@ -122,7 +122,9 @@ public void runScriptLine(ScriptLine aScriptLine)
     _stage = aScriptLine.getScript()._stage;
     _scriptLine = aScriptLine;
     _words = aScriptLine.getWords();
-    String cmd = _words[1];
+    String cmd = _words.length>1? _words[1] : null;
+    if(cmd==null)
+        return;
 
     // Jump to specific command
     switch(cmd) {
@@ -136,7 +138,7 @@ public void runScriptLine(ScriptLine aScriptLine)
         case "dances": runDance(); break;
         case "jumps": runJump(); break;
         case "waves": runWave(); break;
-        default: return;// false;
+        default: return;
     }
     
     // If image not loaded yet, just return

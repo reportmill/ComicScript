@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ColView PrefWidth="180" Spacing="2" FillWidth="true">
+  <font name="Arial" size="13" />
+  <Label Name="HelpListLabel" Padding="3,3,3,5" text="Vocabulary">
+    <BevelBorder />
+    <font name="Arial Bold" size="13" />
+  </Label>
+  <ListView Name="HelpListView" MinHeight="60" GrowHeight="true">
+    <LineBorder Color="#c0c0c0" />
+  </ListView>
+</ColView>

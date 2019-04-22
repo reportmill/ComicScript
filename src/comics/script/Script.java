@@ -212,9 +212,11 @@ public View getView(ScriptLine aScriptLine)
     // Get image for word
     String words[] = aScriptLine.getWords();
     Asset asset = getNextAsset(words, -1);
+    if(asset==null)
+        return null;
     
     // Get actor for image
-    String name = asset!=null? asset.getName() : null;
+    String name = asset.getName();
     View child = getView(name);
     
     // If actor not found, create
