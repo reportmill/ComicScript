@@ -3,6 +3,7 @@ import comics.script.*;
 import snap.gfx.*;
 import snap.view.*;
 import comics.app.PlayBar.*;
+import snap.web.WebURL;
 
 /**
  * A View to play an animation. Encapsulates a CameraView, StageView and Script.
@@ -462,5 +463,33 @@ protected void processEvent(ViewEvent anEvent)
     }
     else super.processEvent(anEvent);
 }
+
+/**
+ * Shows the title animation.
+ */
+protected void showTitleAnim()
+{
+    Image img = getHeaderImage();
+    if(!img.isLoaded()) { img.addPropChangeListener(pc -> showTitleAnim()); return; }
+    
+    ImageView iview = new ImageView(img); iview.setEffect(new ShadowEffect(20,Color.WHITE,0,0));
+    iview.setPadding(40,0,0,0); iview.setSize(iview.getPrefSize());
+    iview.setManaged(false); iview.setLean(Pos.TOP_CENTER);
+    getCamera().addChild(iview);
+    iview.setOpacity(0);
+    iview.getAnim(200).setOpacity(1).getAnim(3000).getAnim(3500).setOpacity(0).play();
+    iview.getAnim(0).setOnFinish(a -> getCamera().removeChild(iview));
+}
+
+/**
+ * Returns the Header image.
+ */
+Image getHeaderImage()
+{
+    if(_headerImg!=null) return _headerImg;
+    Object src = WebURL.getURL(getClass(), "pkg.images/Header.png");
+    _headerImg = Image.get(src);
+    return _headerImg;
+} Image _headerImg;
 
 }

@@ -70,7 +70,7 @@ public void setEditing(boolean aValue)
     _editing = aValue;
     
     // Fix TitleView, TabView Visible
-    _titleView.setVisible(aValue);
+    //_titleView.setVisible(aValue);
     _editorBox.setVisible(aValue);
     _playerBox.setGrowHeight(!aValue); // Don't grow playerbox when editing (should grow EditorView)
     getPlayer().getPlayBar()._editButton.setText(aValue? "Player" : "Edit");
@@ -81,6 +81,7 @@ public void setEditing(boolean aValue)
             Size psize = getWindow().getPrefSize();
             Rect screenRect = ViewEnv.getEnv().getScreenBoundsInset();
             Rect maxRect = screenRect.getRectCenteredInside(psize.width, psize.height);
+            if(getWindow().isShowing()) { maxRect.x = getWindow().getX(); maxRect.y = getWindow().getY(); }
             getWindow().setMaximizedBounds(maxRect);
         }
         _player.setPadding(20,20,20,20); _player.getCamera().setEffect(new ShadowEffect().copySimple());
@@ -93,6 +94,8 @@ public void setEditing(boolean aValue)
         _player.setPadding(0,0,0,0); _player.getCamera().setEffect(null);
         getWindow().setMaximized(false);
     }
+    
+    getPlayer().showTitleAnim();
 }
 
 /**
@@ -131,6 +134,7 @@ protected void initUI()
     // Get EditorBox
     _editorBox = (ColView)splitView.getItem(1);
     _editorBox.setVisible(false);
+    _editorBox.setPrefWidth(800);
     
     // Add EditorPane
     _editorPane = new EditorPane(this);
