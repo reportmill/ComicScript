@@ -1,6 +1,7 @@
 package comics.app;
 import comics.script.*;
 import snap.gfx.*;
+import snap.util.PropChangeListener;
 import snap.view.*;
 import comics.app.PlayBar.*;
 import snap.web.WebURL;
@@ -470,14 +471,17 @@ protected void processEvent(ViewEvent anEvent)
 protected void showTitleAnim()
 {
     Image img = getHeaderImage();
-    if(!img.isLoaded()) { img.addPropChangeListener(pc -> showTitleAnim()); return; }
+    if(!img.isLoaded()) { img.addPropChangeListener(_titleAnimLsnr); return; }
+    if(!isShowing()) { addPropChangeListener(_titleAnimLsnr, Showing_Prop); return; }
     
+    img.removePropChangeListener(_titleAnimLsnr);
+    removePropChangeListener(_titleAnimLsnr);
     ImageView iview = new ImageView(img); iview.setEffect(new ShadowEffect(20,Color.WHITE,0,0));
-    iview.setPadding(40,0,0,0); iview.setSize(iview.getPrefSize());
+    iview.setPadding(40,20,20,20); iview.setSize(iview.getPrefSize());
     iview.setManaged(false); iview.setLean(Pos.TOP_CENTER);
     getCamera().addChild(iview);
-    iview.setOpacity(0);
-    iview.getAnim(200).setOpacity(1).getAnim(3000).getAnim(3500).setOpacity(0).play();
+    iview.setTransY(getCamera().getHeight());
+    iview.getAnim(1500).setTransY(0).getAnim(3000).getAnim(3500).setOpacity(0).play();
     iview.getAnim(0).setOnFinish(a -> getCamera().removeChild(iview));
 }
 
@@ -490,6 +494,10 @@ Image getHeaderImage()
     Object src = WebURL.getURL(getClass(), "pkg.images/Header.png");
     _headerImg = Image.get(src);
     return _headerImg;
-} Image _headerImg;
+}
+
+// For TitleAnim
+Image _headerImg;
+PropChangeListener _titleAnimLsnr = pc -> showTitleAnim();
 
 }

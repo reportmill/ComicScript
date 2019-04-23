@@ -1,5 +1,7 @@
 package comics.app;
 import comics.script.*;
+import snap.gfx.*;
+import snap.util.SnapUtils;
 import snap.view.*;
 import snap.viewx.TransitionPane;
 
@@ -8,8 +10,17 @@ import snap.viewx.TransitionPane;
  */
 public class EditorPane extends ViewOwner {
     
+    // The MenuBar
+    MenuBar           _menuBar;
+    
+    // The View that holds editor UI
+    ColView           _editorBox;
+    
     // The PlayerPane
     PlayerPane        _playerPane;
+    
+    // The View that holds PlayerView
+    ColView           _playerBox;
     
     // The PlayerView
     PlayerView        _player;
@@ -29,7 +40,36 @@ public class EditorPane extends ViewOwner {
 public EditorPane(PlayerPane aPlayerPane)
 {
     _playerPane = aPlayerPane;
+    _playerBox = _playerPane._playerBox;
     _player = aPlayerPane.getPlayer();
+    
+    // Install in window
+    WindowView win = _playerPane.getWindow();
+    win.setContent(getUI());
+
+    // Enable Editing
+    _player.setPadding(20,20,20,20); _player.getCamera().setEffect(new ShadowEffect().copySimple());
+    if(!SnapUtils.isTeaVM) {
+        Size psize = win.isShowing()? win.getSize() : win.getPrefSize();
+        Rect screenRect = ViewEnv.getEnv().getScreenBoundsInset();
+        Rect maxRect = screenRect.getRectCenteredInside(psize.width, psize.height);
+        if(win.isShowing()) { maxRect.x = win.getX(); maxRect.y = win.getY(); }
+        win.setMaximizedBounds(maxRect);
+    }
+    win.setMaximized(true);
+    
+    scriptChanged();
+    resetLater();
+}
+
+/**
+ * Hides the EditorPane.
+ */
+public void closeEditor()
+{
+    _playerPane.getWindow().setContent(_playerPane.getUI());
+    _player.setPadding(0,0,0,0); _player.getCamera().setEffect(null);
+    _playerPane.getWindow().setMaximized(false);
 }
 
 /**
@@ -91,11 +131,22 @@ protected View createUI()
     _transPane.setContent(_scriptEditor.getUI());
     
     //<ColView Padding="8,4,4,4" GrowHeight="true" FillWidth="true" Title="Cast" />
-    ColView colView = new ColView(); colView.setPadding(4,4,4,4);
-    colView.setGrowHeight(true); colView.setFillWidth(true);
-    colView.addChild(_transPane);
+    _editorBox = new ColView(); _editorBox.setPadding(4,4,4,4); _editorBox.setFont(Font.Arial14);
+    _editorBox.setGrowHeight(true); _editorBox.setFillWidth(true); _editorBox.setPrefHeight(400);
+    _editorBox.addChild(_transPane);
     
-    return colView;
+    //<ColView PrefWidth="800" Spacing="5" FillWidth="true"> ColView colView = (ColView)super.createUI();
+    ColView colView = new ColView(); colView.setPrefWidth(800); colView.setSpacing(5); colView.setFillWidth(true);
+    colView.addChild(_playerBox);
+    colView.addChild(_editorBox);
+    
+    // Return in SplitView
+    SplitView splitView = SplitView.makeSplitView(colView);
+    splitView.getDivider(0).setPrefSpan(8);
+    
+    MenuBar mbar = getMenuBar(); mbar.setFont(Font.Arial14);
+    View mbarView = MenuBar.createMenuBarView(mbar, splitView);
+    return mbarView;
 }
 
 /**
@@ -105,6 +156,30 @@ protected void resetUI()
 {
     if(_scriptEditor.getUI().isShowing()) _scriptEditor.resetLater();
     if(_lineEditor.getUI().isShowing()) _lineEditor.resetLater();
+}
+
+/**
+ * Returns the MenuBar.
+ */
+protected MenuBar getMenuBar()
+{
+    // FileMenu
+    Menu fileMenu = new Menu(); fileMenu.setText("File");
+    MenuItem newMenu = new Menu(); newMenu.setText("New");
+    fileMenu.addItem(newMenu);
+    
+    // EditMenu
+    Menu editMenu = new Menu(); editMenu.setText("Edit");
+    MenuItem cutMenu = new Menu(); cutMenu.setText("Cut");
+    MenuItem copyMenu = new Menu(); copyMenu.setText("Copy");
+    MenuItem pasteMenu = new Menu(); pasteMenu.setText("Paste");
+    MenuItem deleteMenu = new Menu(); deleteMenu.setText("Delete");
+    editMenu.addItem(cutMenu); editMenu.addItem(copyMenu); editMenu.addItem(pasteMenu); editMenu.addItem(deleteMenu); 
+    
+    // Create MenuBar
+    MenuBar mbar = new MenuBar();
+    mbar.addMenu(fileMenu); mbar.addMenu(editMenu);
+    return mbar;
 }
 
 }
