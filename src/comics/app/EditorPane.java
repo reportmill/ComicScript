@@ -20,7 +20,7 @@ public class EditorPane extends ViewOwner {
     PlayerPane        _playerPane;
     
     // The View that holds PlayerView
-    ColView           _playerBox;
+    BoxView           _playerBox;
     
     // The PlayerView
     PlayerView        _player;
@@ -48,7 +48,8 @@ public EditorPane(PlayerPane aPlayerPane)
     win.setContent(getUI());
 
     // Enable Editing
-    _player.setPadding(20,20,20,20); _player.getCamera().setEffect(new ShadowEffect().copySimple());
+    _playerBox.setPadding(20,20,20,20);
+    _player.setEffect(new ShadowEffect().copySimple());
     if(!SnapUtils.isTeaVM) {
         Size psize = win.isShowing()? win.getSize() : win.getPrefSize();
         Rect screenRect = ViewEnv.getEnv().getScreenBoundsInset();
@@ -68,7 +69,8 @@ public EditorPane(PlayerPane aPlayerPane)
 public void closeEditor()
 {
     _playerPane.getWindow().setContent(_playerPane.getUI());
-    _player.setPadding(0,0,0,0); _player.getCamera().setEffect(null);
+    _playerBox.setPadding(0,0,0,0);
+    _player.setEffect(null);
     _playerPane.getWindow().setMaximized(false);
 }
 

@@ -37,7 +37,7 @@ public class PlayBar extends RowView {
 public PlayBar(PlayerView aPV)
 {
     _player = aPV;
-    setHeight(36); setManaged(false);
+    setHeight(36); setManaged(false); setLean(Pos.BOTTOM_LEFT); setGrowWidth(true);
     setPadding(6,10,0,10); setAlign(HPos.LEFT); setSpacing(20);
     enableEvents(MouseMove, MousePress, MouseDrag, MouseExit);
     setCursor(Cursor.HAND);

@@ -9,7 +9,7 @@ import snap.web.WebURL;
 /**
  * A View to play an animation. Encapsulates a CameraView, StageView and Script.
  */
-public class PlayerView extends BoxView {
+public class PlayerView extends ScaleBox {
 
     // StageView: the parent view of actors
     StageView           _stage;
@@ -51,6 +51,11 @@ public class PlayerView extends BoxView {
  */
 public PlayerView()
 {
+    // Create/configure this view
+    setFillWidth(true); setFillHeight(true);
+    setClipToBounds(true);
+    enableEvents(MouseEnter, MouseExit, MouseMove, MousePress);
+    
     // Create configure stage
     _stage = new StageView();
     _stage.setClipToBounds(true);
@@ -58,12 +63,7 @@ public PlayerView()
     
     // Create/configure camera
     _camera = new CameraView(_stage); _camera._player = this;
-    
-    // Create/configure this view
-    setAlign(Pos.CENTER);
     setContent(_camera);
-    setClipToBounds(true);
-    enableEvents(MouseEnter, MouseExit, MouseMove, MousePress);
     
     // Create Script (empty)
     _script = new Script(this, "");
@@ -370,8 +370,7 @@ protected void setShowingControls(boolean aValue)
     _playBarShowing = aValue;
     
     // Add or remove PlayButton
-    //if(aValue) addChild(getPlayButton());
-    //else removeChild(getPlayButton());
+    //if(aValue) addChild(getPlayButton()); else removeChild(getPlayButton());
     
     // Add or remove PlayBar
     getPlayBar().getAnim(0).finish();
@@ -431,22 +430,6 @@ protected PlayButtonBig getPlayButton()
 }
 
 /**
- * Override to size PlayBar.
- */
-protected void layoutImpl()
-{
-    // Do normal version
-    super.layoutImpl();
-    
-    // If PlayBar showing, position at bottom-center of camera rect
-    PlayBar pbar = getPlayBar();
-    if(pbar.isShowing()) {
-        pbar.setBounds(getCamera().getX(), getCamera().getMaxY() - pbar.getHeight(), getCamera().getWidth(),
-            pbar.getHeight());
-    }
-}
-
-/**
  * Process event.
  */
 protected void processEvent(ViewEvent anEvent)
@@ -468,36 +451,48 @@ protected void processEvent(ViewEvent anEvent)
 /**
  * Shows the title animation.
  */
-protected void showTitleAnim()
+protected void showIntroAnim()
 {
-    Image img = getHeaderImage();
-    if(!img.isLoaded()) { img.addPropChangeListener(_titleAnimLsnr); return; }
-    if(!isShowing()) { addPropChangeListener(_titleAnimLsnr, Showing_Prop); return; }
+    // If already running, just return
+    if(_introView!=null) return;
     
-    img.removePropChangeListener(_titleAnimLsnr);
-    removePropChangeListener(_titleAnimLsnr);
-    ImageView iview = new ImageView(img); iview.setEffect(new ShadowEffect(20,Color.WHITE,0,0));
-    iview.setPadding(40,20,20,20); iview.setSize(iview.getPrefSize());
-    iview.setManaged(false); iview.setLean(Pos.TOP_CENTER);
-    getCamera().addChild(iview);
-    iview.setTransY(getCamera().getHeight());
-    iview.getAnim(1500).setTransY(0).getAnim(3000).getAnim(3500).setOpacity(0).play();
-    iview.getAnim(0).setOnFinish(a -> getCamera().removeChild(iview));
+    // Get IntroImage (come back later if image or Player not loaded)
+    Image img = getIntroImage();
+    if(!img.isLoaded()) { img.addPropChangeListener(_introAnimLsnr); return; }
+    if(!isShowing()) { addPropChangeListener(_introAnimLsnr, Showing_Prop); return; }
+    
+    // Remove image/player listeners, if still set
+    img.removePropChangeListener(_introAnimLsnr); removePropChangeListener(_introAnimLsnr, Showing_Prop);
+    
+    // Create ImageView and add to player
+    _introView = new ImageView(img); _introView.setEffect(new ShadowEffect(20,Color.WHITE,0,0));
+    _introView.setPadding(40,20,20,20); _introView.setSize(_introView.getPrefSize());
+    _introView.setManaged(false); _introView.setLean(Pos.TOP_CENTER);
+    getCamera().addChild(_introView);
+    
+    // Configure/start anim
+    _introView.setTransY(getCamera().getHeight());
+    _introView.getAnim(1500).setTransY(0).getAnim(3000).getAnim(3500).setOpacity(0).play();
+    _introView.getAnim(0).setOnFinish(a -> introAnimFinished());
 }
+
+/**
+ * Called when IntroAnim done.
+ */
+void introAnimFinished()  { getCamera().removeChild(_introView); _introView = null; }
 
 /**
  * Returns the Header image.
  */
-Image getHeaderImage()
+Image getIntroImage()
 {
-    if(_headerImg!=null) return _headerImg;
+    if(_introImg!=null) return _introImg;
     Object src = WebURL.getURL(getClass(), "pkg.images/Header.png");
-    _headerImg = Image.get(src);
-    return _headerImg;
+    return _introImg = Image.get(src);
 }
 
-// For TitleAnim
-Image _headerImg;
-PropChangeListener _titleAnimLsnr = pc -> showTitleAnim();
+// For IntroAnim
+ImageView _introView; Image _introImg;
+PropChangeListener _introAnimLsnr = pc -> showIntroAnim();
 
 }

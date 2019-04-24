@@ -1,5 +1,6 @@
 package comics.app;
 import comics.script.Samples;
+import snap.gfx.Pos;
 import snap.view.*;
 
 /**
@@ -11,7 +12,7 @@ public class PlayerPane extends ViewOwner {
     PlayerView      _player;
     
     // The View that holds the PlayerView
-    ColView         _playerBox;
+    BoxView         _playerBox;
     
     // Whether PlayerPane is showing editing UI
     boolean         _editing;
@@ -61,7 +62,7 @@ public void setEditing(boolean aValue)
     _playerBox.setGrowHeight(!aValue);
     _player.getPlayBar()._editButton.setText(aValue? "Player" : "Edit");
     
-    getPlayer().showTitleAnim();
+    getPlayer().showIntroAnim();
 }
 
 /**
@@ -70,11 +71,11 @@ public void setEditing(boolean aValue)
 protected View createUI()
 {
     // Create PlayerView
-    _player = new PlayerView(); _player.setGrowHeight(true);
+    _player = new PlayerView();
     
-    //<ColView Padding="8,4,4,4" PrefHeight="400" GrowHeight="true" FillWidth="true">
-    _playerBox = new ColView(); _playerBox.setPadding(8,4,4,4); _playerBox.setPrefHeight(400);
-    _playerBox.setGrowHeight(true); _playerBox.setFillWidth(true);
+    // Create PlayerBox to hold Player
+    _playerBox = new BoxView(); _playerBox.setPadding(8,4,4,4); _playerBox.setPrefHeight(400);
+    _playerBox.setGrowHeight(true); _playerBox.setAlign(Pos.CENTER);
     _playerBox.addChild(_player);
     return _playerBox;
 }
