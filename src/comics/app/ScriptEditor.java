@@ -46,14 +46,68 @@ public PlayerView getPlayer()  { return _editorPane.getPlayer(); }
 public Script getScript()  { return _editorPane.getScript(); }
 
 /**
+ * Deletes the current selected line.
+ */
+public void delete()
+{
+    int ind = getSelIndex(); if(ind<0) { selectPrev(); return; }
+    getScript().setLineText("", ind);
+    scriptChanged();
+    if(ind<getScript().getLineCount())
+        selectPrev();
+    else runCurrentLine();
+}
+
+/**
  * Returns the selected ScriptLine index.
  */
 public int getSelIndex()  { return _scriptView.getSelIndex(); }
 
 /**
+ * Sets the selected ScriptLine index.
+ */
+public void setSelIndex(int anIndex)
+{
+    _scriptView.setSelIndex(anIndex);
+    if(anIndex>=0)
+        runCurrentLine();
+}
+
+/**
  * Returns the selected ScriptLine.
  */
 public ScriptLine getSelLine()  { return _scriptView.getSelLine(); }
+
+/**
+ * Selects previous line.
+ */
+public void selectPrev()
+{
+    int ind = getSelIndex(); if(ind<0) ind = ScriptView.negateIndex(ind);
+    if(ind==0) { beep(); return; }
+    setSelIndex(ind-1);
+}
+
+/**
+ * Selects next line.
+ */
+public void selectNext()
+{
+    int ind = getSelIndex(); if(ind<0) ind = ScriptView.negateIndex(ind);
+    if(ind+1>=getScript().getLineCount()) { beep(); return; }
+    setSelIndex(ind+1);
+}
+
+/**
+ * Selects next line.
+ */
+public void selectNextWithInsert()
+{
+    int ind = getSelIndex();
+    if(ind<0) { ind = ScriptView.negateIndex(ind); if(ind>=getScript().getLineCount()) ind = 0; }
+    else ind = ScriptView.negateIndex(ind) - 1;
+    setSelIndex(ind);
+}
 
 /**
  * Runs the current line.
@@ -107,7 +161,9 @@ void inputTextDidKeyPress(ViewEvent anEvent)
     }
     
     if((anEvent.isDeleteKey() || anEvent.isBackSpaceKey()) && _inputText.length()==0) {
-        ViewUtils.fireActionEvent(_inputText, anEvent);
+        //ViewUtils.fireActionEvent(_inputText, anEvent);
+        _inputText.escape(anEvent);
+        delete();
         anEvent.consume();
     }
 }
@@ -140,7 +196,6 @@ protected View createUI()
     _inputText = new TextField(); _inputText.setName("InputText"); _inputText.setGrowWidth(true);
     _inputText.setFont(new Font("Arial", 16)); _inputText.setRadius(10);
     _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
-    setFirstFocus(_inputText);
     
     // Create/configure InputButton
     Button inputButton = new Button("\u23CE"); inputButton.setName("InputButton"); inputButton.setPrefWidth(80);
@@ -165,7 +220,10 @@ protected View createUI()
  */
 protected void initUI()
 {
-    // Get HelpListView
+    // Make ScriptView FirstFocus
+    setFirstFocus(_scriptView);
+    
+    // Get/configure HelpListView
     _helpListView = getView("HelpListView", ListView.class);
     _helpListView.setFont(Font.Arial16);
     _helpListView.setFocusWhenPressed(false); _helpListView.getListArea().setFocusWhenPressed(false);
@@ -206,7 +264,9 @@ protected void respondUI(ViewEvent anEvent)
         String str = _helpListView.getSelItem();
         String str2 = starName!=null? starName + ' ' + str : str;
         ViewUtils.runOnMouseUp(() -> {
-            modifyScript(str2); });
+            modifyScript(str2);
+            resetLater();
+        });
     }
     
     // Handle InputButton
@@ -250,8 +310,8 @@ void modifyScript(String aStr)
     if(ind>=0) {
         
         // If text hasn't changed, select new
-        if(getScript().getLine(ind).getText().equals(str)) { ind = ScriptView.negateIndex(ind) - 1;
-           _scriptView.setSelIndex(ind); return; }
+        if(getScript().getLine(ind).getText().equals(str)) {
+           selectNextWithInsert(); return; }
            
         // Set line to new text
         getScript().setLineText(str, ind);
@@ -262,11 +322,8 @@ void modifyScript(String aStr)
     else {
         
         // If no new text, select next line
-        if(str.length()==0) { ind = ScriptView.negateIndex(ind);
-            if(ind>=getScript().getLineCount()) ind = 0;
-            _scriptView.setSelIndex(ind);
-            runCurrentLine(); return;
-        }
+        if(str.length()==0) {
+            selectNext(); return; }
             
         // Add new line
         ind = ScriptView.negateIndex(ind);
@@ -274,8 +331,8 @@ void modifyScript(String aStr)
         scriptChanged();
         _scriptView.setSelIndex(ind);
     }
-    runCurrentLine(); runCurrentLine(); // This sucks
-    runLater(() -> resetLater());
+    runCurrentLine(); //runCurrentLine(); // This sucks
+    _scriptView.requestFocus();
 }
 
 }

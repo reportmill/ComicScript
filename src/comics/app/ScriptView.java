@@ -31,7 +31,8 @@ public class ScriptView extends ParentView {
     static int SPACING = 6;
     static Color LINEVIEW_FILL = new Color(.9d);
     static Color SELECT_COLOR = Color.get("#039ed3");
-    static Effect SELECT_EFFECT = new ShadowEffect(8, SELECT_COLOR, 0, 0);
+    static Effect SELECT_EFFECT = new ShadowEffect(8, Color.DARKGRAY, 0, 0);
+    static Effect SELECT_EFFECT_FOC = new ShadowEffect(8, SELECT_COLOR, 0, 0);
 
 /**
  * Creates a ScriptView.
@@ -44,12 +45,13 @@ public ScriptView(ScriptEditor aSE)
     setGrowWidth(true); setGrowHeight(true);
     setFont(new Font("Arial", 15));
     setFill(Color.WHITE);
-    enableEvents(MouseRelease);
+    setFocusable(true); setFocusWhenPressed(true); setFocusKeysEnabled(false);
+    enableEvents(MousePress, KeyPress);
     
     // Configure CursorLineView
     _cursorLineView = new LineView(new ScriptLine(getScript(),"")); _cursorLineView.setPrefSize(150,1);
     _cursorLineView.setMargin(0,0,0,5);
-    _cursorLineView.setFill(Color.LIGHTGRAY); _cursorLineView.setEffect(SELECT_EFFECT);
+    _cursorLineView.setFill(Color.LIGHTGRAY); _cursorLineView.setEffect(SELECT_EFFECT_FOC);
 }
 
 /**
@@ -88,6 +90,14 @@ public void setScript(Script aScript)
 public String getText()  { return _text; }
 
 /**
+ * Deletes the current selection.
+ */
+public void delete()
+{
+    
+}
+
+/**
  * Returns the selected index.
  */
 public int getSelIndex()  { return _selIndex; }
@@ -101,7 +111,7 @@ public void setSelIndex(int anIndex)
     if(anIndex>=getChildCount()) return;
     LineView lv0 = getSelLineView(); if(lv0!=null) lv0.setEffect(null);
     _selIndex = anIndex;
-    LineView lv1 = getSelLineView(); if(lv1!=null) lv1.setEffect(SELECT_EFFECT);
+    LineView lv1 = getSelLineView(); if(lv1!=null) lv1.setEffect(getSelEffect());
     
     _scriptEditor.resetLater();
     
@@ -154,11 +164,66 @@ protected void layoutImpl()  { ColView.layout(this, null, null, false, SPACING);
  */
 protected void processEvent(ViewEvent anEvent)
 {
-    if(anEvent.isMouseRelease()) {
+    // Handle MousePress: Select negative index to trigger insert mode
+    if(anEvent.isMousePress()) {
         int index = 0; for(LineView lview : _lineViews) { if(lview.getY()+5>anEvent.getY()) break; index++; }
         index = negateIndex(index);
         setSelIndex(index);
+        _scriptEditor._inputText.requestFocus();
     }
+    
+    // Handle KeyPress
+    else if(anEvent.isKeyPress()) {
+        
+        // Handle Delete and BackSpaceKey: Delete current line
+        if(anEvent.isDeleteKey() || anEvent.isBackSpaceKey())
+            _scriptEditor.delete();
+            
+        // Handle Up/Down arrow
+        else if(anEvent.isUpArrow())
+            _scriptEditor.selectPrev();
+        else if(anEvent.isDownArrow())
+            _scriptEditor.selectNext();
+            
+        // Handle tab key
+        else if(anEvent.isTabKey()) {
+            if(anEvent.isShiftDown()) _scriptEditor.selectPrev();
+            else _scriptEditor.selectNext();
+        }
+            
+        // Handle enter key
+        else if(anEvent.isEnterKey()) {
+            if(anEvent.isShiftDown()) _scriptEditor.selectPrev();
+            else _scriptEditor.selectNextWithInsert();
+        }
+        
+        // Handle letter or digit
+        else {
+            char c = anEvent.getKeyChar();
+            if(Character.isLetterOrDigit(c)) {
+                _scriptEditor._inputText.requestFocus();
+                _scriptEditor._inputText.selectAll();
+                ViewUtils.processEvent(_scriptEditor._inputText, anEvent);
+            }
+        }
+        anEvent.consume();
+    }
+}
+
+/**
+ * Returns the Select effect.
+ */
+Effect getSelEffect()  { return isFocused()? SELECT_EFFECT_FOC : SELECT_EFFECT; }
+
+/**
+ * Override to reset Select effect.
+ */
+protected void setFocused(boolean aValue)
+{
+    // If already set, just return
+    if(aValue==isFocused()) return; super.setFocused(aValue);
+    
+    for(View child : _lineViews) if(child.getEffect()!=null) child.setEffect(getSelEffect());
 }
 
 /**
@@ -177,7 +242,7 @@ private class LineView extends Label {
         setPadding(5,10,5,10);
         setFont(ScriptView.this.getFont());
         setFill(LINEVIEW_FILL);
-        enableEvents(MouseRelease);
+        enableEvents(MousePress);
     }
 
     /** Returns bounds shape as rounded rect. */
@@ -186,13 +251,27 @@ private class LineView extends Label {
     /** Handle Events. */
     protected void processEvent(ViewEvent anEvent)
     {
-        if(anEvent.isMouseRelease()) {
-            _scriptEditor.getPlayer().stop();
-            int index = _lineViews.indexOf(this);
-            setSelIndex(index);
-            _scriptEditor.runCurrentLine();
+        // Handle MousePress
+        if(anEvent.isMousePress()) {
+            
+            // Focus ScriptView
+            ScriptView.this.requestFocus();
+            
+            // Handle single-click
+            if(anEvent.getClickCount()==1) {
+                _scriptEditor.getPlayer().stop();
+                int ind = _lineViews.indexOf(this);
+                _scriptEditor.setSelIndex(ind);
+            }
+            
+            // Handle multi-click
+            else {
+                _scriptEditor._inputText.requestFocus();
+                _scriptEditor._inputText.selectAll();
+            }
+            
+            // Consume event
             anEvent.consume();
-            _scriptEditor._inputText.requestFocus();
         }
     }
     
