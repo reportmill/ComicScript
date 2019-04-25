@@ -33,6 +33,7 @@ public void showPlayer()
         _player.setScriptText(scriptText);
         if(_editorPane!=null)
             _editorPane.scriptChanged();
+        _player.showIntroAnim();
     });
 }
 

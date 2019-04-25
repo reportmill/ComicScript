@@ -454,8 +454,8 @@ protected void processEvent(ViewEvent anEvent)
 protected void showIntroAnim()
 {
     // If already running, just return
-    if(_introView!=null) return;
-    
+    if(_introView!=null) { removeChild(_introView); _introView = null; }
+        
     // Get IntroImage (come back later if image or Player not loaded)
     Image img = getIntroImage();
     if(!img.isLoaded()) { img.addPropChangeListener(_introAnimLsnr); return; }
@@ -468,18 +468,19 @@ protected void showIntroAnim()
     _introView = new ImageView(img); _introView.setEffect(new ShadowEffect(20,Color.WHITE,0,0));
     _introView.setPadding(40,20,20,20); _introView.setSize(_introView.getPrefSize());
     _introView.setManaged(false); _introView.setLean(Pos.TOP_CENTER);
-    getCamera().addChild(_introView);
+    addChild(_introView);
     
     // Configure/start anim
-    _introView.setTransY(getCamera().getHeight());
+    _introView.setTransY(getHeight()-40);
     _introView.getAnim(1500).setTransY(0).getAnim(3000).getAnim(3500).setOpacity(0).play();
+    _introView.getAnim(0).setOnFrame(a -> _introView.setScale(getCamera().getScale()));
     _introView.getAnim(0).setOnFinish(a -> introAnimFinished());
 }
 
 /**
  * Called when IntroAnim done.
  */
-void introAnimFinished()  { getCamera().removeChild(_introView); _introView = null; }
+void introAnimFinished()  { removeChild(_introView); _introView = null; }
 
 /**
  * Returns the Header image.
