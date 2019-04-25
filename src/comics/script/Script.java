@@ -2,6 +2,7 @@ package comics.script;
 import comics.app.*;
 import java.util.*;
 import snap.gfx.Image;
+import snap.util.SnapUtils;
 import snap.view.*;
 
 /**
@@ -16,7 +17,7 @@ public class Script {
     StageView          _stage;
     
     // The View text
-    String             _text;
+    String             _text = "";
 
     // The Script lines
     List <ScriptLine>  _lines;
@@ -36,11 +37,10 @@ public class Script {
 /**
  * Creates a script for given PlayerView.
  */
-public Script(PlayerView aPlayer, String aScript)
+public Script(PlayerView aPlayer)
 {
     _player = aPlayer;
     _stage = aPlayer.getStage();
-    setText(aScript);
 }
 
 /**
@@ -56,7 +56,15 @@ public String getText()  { return _text; }
 /**
  * Sets the text.
  */
-public void setText(String aStr)  { _text = aStr; _lines = null; _runTime = -1; }
+public void setText(String aStr)
+{
+    // If already set, just return
+    if(SnapUtils.equals(aStr, _text)) return;
+    
+    // Set text, reset Lines, RunTime, notify player
+    _text = aStr; _lines = null; _runTime = -1;
+    _player.scriptChanged();
+}
 
 /**
  * Returns the number of lines.

@@ -1,18 +1,20 @@
 package comics.app;
 import snap.gfx.Color;
-import snap.viewx.SnapScene;
+import snap.view.ChildView;
 
 /**
  * A class to hold actors.
  */
-public class StageView extends SnapScene {
+public class StageView extends ChildView {
 
 /**
  * Creates a StageView.
  */
 public StageView()
 {
-    setFill(Color.BLACK);
+    setPrefSize(720, 405);
+    setFill(Color.BLACK); setBorder(Color.BLACK, 1);
+    setFocusable(false); setFocusWhenPressed(false); // Only need this because SnapScene superclass sets
 }
 
 }

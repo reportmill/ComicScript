@@ -3,7 +3,6 @@ import comics.app.*;
 import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;
-import snap.viewx.SnapScene;
 import comics.script.Asset.*;
 
 /**
@@ -12,7 +11,7 @@ import comics.script.Asset.*;
 public class Actor extends ImageView implements Star {
     
     // The stage
-    SnapScene        _stage;
+    StageView        _stage;
     
     // The Script
     Script           _script;

@@ -18,9 +18,6 @@ public class ScriptView extends ParentView {
     // The selected index
     int                _selIndex = -1;
     
-    // The last text from script
-    String             _text;
-    
     // The current list of LineViews
     List <LineView>    _lineViews = new ArrayList();
     
@@ -60,42 +57,30 @@ public ScriptView(ScriptEditor aSE)
 public Script getScript()  { return _script; }
 
 /**
- * Sets the script.
+ * Called when Script changes.
  */
-public void setScript(Script aScript)
+protected void scriptChanged()
 {
-    _script = aScript;
-    _text = _script.getText();
+    // Set script
+    _script = _scriptEditor.getScript();
     
-    // Get current SelIndex. If out of bounds for new script, set to end.
-    int selIndex = getSelIndex(); _selIndex = -1;
-    if(selIndex>=0 && selIndex>=aScript.getLineCount()) selIndex = aScript.getLineCount() - 1;
-    else if(selIndex<0 && -selIndex>aScript.getLineCount()) selIndex = -aScript.getLineCount();
-    
-    // Iterate over lines
+    // Iterate over lines and add LineView for each
     removeChildren(); _lineViews.clear();
-    for(ScriptLine sline : aScript.getLines()) {
+    for(ScriptLine sline : _script.getLines()) {
         LineView lview = new LineView(sline);
         addChild(lview); _lineViews.add(lview);
     }
     addChild(_cursorLineView);
     
     // Reset SelIndex
-    setSelIndex(selIndex);
+    int ind = _scriptEditor.getPlayer().getRunLine();
+    _selIndex = -1; setSelIndex(ind);
 }
 
 /**
- * Returns the script text.
+ * Returns the line count.
  */
-public String getText()  { return _text; }
-
-/**
- * Deletes the current selection.
- */
-public void delete()
-{
-    
-}
+public int getLineCount()  { return _script.getLineCount(); }
 
 /**
  * Returns the selected index.
@@ -107,19 +92,27 @@ public int getSelIndex()  { return _selIndex; }
  */
 public void setSelIndex(int anIndex)
 {
+    // If already set or too high, just return
     if(anIndex==_selIndex) return;
     if(anIndex>=getChildCount()) return;
-    LineView lv0 = getSelLineView(); if(lv0!=null) lv0.setEffect(null);
+    
+    // Undecorate last selected LineView
+    LineView oldSelLV = getSelLineView(); if(oldSelLV!=null) oldSelLV.setEffect(null);
+    
+    // Set new value
     _selIndex = anIndex;
-    LineView lv1 = getSelLineView(); if(lv1!=null) lv1.setEffect(getSelEffect());
     
+    // Decorate new selected LineView
+    LineView selLineView = getSelLineView();
+    if(selLineView!=null) { 
+        selLineView.setEffect(getSelEffect());
+        ViewUtils.runLater(() -> scrollToVisible(selLineView.getBoundsParent().getInsetRect(-5)));
+    }
+    
+    // Reset ScriptEditor
     _scriptEditor.resetLater();
-    
-    View lview = getSelLineView();
-    if(lview!=null)
-        ViewUtils.runLater(() -> scrollToVisible(lview.getBoundsParent().getInsetRect(-5)));
         
-    // Configure CursorLineView
+    // Add/remove CursorLineView
     if(_selIndex<0) {
         int ind0 = indexOfChild(_cursorLineView), ind1 = negateIndex(_selIndex);
         if(ind1<ind0) addChild(_cursorLineView, ind1);

@@ -46,16 +46,68 @@ public PlayerView getPlayer()  { return _editorPane.getPlayer(); }
 public Script getScript()  { return _editorPane.getScript(); }
 
 /**
+ * Adds a ScriptLine for given string at given index.
+ */
+public void addLineText(String aStr, int anIndex)
+{
+    getScript().addLineText(aStr, anIndex);
+    scriptChanged();
+    _scriptView.setSelIndex(anIndex);
+}
+
+/**
+ * Sets ScriptLine text to given string at given index.
+ */
+public void setLineText(String aStr, int anIndex)
+{
+    getScript().setLineText(aStr, anIndex);
+    scriptChanged();
+}
+
+/**
  * Deletes the current selected line.
  */
 public void delete()
 {
     int ind = getSelIndex(); if(ind<0) { selectPrev(); return; }
-    getScript().setLineText("", ind);
-    scriptChanged();
+    setLineText("", ind);
     if(ind<getScript().getLineCount())
         selectPrev();
     else runCurrentLine();
+}
+
+/**
+ * Sets selected ScriptLine to text for given string at given index.
+ */
+public void setLineText(String aStr)
+{
+    // Get selected line index and new string
+    int ind = getSelIndex(); String str = aStr.trim();
+    
+    // If selected line
+    if(ind>=0) {
+        
+        // If text hasn't changed, select new
+        if(getScript().getLine(ind).getText().equals(str)) {
+           selectNextWithInsert(); return; }
+           
+        // Set line to new text
+        setLineText(str, ind);
+    }
+    
+    // If new line
+    else {
+        
+        // If no new text, select next line
+        if(str.length()==0) {
+            selectNext(); return; }
+            
+        // Add new line
+        ind = ScriptView.negateIndex(ind);
+        addLineText(str, ind);
+    }
+    runCurrentLine();
+    _scriptView.requestFocus();
 }
 
 /**
@@ -120,23 +172,12 @@ public void runCurrentLine()
     getPlayer().playLine(lineIndex);
 }
 
-/** Sets player to line end. */
-/*public void setPlayerRunTimeToLineEnd(int aLineIndex) {
-    int time = getPlayer().getLineEndTime(aLineIndex); if(time>0) time--;
-    getPlayer().stop(); getPlayer().setRunTime(time); getPlayer().playLine(); }*/
-
 /**
  * Called when Script text changes.
  */
 protected void scriptChanged()
 {
-    if(_scriptView==null) return;
-    String scriptText = getScript().getText();
-    if(!scriptText.equals(_scriptView.getText())) {
-        _scriptView.setScript(getScript());
-        if(getSelIndex()==-1)
-            _scriptView.setSelIndex(-getScript().getLineCount() - 1);
-    }
+    _scriptView.scriptChanged();
 }
 
 /**
@@ -264,7 +305,7 @@ protected void respondUI(ViewEvent anEvent)
         String str = _helpListView.getSelItem();
         String str2 = starName!=null? starName + ' ' + str : str;
         ViewUtils.runOnMouseUp(() -> {
-            modifyScript(str2);
+            setLineText(str2);
             resetLater();
         });
     }
@@ -275,7 +316,7 @@ protected void respondUI(ViewEvent anEvent)
         
     // Handle InputText
     if(anEvent.equals("InputText"))
-        modifyScript(anEvent.getStringValue().trim());
+        setLineText(anEvent.getStringValue().trim());
 }
 
 /**
@@ -296,43 +337,6 @@ void resetHelpListView()
         setViewText("HelpListLabel", "Actions");
         _helpListView.setItems(_actActions);
     }
-}
-
-/**
- * Modify's the script by replacing current SelLine text with given string.
- */
-void modifyScript(String aStr)
-{
-    // Get selected line index and new string
-    int ind = getSelIndex(); String str = aStr.trim();
-    
-    // If selected line
-    if(ind>=0) {
-        
-        // If text hasn't changed, select new
-        if(getScript().getLine(ind).getText().equals(str)) {
-           selectNextWithInsert(); return; }
-           
-        // Set line to new text
-        getScript().setLineText(str, ind);
-        scriptChanged();
-    }
-    
-    // If new line
-    else {
-        
-        // If no new text, select next line
-        if(str.length()==0) {
-            selectNext(); return; }
-            
-        // Add new line
-        ind = ScriptView.negateIndex(ind);
-        getScript().addLineText(str, ind);
-        scriptChanged();
-        _scriptView.setSelIndex(ind);
-    }
-    runCurrentLine(); //runCurrentLine(); // This sucks
-    _scriptView.requestFocus();
 }
 
 }

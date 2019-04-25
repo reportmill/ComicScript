@@ -43,13 +43,27 @@ public EditorPane(PlayerPane aPlayerPane)
     _playerBox = _playerPane._playerBox;
     _player = aPlayerPane.getPlayer();
     
+    // Show editor
+    showEditor();
+}
+
+/**
+ * Shows the EditorPane.
+ */
+public void showEditor()
+{
     // Install in window
     WindowView win = _playerPane.getWindow();
     win.setContent(getUI());
 
-    // Enable Editing
+    // Configure PlayerBox
     _playerBox.setPadding(20,20,20,20);
+    
+    // Configure Player
     _player.setEffect(new ShadowEffect().copySimple());
+    _player._editorPane = this;
+    
+    // If desktop, set Window.MaximizedBounds to window PrefSize
     if(!SnapUtils.isTeaVM) {
         Size psize = win.isShowing()? win.getSize() : win.getPrefSize();
         Rect screenRect = ViewEnv.getEnv().getScreenBoundsInset();
@@ -57,8 +71,11 @@ public EditorPane(PlayerPane aPlayerPane)
         if(win.isShowing()) { maxRect.x = win.getX(); maxRect.y = win.getY(); }
         win.setMaximizedBounds(maxRect);
     }
+    
+    // Maximize window
     win.setMaximized(true);
     
+    // Notify scriptChanged and reset UI
     scriptChanged();
     resetLater();
 }
@@ -71,6 +88,7 @@ public void closeEditor()
     _playerPane.getWindow().setContent(_playerPane.getUI());
     _playerBox.setPadding(0,0,0,0);
     _player.setEffect(null);
+    _player._editorPane = null;
     _playerPane.getWindow().setMaximized(false);
 }
 
@@ -119,8 +137,10 @@ public void showScriptEditor()
  */
 protected void scriptChanged()
 {
-    _scriptEditor.scriptChanged();
-    _lineEditor.scriptChanged();
+    if(_scriptEditor.isUISet())
+        _scriptEditor.scriptChanged();
+    if(_lineEditor.isUISet())
+        _lineEditor.scriptChanged();
 }
 
 /**

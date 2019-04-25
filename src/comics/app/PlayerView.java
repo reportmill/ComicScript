@@ -21,7 +21,7 @@ public class PlayerView extends ScaleBox {
     Script              _script;
     
     // The current line being run
-    int                 _runLine = -1;
+    int                 _runLine;
     
     // Whether currenly running all lines
     boolean             _playing;
@@ -40,6 +40,9 @@ public class PlayerView extends ScaleBox {
     
     // The runnable to call playLineDone()
     Runnable            _playLineDoneRun = () -> playLineDone();
+    
+    // The EditorPane
+    EditorPane          _editorPane;
     
     // Constants for Property Changes
     public static final String RunLine_Prop = "RunLine";
@@ -66,7 +69,7 @@ public PlayerView()
     setContent(_camera);
     
     // Create Script (empty)
-    _script = new Script(this, "");
+    _script = new Script(this);
     
     // Show Controls
     setShowControls(true);
@@ -95,12 +98,20 @@ public String getScriptText()  { return getScript().getText(); }
 /**
  * Sets the Script text.
  */
-public void setScriptText(String aStr)
+public void setScriptText(String aStr)  { getScript().setText(aStr); }
+
+/**
+ * Called when the script changes.
+ */
+public void scriptChanged()
 {
-    if(aStr.equals(getScript().getText())) return;
-    getScript().setText(aStr);
-    getScript().getLines();
-    _runLine = -1; setRunTime(0);
+    // Reset RunLine
+    int runLine = getRunLine(); if(runLine>=getScript().getLineCount()) runLine = getScript().getLineCount() -1;
+    _runLine = -1;
+    setRunLine(runLine);
+    
+    // Notify EditorPane
+    if(_editorPane!=null) _editorPane.scriptChanged();
 }
 
 /**
@@ -130,7 +141,10 @@ public void setRunTime(int aTime)
 {
     // If playing, stop anim
     boolean playing = isPlaying();
-    if(playing) { _camera.getAnim(0).setOnFinish(null); _camera.stopAnimDeep(); }
+    if(playing) {
+        _camera.getAnim(0).setOnFinish(null);
+        _camera.stopAnimDeep();
+    }
     
     // Get RunLine and RunLine time for player time
     int time = Math.min(aTime, getRunTimeMax()); if(time<0) time = 0;
@@ -194,17 +208,6 @@ protected void setRunLine(int anIndex)
 }
 
 /**
- * Plays until end of current RunLine - which then calls playLineDone().
- */
-protected void playLine()
-{
-    _camera.stopAnimDeep(); //System.out.println("Play Line " + _runLine);
-    int runTime = getLineRunTime(getRunLine());
-    _camera.getAnim(runTime).setOnFinish(a -> ViewUtils.runLater(_playLineDoneRun));
-    _camera.playAnimDeep();
-}
-
-/**
  * Runs the script line at given index.
  */
 public void playLine(int anIndex)
@@ -216,6 +219,28 @@ public void playLine(int anIndex)
     int runTime = getLineStartTime(anIndex);
     setRunTime(runTime);
     playLine();
+}
+
+/**
+ * Plays until end of current RunLine - which then calls playLineDone().
+ */
+protected void playLine()
+{
+    // Stop animation
+    _camera.stopAnimDeep();
+    
+    // Get current line run time and current camera time
+    int lineRunTime = getLineRunTime(getRunLine());
+    int camTime = _camera.getAnimTimeDeep();
+    
+    // If time remaining for current line, keep playing and end with playLineDone
+    if(camTime<lineRunTime) {
+        _camera.getAnim(lineRunTime).setOnFinish(a -> ViewUtils.runLater(_playLineDoneRun));
+        _camera.playAnimDeep();
+    }
+    
+    // Otherwise, just trigger playLineDone
+    else ViewUtils.runLater(_playLineDoneRun);
 }
 
 /**
@@ -268,8 +293,9 @@ public void play()
         setRunTime(0);
     
     // Start anim and firePropChange
-    playLine(); _playing = true;
+    _playing = true;
     firePropChange(Playing_Prop, !_playing, _playing);
+    playLine();
 }
 
 /**
