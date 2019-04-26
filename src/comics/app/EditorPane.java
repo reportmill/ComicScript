@@ -194,7 +194,7 @@ protected void resetUI()
  */
 protected void respondUI(ViewEvent anEvent)
 {
-    if(anEvent.equals("CloseButton"))
+    if(anEvent.equals("CloseButton") || anEvent.equals("CloseMenu"))
         _playerPane.setEditing(false);
 }
 
@@ -203,22 +203,27 @@ protected void respondUI(ViewEvent anEvent)
  */
 protected MenuBar getMenuBar()
 {
+    // AppMenu
+    Menu appMenu = new Menu(); appMenu.setText("ComicCreator");
+    MenuItem closeMenu = new MenuItem(); closeMenu.setName("CloseMenu"); closeMenu.setText("Close Editor");
+    appMenu.addItem(closeMenu);
+    
     // FileMenu
     Menu fileMenu = new Menu(); fileMenu.setText("File");
-    MenuItem newMenu = new Menu(); newMenu.setText("New");
+    MenuItem newMenu = new MenuItem(); newMenu.setText("New");
     fileMenu.addItem(newMenu);
     
     // EditMenu
     Menu editMenu = new Menu(); editMenu.setText("Edit");
-    MenuItem cutMenu = new Menu(); cutMenu.setText("Cut");
-    MenuItem copyMenu = new Menu(); copyMenu.setText("Copy");
-    MenuItem pasteMenu = new Menu(); pasteMenu.setText("Paste");
-    MenuItem deleteMenu = new Menu(); deleteMenu.setText("Delete");
+    MenuItem cutMenu = new MenuItem(); cutMenu.setText("Cut");
+    MenuItem copyMenu = new MenuItem(); copyMenu.setText("Copy");
+    MenuItem pasteMenu = new MenuItem(); pasteMenu.setText("Paste");
+    MenuItem deleteMenu = new MenuItem(); deleteMenu.setText("Delete");
     editMenu.addItem(cutMenu); editMenu.addItem(copyMenu); editMenu.addItem(pasteMenu); editMenu.addItem(deleteMenu); 
     
     // Create MenuBar
     MenuBar mbar = new MenuBar();
-    mbar.addMenu(fileMenu); mbar.addMenu(editMenu);
+    mbar.addMenu(appMenu); mbar.addMenu(fileMenu); mbar.addMenu(editMenu);
     return mbar;
 }
 
