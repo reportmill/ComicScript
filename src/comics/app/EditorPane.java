@@ -87,6 +87,7 @@ public void closeEditor()
 {
     _playerPane.getWindow().setContent(_playerPane.getUI());
     _playerBox.setPadding(0,0,0,0);
+    ((ChildView)_playerBox).removeChild(_playerPane.getView("CloseButton"));
     _player.setEffect(null);
     _player._editorPane = null;
     _playerPane.getWindow().setMaximized(false);
@@ -157,6 +158,14 @@ protected View createUI()
     _editorBox.setGrowHeight(true); _editorBox.setFillWidth(true); _editorBox.setPrefHeight(400);
     _editorBox.addChild(_transPane);
     
+    // Add close button
+    Image img = Image.get(getClass(), "Close.png");
+    ImageView closeBtn = new ImageView(img); closeBtn.setName("CloseButton");
+    closeBtn.setLean(Pos.TOP_RIGHT); closeBtn.setPadding(2,2,0,0); closeBtn.setManaged(false);
+    closeBtn.setSize(20+2, 20+2);
+    enableEvents(closeBtn, MouseRelease);
+    ((ChildView)_playerBox).addChild(closeBtn);
+    
     //<ColView PrefWidth="800" Spacing="5" FillWidth="true"> ColView colView = (ColView)super.createUI();
     ColView colView = new ColView(); colView.setPrefWidth(800); colView.setSpacing(5); colView.setFillWidth(true);
     colView.addChild(_playerBox);
@@ -178,6 +187,15 @@ protected void resetUI()
 {
     if(_scriptEditor.getUI().isShowing()) _scriptEditor.resetLater();
     if(_lineEditor.getUI().isShowing()) _lineEditor.resetLater();
+}
+
+/**
+ * RespondUI.
+ */
+protected void respondUI(ViewEvent anEvent)
+{
+    if(anEvent.equals("CloseButton"))
+        _playerPane.setEditing(false);
 }
 
 /**

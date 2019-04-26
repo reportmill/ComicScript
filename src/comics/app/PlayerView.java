@@ -485,7 +485,7 @@ protected void showIntroAnim()
     // Get IntroImage (come back later if image or Player not loaded)
     Image img = getIntroImage(), img2 = getRealImage();
     if(!img.isLoaded()) { img.addPropChangeListener(_introAnimLsnr); return; }
-    if(!img2.isLoaded()) { img.addPropChangeListener(_introAnimLsnr); return; }
+    if(!img2.isLoaded()) { img2.addPropChangeListener(_introAnimLsnr); return; }
     if(!isShowing()) { addPropChangeListener(_introAnimLsnr, Showing_Prop); return; }
     
     // Remove image/player listeners, if still set
@@ -499,21 +499,22 @@ protected void showIntroAnim()
     
     // Create ColView to hold images and add to player
     _introView = new ColView(); _introView.setAlign(Pos.TOP_CENTER); _introView.setSpacing(0);
-    _introView.setPadding(40,20,20,20); _introView.setEffect(new ShadowEffect(20,Color.WHITE,0,0));
+    _introView.setPadding(30,20,20,20);
+    _introView.setEffect(new ShadowEffect(20,Color.WHITE,0,0));
     _introView.setManaged(false); _introView.setLean(Pos.TOP_CENTER);
     _introView.setChildren(introImgView, realImgView);
     _introView.setSize(_introView.getPrefSize());
     addChild(_introView);
     
     // Configure/start anim
-    _introView.setTransY(getHeight()-40);
+    _introView.setTransY(getHeight()-30);
     _introView.getAnim(1500).setTransY(0).getAnim(3000).getAnim(3500).setOpacity(0).play();
     _introView.getAnim(0).setOnFrame(a -> _introView.setScale(getCamera().getScale()));
-    _introView.getAnim(0).setOnFinish(a -> introAnimFinished());
+    _introView.getAnim(0).setOnFinish(a -> introFinished());
 }
 
 /** Called when IntroAnim done. */
-void introAnimFinished()  { removeChild(_introView); _introView = null; }
+void introFinished()  { removeChild(_introView); _introView = null; }
 
 /** Returns the Header/Reallusion images. */
 Image getIntroImage()  { if(_introImg!=null) return _introImg;
