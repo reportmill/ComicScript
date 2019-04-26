@@ -23,7 +23,7 @@ public class ScriptLineEditor extends ViewOwner {
     String _actActions[] = { "walks", "waves", "jumps", "dances", "drops", "says", "grows", "flips", "explodes" };
     
     // Constants
-    Font     MAIN_FONT = new Font("Arial", 20);
+    Font     MAIN_FONT = new Font("Arial", 18);
 
 /**
  * Creates a ScriptLineEditor.

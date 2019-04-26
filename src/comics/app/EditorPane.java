@@ -173,7 +173,7 @@ protected View createUI()
     
     // Return in SplitView
     SplitView splitView = SplitView.makeSplitView(colView);
-    splitView.getDivider(0).setPrefSpan(8);
+    splitView.getDivider(0).setPrefSpan(10);
     
     MenuBar mbar = getMenuBar(); mbar.setFont(Font.Arial14);
     View mbarView = MenuBar.createMenuBarView(mbar, splitView);

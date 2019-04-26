@@ -217,9 +217,9 @@ protected View createUI()
     // Create ToolBar
     RowView toolBar = new RowView();
     Label label = new Label("Script:"); label.setFont(Font.Arial16.getBold());
-    Button btn = new Button("Edit Line"); btn.setName("EditLineButton");
-    btn.setLeanX(HPos.RIGHT); btn.setPrefSize(95,26);
-    toolBar.setChildren(label, btn);
+    Button samplesBtn = new Button("Samples"); samplesBtn.setName("SamplesButton");
+    samplesBtn.setLeanX(HPos.RIGHT); samplesBtn.setPrefSize(95,26);
+    toolBar.setChildren(label, samplesBtn);
     
     // Create/configure ScriptView
     _scriptView = new ScriptView(this);
@@ -238,13 +238,15 @@ protected View createUI()
     _inputText.setFont(new Font("Arial", 16)); _inputText.setRadius(10);
     _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
     
-    // Create/configure InputButton
+    // Create/configure InputButton, EditLineButton
     Button inputButton = new Button("\u23CE"); inputButton.setName("InputButton"); inputButton.setPrefWidth(80);
+    Button editLineBtn = new Button("Edit Line"); editLineBtn.setName("EditLineButton");
+    editLineBtn.setLeanX(HPos.RIGHT); editLineBtn.setPrefSize(85,26);
     
     // Create/configure InputText
     RowView inputRow = new RowView(); inputRow.setPadding(4,4,4,4); inputRow.setSpacing(8);
     inputRow.setFillHeight(true);
-    inputRow.setChildren(_inputText, inputButton);
+    inputRow.setChildren(_inputText, inputButton, editLineBtn);
     
     //<ColView Padding="8,4,4,4" GrowHeight="true" FillWidth="true" Title="Cast" />
     ColView colView = new ColView(); colView.setPadding(8,5,5,5); colView.setSpacing(4);
@@ -294,6 +296,10 @@ protected void resetUI()
  */
 protected void respondUI(ViewEvent anEvent)
 {
+    // Handle SamplesButton
+    if(anEvent.equals("SamplesButton"))
+        new SamplesPane().showSamples(_editorPane);
+    
     // Handle EditLineButton
     if(anEvent.equals("EditLineButton"))
         _editorPane.showLineEditor();
