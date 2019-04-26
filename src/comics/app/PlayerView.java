@@ -4,7 +4,6 @@ import snap.gfx.*;
 import snap.util.PropChangeListener;
 import snap.view.*;
 import comics.app.PlayBar.*;
-import snap.web.WebURL;
 
 /**
  * A View to play an animation. Encapsulates a CameraView, StageView and Script.
@@ -484,17 +483,26 @@ protected void showIntroAnim()
     if(_introView!=null) { removeChild(_introView); _introView = null; }
         
     // Get IntroImage (come back later if image or Player not loaded)
-    Image img = getIntroImage();
+    Image img = getIntroImage(), img2 = getRealImage();
     if(!img.isLoaded()) { img.addPropChangeListener(_introAnimLsnr); return; }
+    if(!img2.isLoaded()) { img.addPropChangeListener(_introAnimLsnr); return; }
     if(!isShowing()) { addPropChangeListener(_introAnimLsnr, Showing_Prop); return; }
     
     // Remove image/player listeners, if still set
-    img.removePropChangeListener(_introAnimLsnr); removePropChangeListener(_introAnimLsnr, Showing_Prop);
+    img.removePropChangeListener(_introAnimLsnr); img2.removePropChangeListener(_introAnimLsnr);
+    removePropChangeListener(_introAnimLsnr, Showing_Prop);
     
-    // Create ImageView and add to player
-    _introView = new ImageView(img); _introView.setEffect(new ShadowEffect(20,Color.WHITE,0,0));
-    _introView.setPadding(40,20,20,20); _introView.setSize(_introView.getPrefSize());
+    // Create IntroImageView and RealView
+    ImageView introImgView = new ImageView(img);
+    ImageView realImgView = new ImageView(img2);
+    realImgView.setScale(.8); realImgView.setTransY(-20);
+    
+    // Create ColView to hold images and add to player
+    _introView = new ColView(); _introView.setAlign(Pos.TOP_CENTER); _introView.setSpacing(0);
+    _introView.setPadding(40,20,20,20); _introView.setEffect(new ShadowEffect(20,Color.WHITE,0,0));
     _introView.setManaged(false); _introView.setLean(Pos.TOP_CENTER);
+    _introView.setChildren(introImgView, realImgView);
+    _introView.setSize(_introView.getPrefSize());
     addChild(_introView);
     
     // Configure/start anim
@@ -504,23 +512,17 @@ protected void showIntroAnim()
     _introView.getAnim(0).setOnFinish(a -> introAnimFinished());
 }
 
-/**
- * Called when IntroAnim done.
- */
+/** Called when IntroAnim done. */
 void introAnimFinished()  { removeChild(_introView); _introView = null; }
 
-/**
- * Returns the Header image.
- */
-Image getIntroImage()
-{
-    if(_introImg!=null) return _introImg;
-    Object src = WebURL.getURL(getClass(), "pkg.images/Header.png");
-    return _introImg = Image.get(src);
-}
+/** Returns the Header/Reallusion images. */
+Image getIntroImage()  { if(_introImg!=null) return _introImg;
+    return _introImg = Image.get(getClass(), "pkg.images/Header.png"); }
+Image getRealImage()  { if(_realImg!=null) return _realImg;
+    return _realImg = Image.get(getClass(), "pkg.images/RealLogo.png"); }
 
 // For IntroAnim
-ImageView _introView; Image _introImg;
+ColView _introView; Image _introImg; Image _realImg;
 PropChangeListener _introAnimLsnr = pc -> showIntroAnim();
 
 }
