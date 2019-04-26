@@ -1,6 +1,6 @@
 package comics.app;
 import comics.script.Samples;
-import snap.gfx.Pos;
+import snap.gfx.*;
 import snap.view.*;
 
 /**
@@ -12,7 +12,7 @@ public class PlayerPane extends ViewOwner {
     PlayerView      _player;
     
     // The View that holds the PlayerView
-    BoxView         _playerBox;
+    PlayerBox       _playerBox;
     
     // Whether PlayerPane is showing editing UI
     boolean         _editing;
@@ -75,8 +75,7 @@ protected View createUI()
     _player = new PlayerView();
     
     // Create PlayerBox to hold Player
-    _playerBox = new BoxView(); _playerBox.setPadding(8,4,4,4); _playerBox.setPrefHeight(400);
-    _playerBox.setGrowHeight(true); _playerBox.setAlign(Pos.CENTER);
+    _playerBox = new PlayerBox(); _playerBox.setGrowHeight(true); _playerBox.setAlign(Pos.CENTER);
     _playerBox.addChild(_player);
     return _playerBox;
 }
@@ -89,6 +88,43 @@ protected void respondUI(ViewEvent anEvent)
     // Handle EditButton
     if(anEvent.equals("EditButton")) {
         setEditing(!isEditing()); anEvent.consume(); }
+}
+
+/**
+ * A class to layout PlayerView.
+ */
+protected class PlayerBox extends ChildView {
+    
+    /** Override. */
+    protected double getPrefWidthImpl(double aH)  { return BoxView.getPrefWidth(this, _player, aH); }
+    
+    /** Override. */
+    protected double getPrefHeightImpl(double aW)  { return BoxView.getPrefHeight(this, _player, aW); }
+    
+    /** Override. */
+    protected void layoutImpl()
+    {
+        // Get parent bounds for insets (just return if empty)
+        Insets ins = getInsetsAll();
+        double px = ins.left, py = ins.top;
+        double pw = getWidth() - px - ins.right; if(pw<0) pw = 0; if(pw<=0) return;
+        double ph = getHeight() - py - ins.bottom; if(ph<0) ph = 0; if(ph<=0) return;
+    
+        // Get player pref sizes
+        double cw = _player.getPrefWidth();
+        double ch = _player.getPrefHeight();
+        
+        // If player size doesn't fit in available space, shrink to fit keeping aspect
+        if(cw>pw || ch>ph) {
+            double scale = Math.min(pw/cw, ph/ch);
+            cw = Math.round(cw*scale);
+            ch = Math.round(ch*scale);
+        }
+        
+        // Position player in center with given sizes
+        double dx = Math.round((pw - cw)/2), dy = Math.round((ph - ch)/2);
+        _player.setBounds(px+dx, py+dy, cw, ch);
+    }
 }
 
 }

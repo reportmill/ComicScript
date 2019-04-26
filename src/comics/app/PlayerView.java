@@ -55,6 +55,7 @@ public class PlayerView extends ScaleBox {
 public PlayerView()
 {
     // Create/configure this view
+    setPrefSize(720, 405);
     setFillWidth(true); setFillHeight(true);
     setClipToBounds(true);
     enableEvents(MouseEnter, MouseExit, MouseMove, MousePress);

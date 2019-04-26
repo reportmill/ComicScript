@@ -20,7 +20,7 @@ public class EditorPane extends ViewOwner {
     PlayerPane        _playerPane;
     
     // The View that holds PlayerView
-    BoxView           _playerBox;
+    View              _playerBox;
     
     // The PlayerView
     PlayerView        _player;
