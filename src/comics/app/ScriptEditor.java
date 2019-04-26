@@ -306,6 +306,7 @@ protected void respondUI(ViewEvent anEvent)
         
     // Handle HelpListView
     if(anEvent.equals("HelpListView")) {
+        _scriptView.requestFocus();
         ScriptLine line = getSelLine();
         String starName = line!=null && line.getStar()!=null? line.getStar().getStarName() : null;
         String str = _helpListView.getSelItem();
