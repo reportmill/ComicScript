@@ -26,6 +26,8 @@ public class ScriptEditor extends ViewOwner {
     // Constants
     String _stars[] = { "Setting", "Camera", "Lady", "Man", "Car", "Cat", "Dog", "Trump", "Obama", "Duke" };
     String _actActions[] = { "walks", "waves", "jumps", "dances", "drops", "says", "grows", "flips", "explodes" };
+    String _camActions[] = { "zooms", "blurs" };
+    String _setActions[] = { "beach", "ovaloffice", "whitehouse" };
     
 /**
  * Creates a ScriptEditor.
@@ -341,8 +343,11 @@ void resetHelpListView()
     
     // Otherwise, clear list
     else {
+        String name = line.getStar().getStarName(); if(name==null) return; name = name.toLowerCase();
         setViewText("HelpListLabel", "Actions");
-        _helpListView.setItems(_actActions);
+        if(name.equals("camera")) _helpListView.setItems(_camActions);
+        else if(name.equals("setting")) _helpListView.setItems(_setActions);
+        else _helpListView.setItems(_actActions);
     }
 }
 
