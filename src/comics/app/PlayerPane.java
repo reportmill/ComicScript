@@ -1,5 +1,4 @@
 package comics.app;
-import comics.script.Samples;
 import snap.gfx.*;
 import snap.view.*;
 
@@ -29,7 +28,7 @@ public void showPlayer()
         setWindowVisible(true);
     
     runLater(() -> {
-        String scriptText = Samples.getSample("Welcome");
+        String scriptText = getSampleScript();
         _player.setScriptText(scriptText);
         if(_editorPane!=null)
             _editorPane.scriptChanged();
@@ -88,6 +87,18 @@ protected void respondUI(ViewEvent anEvent)
     // Handle EditButton
     if(anEvent.equals("EditButton")) {
         setEditing(!isEditing()); anEvent.consume(); }
+}
+
+/**
+ * Returns a sample script.
+ */
+public String getSampleScript()
+{
+    return "Setting is beach\n" + "Lady walks in\n" + "Man walks in from right\n" +
+        "Lady says, \"Welcome to ComicScript animator!\"\n" +
+        "Man says, \"Build animations with natural language!\"\n" +
+        "Camera zooms in on Lady\n" + "Lady waves\n" + "Man jumps\n" + "Camera zooms out\n" +
+        "Lady dances\n" + "Man explodes\n";
 }
 
 /**
