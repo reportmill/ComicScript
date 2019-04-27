@@ -239,7 +239,7 @@ public void runDrops()
  */
 public void runGrows()
 {
-    getAnim(_startTime).getAnim(_startTime+1000).setScale(getScale()+.1);
+    getAnim(_startTime).getAnim(_startTime+1000).setScale(getScale()+.2);
     _runTime = 1000;
 }
 

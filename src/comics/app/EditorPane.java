@@ -194,8 +194,12 @@ protected void resetUI()
  */
 protected void respondUI(ViewEvent anEvent)
 {
+    // Handle CloseButton, CloseMenu
     if(anEvent.equals("CloseButton") || anEvent.equals("CloseMenu"))
         _playerPane.setEditing(false);
+        
+    // Handle IntroMenu
+    if(anEvent.equals("IntroMenu")) _player.showIntroAnim();
 }
 
 /**
@@ -206,7 +210,8 @@ protected MenuBar getMenuBar()
     // AppMenu
     Menu appMenu = new Menu(); appMenu.setText("ComicCreator");
     MenuItem closeMenu = new MenuItem(); closeMenu.setName("CloseMenu"); closeMenu.setText("Close Editor");
-    appMenu.addItem(closeMenu);
+    MenuItem introlMenu = new MenuItem(); introlMenu.setName("IntroMenu"); introlMenu.setText("Show Intro");
+    appMenu.addItem(closeMenu); appMenu.addItem(introlMenu);
     
     // FileMenu
     Menu fileMenu = new Menu(); fileMenu.setText("File");

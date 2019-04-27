@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ColView Padding="8,5,5,5" GrowHeight="true" Spacing="4">
   <RowView Padding="4" GrowWidth="true" Spacing="4">
-    <Label text="Script:">
+    <Label Name="ScriptLabel" text="Script:">
       <font name="Arial Bold" size="16" />
     </Label>
-    <Button Name="SamplesButton" PrefWidth="95" PrefHeight="26" Padding="2" LeanX="RIGHT" text="Samples" />
+    <Button Name="CutButton" PrefWidth="22" PrefHeight="22" LeanX="RIGHT" ToolTip="Cut" image="Edit_Cut.png" ShowBorder="false" />
+    <Button Name="CopyButton" PrefWidth="22" PrefHeight="22" ToolTip="Copy" image="Edit_Copy.png" ShowBorder="false" />
+    <Button Name="PasteButton" PrefWidth="22" PrefHeight="22" ToolTip="Paste" image="Edit_Paste.png" ShowBorder="false" />
+    <Button Name="DeleteButton" PrefWidth="22" PrefHeight="22" ToolTip="Delete" image="Edit_Delete.png" ShowBorder="false" />
+    <Separator PrefWidth="8" PrefHeight="18" Vertical="true" />
+    <Button Name="UndoButton" PrefWidth="22" PrefHeight="22" ToolTip="Undo" image="Edit_Undo.png" ShowBorder="false" />
+    <Button Name="RedoButton" PrefWidth="22" PrefHeight="22" ToolTip="Redo" image="Edit_Redo.png" ShowBorder="false" />
+    <Label PrefWidth="90" PrefHeight="18" />
+    <Button Name="SamplesButton" PrefWidth="110" PrefHeight="26" Padding="2" LeanX="RIGHT" text="Samples" />
   </RowView>
   <RowView Name="MainRowView" MinWidth="400" GrowHeight="true" Spacing="5">
     <ColView PrefWidth="180" Spacing="2" FillWidth="true">

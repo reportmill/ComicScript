@@ -243,6 +243,9 @@ protected View createUI()
  */
 protected void initUI()
 {
+    // List for ScriptLabel MousePress
+    enableEvents("ScriptLabel", MousePress);
+    
     // Make ScriptView FirstFocus
     setFirstFocus(_scriptView);
     
@@ -276,14 +279,21 @@ protected void resetUI()
  */
 protected void respondUI(ViewEvent anEvent)
 {
+    // Handle ScriptLabel
+    if(anEvent.equals("ScriptLabel")) getPlayer().showIntroAnim();
+    
+    // Handle CutButton, DeleteButton
+    if(anEvent.equals("CutButton")) delete();
+    if(anEvent.equals("DeleteButton")) delete();
+    
+    // Handle UndoButton, RedoButton
+    if(anEvent.equals("UndoButton")) getScript().undo();
+    if(anEvent.equals("RedoButton")) getScript().redo();
+    
     // Handle SamplesButton
     if(anEvent.equals("SamplesButton"))
         new SamplesPane().showSamples(_editorPane);
     
-    // Handle EditLineButton
-    if(anEvent.equals("EditLineButton"))
-        _editorPane.showLineEditor();
-        
     // Handle HelpListView
     if(anEvent.equals("HelpListView")) {
         _scriptView.requestFocus();
@@ -297,13 +307,17 @@ protected void respondUI(ViewEvent anEvent)
         });
     }
     
+    // Handle InputText
+    if(anEvent.equals("InputText"))
+        setLineText(anEvent.getStringValue().trim());
+
     // Handle InputButton
     if(anEvent.equals("InputButton"))
         runLater(() -> ViewUtils.fireActionEvent(_inputText, anEvent));
         
-    // Handle InputText
-    if(anEvent.equals("InputText"))
-        setLineText(anEvent.getStringValue().trim());
+    // Handle EditLineButton
+    if(anEvent.equals("EditLineButton"))
+        _editorPane.showLineEditor();
 }
 
 /**

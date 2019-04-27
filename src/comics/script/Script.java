@@ -34,6 +34,12 @@ public class Script {
     // The Setting
     Setting            _setting = new Setting(this);
     
+    // Undo/Redo texts
+    List <String>      _undoText = new ArrayList(), _redoText = new ArrayList();
+    
+    // Whether undoing/redoing
+    boolean            _undoing, _redoing;
+    
 /**
  * Creates a script for given PlayerView.
  */
@@ -61,9 +67,40 @@ public void setText(String aStr)
     // If already set, just return
     if(SnapUtils.equals(aStr, _text)) return;
     
+    // Add old to Undo/Redo lists
+    if(_undoing) _redoText.add(_text);
+    else if(_redoing) _undoText.add(_text);
+    else { _undoText.add(_text); _redoText.clear(); }
+    
     // Set text, reset Lines, RunTime, notify player
     _text = aStr; _lines = null; _runTime = -1;
     _player.scriptChanged();
+}
+
+/**
+ * Undo text.
+ */
+public void undo()
+{
+    // Complain and bail if no more undos
+    if(_undoText.size()==0) { ViewUtils.beep(); return; }
+    
+    // Get last undo, add to redos and set
+    String str = _undoText.remove(_undoText.size()-1);
+    _undoing = true; setText(str); _undoing = false;
+}
+
+/**
+ * Redo text.
+ */
+public void redo()
+{
+    // Complain and bail if no more undos
+    if(_redoText.size()==0) { ViewUtils.beep(); return; }
+    
+    // Get last undo, add to redos and set
+    String str = _redoText.remove(_redoText.size()-1);
+    _redoing = true; setText(str); _redoing = false;
 }
 
 /**
