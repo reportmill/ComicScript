@@ -216,48 +216,26 @@ void inputTextDidKeyPress(ViewEvent anEvent)
  */
 protected View createUI()
 {
-    // Create ToolBar
-    RowView toolBar = new RowView();
-    Label label = new Label("Script:"); label.setFont(Font.Arial16.getBold());
-    Button samplesBtn = new Button("Samples"); samplesBtn.setName("SamplesButton");
-    samplesBtn.setLeanX(HPos.RIGHT); samplesBtn.setPrefSize(95,26);
-    toolBar.setChildren(label, samplesBtn);
+    // Get main ColView from UI file
+    ColView mainColView = (ColView)super.createUI(); mainColView.setFillWidth(true);
     
-    // Create/configure ScriptView
+    // Get main RowView
+    RowView mainRowView = (RowView)mainColView.getChild("MainRowView"); mainRowView.setFillHeight(true);
+    
+    // Create/configure ScriptView add to MainRowView
     _scriptView = new ScriptView(this);
     ScrollView scriptScrollView = new ScrollView(_scriptView);
     scriptScrollView.setGrowWidth(true); scriptScrollView.setGrowHeight(true); scriptScrollView.setPrefHeight(180);
+    mainRowView.addChild(scriptScrollView, 0);
     
-    // Load HelpListView UI
-    ColView helpViewBox = (ColView)super.createUI();
-    
-    // Create a RowView to hold scriptView and helpListView
-    RowView rowView = new RowView(); rowView.setSpacing(5); rowView.setGrowHeight(true); rowView.setFillHeight(true);
-    rowView.setChildren(scriptScrollView, helpViewBox);
-    
-    // Create/configure InputText
-    _inputText = new TextField(); _inputText.setName("InputText"); _inputText.setGrowWidth(true);
-    _inputText.setFont(new Font("Arial", 16)); _inputText.setRadius(10);
+    // Get/configure InputRow, InputText, InputButton
+    RowView inputRow = (RowView)mainColView.getChild("InputRow"); inputRow.setFillHeight(true);
+    _inputText = (TextField)inputRow.getChild("InputText"); _inputText.setRadius(10);
     _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
+    Button inputButton = (Button)inputRow.getChild("InputButton"); inputButton.setText("\u23CE");
     
-    // Create/configure InputButton, EditLineButton
-    Button inputButton = new Button("\u23CE"); inputButton.setName("InputButton"); inputButton.setPrefWidth(80);
-    Button editLineBtn = new Button("Edit Line"); editLineBtn.setName("EditLineButton");
-    editLineBtn.setLeanX(HPos.RIGHT); editLineBtn.setPrefSize(85,26);
-    
-    // Create/configure InputText
-    RowView inputRow = new RowView(); inputRow.setPadding(4,4,4,4); inputRow.setSpacing(8);
-    inputRow.setFillHeight(true);
-    inputRow.setChildren(_inputText, inputButton, editLineBtn);
-    
-    //<ColView Padding="8,4,4,4" GrowHeight="true" FillWidth="true" Title="Cast" />
-    ColView colView = new ColView(); colView.setPadding(8,5,5,5); colView.setSpacing(4);
-    colView.setGrowHeight(true); colView.setFillWidth(true);
-    colView.addChild(toolBar);
-    colView.addChild(rowView);
-    colView.addChild(inputRow);
-    
-    return colView;
+    // Return MainColView    
+    return mainColView;
 }
 
 /**

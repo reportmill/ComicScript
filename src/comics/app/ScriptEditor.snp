@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ColView PrefWidth="180" Spacing="2" FillWidth="true">
-  <font name="Arial" size="13" />
-  <Label Name="HelpListLabel" Padding="3,3,3,5" text="Vocabulary">
-    <BevelBorder />
-    <font name="Arial Bold" size="13" />
-  </Label>
-  <ListView Name="HelpListView" MinHeight="60" GrowHeight="true">
-    <LineBorder Color="#c0c0c0" />
-  </ListView>
+<ColView Padding="8,5,5,5" GrowHeight="true" Spacing="4">
+  <RowView Padding="4" GrowWidth="true" Spacing="4">
+    <Label text="Script:">
+      <font name="Arial Bold" size="16" />
+    </Label>
+    <Button Name="SamplesButton" PrefWidth="95" PrefHeight="26" Padding="2" LeanX="RIGHT" text="Samples" />
+  </RowView>
+  <RowView Name="MainRowView" MinWidth="400" GrowHeight="true" Spacing="5">
+    <ColView PrefWidth="180" Spacing="2" FillWidth="true">
+      <font name="Arial" size="13" />
+      <Label Name="HelpListLabel" Padding="3,3,3,5" text="Vocabulary">
+        <BevelBorder />
+        <font name="Arial Bold" size="13" />
+      </Label>
+      <ListView Name="HelpListView" MinHeight="60" GrowHeight="true">
+        <LineBorder Color="#c0c0c0" />
+      </ListView>
+    </ColView>
+  </RowView>
+  <RowView Name="InputRow" Padding="4" GrowWidth="true" Spacing="8">
+    <TextField Name="InputText" GrowWidth="true">
+      <LineBorder Color="#c0c0c0" />
+      <font name="Arial" size="16" />
+    </TextField>
+    <Button Name="InputButton" PrefWidth="80" Padding="2" text="Button" />
+    <Button Name="EditLineButton" PrefWidth="85" PrefHeight="26" Padding="2" text="Edit Line" />
+  </RowView>
 </ColView>
