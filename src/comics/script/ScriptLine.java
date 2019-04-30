@@ -19,9 +19,6 @@ public class ScriptLine {
     // The action
     Action      _action;
     
-    // The runtime of this ScriptLine
-    int         _runTime;
-    
     // Whether this ScriptLine is loaded
     boolean     _loaded = true;
     Image       _img;
@@ -93,18 +90,13 @@ public int getIndex()  { return _script.getLines().indexOf(this); }
  */
 public Star getStar()
 {
-    // Get script words and first word
-    String words[] = getWords();
-    String word = words.length>0? words[0] : null;
-    
-    // Handle empty
-    if(word==null || word.length()==0) { setRunTime(0); return null; }
+    // Get first word
+    String words[] = getWords(); if(words.length==0) return null;
+    String word = words[0]; if(word.length()==0) return null;
     
     // Handle Setting, Camera, Actor
-    if(word.equals("setting"))
-        return _script._setting;
-    if(word.equals("camera"))
-        return _script._player.getCamera();
+    if(word.equals("setting")) return _script._setting;
+    if(word.equals("camera")) return _script._player.getCamera();
     return (Actor)_script.getView(this);
 }
 
@@ -112,11 +104,6 @@ public Star getStar()
  * Returns the runtime of this ScriptLine.
  */
 public int getRunTime()  { Action a = getAction(); return a!=null? a.getRunTime() : 0; }
-
-/**
- * Sets the runtime of this ScriptLine.
- */
-public void setRunTime(int aValue)  { _runTime = aValue; }
 
 /**
  * Adds an unloaded image.
