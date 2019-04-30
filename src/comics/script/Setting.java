@@ -27,9 +27,15 @@ public String getStarName()  { return "Setting"; }
 public Image getStarImage()  { return null; }
 
 /**
+ * Returns the action names for this star.
+ */
+public String[] getActionNames()  { return _actions; }
+private static String _actions[] = { "beach", "ovaloffice", "whitehouse" };
+
+/**
  * Returns an Action for this star and given ScriptLine.
  */
-public Action getStarAction(ScriptLine aScriptLine)
+public Action getAction(ScriptLine aScriptLine)
 {
     Action action = new BackImageAction();
     action.setLine(aScriptLine);

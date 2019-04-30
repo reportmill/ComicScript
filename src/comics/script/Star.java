@@ -17,8 +17,13 @@ public String getStarName();
 public Image getStarImage();
 
 /**
+ * Returns the action names for this star.
+ */
+public String[] getActionNames();
+
+/**
  * Returns an action for given ScriptLine.
  */
-public Action getStarAction(ScriptLine aScriptLine);
+public Action getAction(ScriptLine aScriptLine);
 
 }

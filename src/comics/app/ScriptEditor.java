@@ -25,9 +25,6 @@ public class ScriptEditor extends ViewOwner {
     
     // Constants
     String _stars[] = { "Setting", "Camera", "Lady", "Man", "Car", "Cat", "Dog", "Trump", "Obama", "Duke" };
-    String _actActions[] = { "walks", "waves", "jumps", "dances", "drops", "says", "grows", "flips", "explodes" };
-    String _camActions[] = { "zooms", "blurs" };
-    String _setActions[] = { "beach", "ovaloffice", "whitehouse" };
     
 /**
  * Creates a ScriptEditor.
@@ -263,14 +260,17 @@ protected void initUI()
  */
 protected void resetUI()
 {
-    // Get seleccted ScriptLine
-    ScriptLine sline = getSelLine();
+    // Get seleccted ScriptLine and star
+    ScriptLine line = getSelLine();
+    Star star = line!=null? line.getStar() : null;
     
     // Update HelpListView
-    resetHelpListView();
+    String helpItems[] = star!=null? star.getActionNames() : _stars;
+    setViewText("HelpListLabel", star!=null? "Actions" : "Subjects");
+    _helpListView.setItems(helpItems);
 
     // Update InputText
-    _inputText.setText(sline!=null? sline.getText() : "");
+    _inputText.setText(line!=null? line.getText() : "");
     _inputText.selectAll();
 }
 
@@ -303,6 +303,7 @@ protected void respondUI(ViewEvent anEvent)
         String str2 = starName!=null? starName + ' ' + str : str;
         ViewUtils.runOnMouseUp(() -> {
             setLineText(str2);
+            _helpListView.setSelIndex(-1);
             resetLater();
         });
     }
@@ -318,29 +319,6 @@ protected void respondUI(ViewEvent anEvent)
     // Handle EditLineButton
     if(anEvent.equals("EditLineButton"))
         _editorPane.showLineEditor();
-}
-
-/**
- * Rests the HelpListView.
- */
-void resetHelpListView()
-{
-    ScriptLine line = getSelLine();
-    
-    // If no line or no star, set list of stars
-    if(line==null || line.getStar()==null) {
-        setViewText("HelpListLabel", "Subjects");
-        _helpListView.setItems(_stars);
-    }
-    
-    // Otherwise, clear list
-    else {
-        String name = line.getStar().getStarName(); if(name==null) return; name = name.toLowerCase();
-        setViewText("HelpListLabel", "Actions");
-        if(name.equals("camera")) _helpListView.setItems(_camActions);
-        else if(name.equals("setting")) _helpListView.setItems(_setActions);
-        else _helpListView.setItems(_actActions);
-    }
 }
 
 }

@@ -66,6 +66,46 @@ public String getStarName()  { return _asset.getName(); }
 public Image getStarImage()  { return getImage(); }
 
 /**
+ * Returns the action names for this star.
+ */
+public String[] getActionNames()  { return _actions; }
+private static String _actions[] = { "appears", "walks", "waves", "jumps", "dances", "drops", "says",
+    "grows", "flips", "explodes" };
+
+/**
+ * Returns an Action for this star and given ScriptLine.
+ */
+public Action getAction(ScriptLine aScriptLine)
+{
+    _scriptLine = aScriptLine;
+    String words[] = aScriptLine.getWords();
+    String cmd = words.length>1? words[1] : null;
+    if(cmd==null)
+        return null;
+
+    // Jump to specific command
+    Action action = null;
+    switch(cmd) {
+        case "appears": action = new ActorActions.AppearsAction(); break;
+        case "walks": action = new ActorActions.WalksAction(); break;
+        case "drops": action = new ActorActions.DropsAction(); break;
+        case "grows": action = new ActorActions.GrowsAction(); break;
+        case "flips": action = new ActorActions.FlipsAction(); break;
+        case "says": action = new ActorActions.SaysAction(); break;
+        case "explodes": action = new ActorActions.ExplodesAction(); break;
+        case "dances": action = new ActorActions.DanceAction(); break;
+        case "jumps": action = new ActorActions.JumpAction(); break;
+        case "waves": action = new ActorActions.WaveAction(); break;
+        default: return null;
+    }
+    
+    // If image not loaded yet, just return
+    //if(!getImage().isLoaded()) { aScriptLine.addUnloadedImage(getImage()); }
+    action.setLine(aScriptLine);
+    return action;
+}
+
+/**
  * Called when image is loaded.
  */
 void imageLoaded()
@@ -104,39 +144,6 @@ protected void setSizeForAsset(Asset anAsset)
 {
     Size size = getAssetSize(anAsset);
     setSize(size);
-}
-
-/**
- * Returns an Action for this star and given ScriptLine.
- */
-public Action getStarAction(ScriptLine aScriptLine)
-{
-    _scriptLine = aScriptLine;
-    String words[] = aScriptLine.getWords();
-    String cmd = words.length>1? words[1] : null;
-    if(cmd==null)
-        return null;
-
-    // Jump to specific command
-    Action action = null;
-    switch(cmd) {
-        case "appears": action = new ActorActions.AppearsAction(); break;
-        case "walks": action = new ActorActions.WalksAction(); break;
-        case "drops": action = new ActorActions.DropsAction(); break;
-        case "grows": action = new ActorActions.GrowsAction(); break;
-        case "flips": action = new ActorActions.FlipsAction(); break;
-        case "says": action = new ActorActions.SaysAction(); break;
-        case "explodes": action = new ActorActions.ExplodesAction(); break;
-        case "dances": action = new ActorActions.DanceAction(); break;
-        case "jumps": action = new ActorActions.JumpAction(); break;
-        case "waves": action = new ActorActions.WaveAction(); break;
-        default: return null;
-    }
-    
-    // If image not loaded yet, just return
-    //if(!getImage().isLoaded()) { aScriptLine.addUnloadedImage(getImage()); }
-    action.setLine(aScriptLine);
-    return action;
 }
 
 /**

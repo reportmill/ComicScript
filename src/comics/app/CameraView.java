@@ -66,9 +66,15 @@ public String getStarName()  { return "Camera"; }
 public Image getStarImage()  { return null; }
 
 /**
+ * Returns the action names for this star.
+ */
+public String[] getActionNames()  { return _actions; }
+private static String _actions[] = { "zooms", "blurs" };
+
+/**
  * Returns an Action for this star and given ScriptLine.
  */
-public Action getStarAction(ScriptLine aScriptLine)
+public Action getAction(ScriptLine aScriptLine)
 {
     String words[] = aScriptLine.getWords();
     String cmd = words.length>1? words[1] : null;

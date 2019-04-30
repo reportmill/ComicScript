@@ -80,7 +80,7 @@ public Action getAction()
     
     // Get Star
     Star star = getStar(); if(star==null) return null;
-    return _action = star.getStarAction(this);
+    return _action = star.getAction(this);
 }
 
 /**
