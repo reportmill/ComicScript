@@ -17,8 +17,8 @@ public String getStarName();
 public Image getStarImage();
 
 /**
- * Runs the ScriptLine.
+ * Returns an action for given ScriptLine.
  */
-public void runScriptLine(ScriptLine aScriptLine);
+public Action getStarAction(ScriptLine aScriptLine);
 
 }

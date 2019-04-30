@@ -1,7 +1,6 @@
 package comics.app;
 import comics.script.*;
 import snap.gfx.*;
-import snap.util.ArrayUtils;
 import snap.util.SnapUtils;
 import snap.view.*;
 
@@ -18,15 +17,6 @@ public class CameraView extends ScaleBox implements Star {
     
     // The blur
     double        _blur = 0;
-    
-    // The words
-    String        _words[];
-    
-    // The start time
-    int           _startTime = 0;
-    
-    // The runtime for last command
-    int           _runTime;
     
 /**
  * Creates a CameraView for content.
@@ -76,68 +66,25 @@ public String getStarName()  { return "Camera"; }
 public Image getStarImage()  { return null; }
 
 /**
- * Runs the words.
+ * Returns an Action for this star and given ScriptLine.
  */
-public void runScriptLine(ScriptLine aScriptLine)
+public Action getStarAction(ScriptLine aScriptLine)
 {
-    // Set words and reset runtime
-    _words = aScriptLine.getWords();
-    String cmd = _words.length>1? _words[1] : null;
+    String words[] = aScriptLine.getWords();
+    String cmd = words.length>1? words[1] : null;
     if(cmd==null)
-        return;
-    
+        return null;
+
     // Jump to specific command
+    Action action = null;
     switch(cmd) {
-        case "zoom": runZooms(); break;
-        case "zooms": runZooms(); break;
-        case "blur": runBlurs(); break;
-        case "blurs": runBlurs(); break;
-        default: return;
+        case "zoom": case "zooms": action = new CameraActions.ZoomAction(); break;
+        case "blur": case "blurs": action = new CameraActions.BlurAction(); break;
+        default: return null;
     }
     
-    aScriptLine.setRunTime(_runTime);
-}
-
-/**
- * Runs a zoom command.
- */
-public void runZooms()
-{
-    // Get anim for final destination
-    ViewAnim anim = getAnim(_startTime).getAnim(_startTime+2000);
-
-    // Handle Zooms Out
-    if(ArrayUtils.contains(_words, "out")) {
-        anim.setValue("Zoom", 1);
-    }
-    
-    // Handle Zooms (anything else)
-    else {
-        anim.setValue("Zoom", 2);
-    }
-    
-    _runTime = 2000;
-}
-
-/**
- * Runs a blur command.
- */
-public void runBlurs()
-{
-    // Get anim for final destination
-    ViewAnim anim = getAnim(_startTime).getAnim(_startTime+1000);
-
-    // Handle Zooms Out
-    if(ArrayUtils.contains(_words, "out") || ArrayUtils.contains(_words, "off")) {
-        anim.setValue("Blur", 0d);
-    }
-    
-    // Handle Zooms (anything else)
-    else {
-        anim.setValue("Blur", 8d);
-    }
-    
-    _runTime = 1000;
+    action.setLine(aScriptLine);
+    return action;
 }
 
 /**

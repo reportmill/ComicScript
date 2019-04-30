@@ -50,6 +50,16 @@ public Script(PlayerView aPlayer)
 }
 
 /**
+ * Returns the Player.
+ */
+public PlayerView getPlayer()  { return _player; }
+
+/**
+ * Returns the Stage.
+ */
+public StageView getStage()  { return _stage; }
+
+/**
  * Returns the setting.
  */
 public Setting getSetting()  { return _setting; }
@@ -244,9 +254,9 @@ public void runLine(int anIndex)
  */
 protected void runLine(ScriptLine aScriptLine)
 {
-    Star star = aScriptLine.getStar();
-    if(star!=null)
-        star.runScriptLine(aScriptLine);
+    Action action = aScriptLine.getAction(); 
+    if(action!=null)
+        action.run();
 }
 
 /**

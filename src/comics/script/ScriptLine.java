@@ -16,6 +16,9 @@ public class ScriptLine {
     // The words
     String      _words[];
     
+    // The action
+    Action      _action;
+    
     // The runtime of this ScriptLine
     int         _runTime;
     
@@ -68,6 +71,19 @@ public String[] getWords()
 }
 
 /**
+ * Returns the action.
+ */
+public Action getAction()
+{
+    // If already set, just return
+    if(_action!=null) return _action;
+    
+    // Get Star
+    Star star = getStar(); if(star==null) return null;
+    return _action = star.getStarAction(this);
+}
+
+/**
  * Returns the index.
  */
 public int getIndex()  { return _script.getLines().indexOf(this); }
@@ -95,7 +111,7 @@ public Star getStar()
 /**
  * Returns the runtime of this ScriptLine.
  */
-public int getRunTime()  { return _runTime; }
+public int getRunTime()  { Action a = getAction(); return a!=null? a.getRunTime() : 0; }
 
 /**
  * Sets the runtime of this ScriptLine.
