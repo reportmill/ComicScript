@@ -22,7 +22,11 @@ public ScriptLine getLine()  { return _line; }
 /**
  * Returns the ScriptLine that this action is associated with.
  */
-public void setLine(ScriptLine aLine)  { _line = aLine; }
+public void setLine(ScriptLine aLine)
+{
+    _line = aLine;
+    load();
+}
 
 /**
  * Returns the name of the action.
@@ -53,6 +57,11 @@ public String getText()  { return _line.getText(); }
  * Returns the star.
  */
 public Star getStar()  { return _line.getStar(); }
+
+/**
+ * Loads the Action.
+ */
+public void load()  { }
 
 /**
  * Runs the Action.

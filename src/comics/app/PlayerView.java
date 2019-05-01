@@ -46,7 +46,6 @@ public class PlayerView extends ScaleBox {
     // Constants for Property Changes
     public static final String RunLine_Prop = "RunLine";
     public static final String Playing_Prop = "Playing";
-    public static final String Loading_Prop = "Loading";
     
 /**
  * Creates a PlayerView.
@@ -229,6 +228,11 @@ protected void playLine()
     // Stop animation
     _camera.stopAnimDeep();
     
+    // If current line not loaded, come back
+    ScriptLine line = getScript().getLine(getRunLine());
+    if(line!=null && !line.isLoaded())  {
+        line.setLoadListener(pc -> playLine(getRunLine())); return; }
+    
     // Get current line run time and current camera time
     int lineRunTime = getLineRunTime(getRunLine());
     int camTime = _camera.getAnimTimeDeep();
@@ -285,9 +289,6 @@ public void play()
     // If is playing or no lines, just return
     if(isPlaying()) return; if(getLineCount()==0) return;
     
-    // If script not loaded, come back
-    if(!_script.isLoaded()) { setLoading(true, () -> play()); return; }
-    
     // If at end, reset to beginning
     if(getRunTime()>=getRunTimeMax())
         setRunTime(0);
@@ -313,30 +314,6 @@ public void stop()
     // Reset controls
     resetShowingControls();
     repaint();
-}
-
-/**
- * Returns whether the player loading.
- */
-public boolean isLoading()  { return _loading; } boolean _loading;
-
-/**
- * Sets the player loading.
- */
-protected void setLoading(boolean aValue, Runnable aRun)
-{
-    if(aValue==_loading) return;
-    firePropChange(Loading_Prop, _loading, _loading = aValue);
-    
-    if(aValue) {
-        _script._loadLsnr = aRun;
-        ProgressBar pbar = new ProgressBar(); pbar.setIndeterminate(true); pbar.setSize(pbar.getPrefSize());
-        pbar.setManaged(false); pbar.setLean(Pos.CENTER);
-        _stage.addChild(pbar);
-    }
-    
-    else if(aRun!=null)
-        aRun.run();
 }
 
 /**
@@ -415,9 +392,6 @@ protected void setShowingControls(boolean aValue)
  */
 protected void resetShowingControls()
 {
-    // If script not loaded, just return
-    if(!_script.isLoaded()) { setLoading(true, () -> resetShowingControls()); return; }
-    
     // If should never show controls, just return
     if(!isShowControls()) { setShowingControls(false); return; }
         
@@ -484,13 +458,10 @@ protected void showIntroAnim()
         
     // Get IntroImage (come back later if image or Player not loaded)
     Image img = getIntroImage(), img2 = getRealImage();
-    if(!img.isLoaded()) { img.addPropChangeListener(_introAnimLsnr); return; }
-    if(!img2.isLoaded()) { img2.addPropChangeListener(_introAnimLsnr); return; }
-    if(!isShowing()) { addPropChangeListener(_introAnimLsnr, Showing_Prop); return; }
-    
-    // Remove image/player listeners, if still set
-    img.removePropChangeListener(_introAnimLsnr); img2.removePropChangeListener(_introAnimLsnr);
-    removePropChangeListener(_introAnimLsnr, Showing_Prop);
+    if(!img.isLoaded()) { img.addLoadListener(pc -> showIntroAnim()); return; }
+    if(!img2.isLoaded()) { img2.addLoadListener(pc -> showIntroAnim()); return; }
+    if(!isShowing()) {
+        addPropChangeListener(PropChangeListener.getOneShot(pc -> showIntroAnim()), Showing_Prop); return; }
     
     // Create IntroImageView and RealView
     ImageView introImgView = new ImageView(img);
@@ -524,6 +495,5 @@ Image getRealImage()  { if(_realImg!=null) return _realImg;
 
 // For IntroAnim
 ColView _introView; Image _introImg; Image _realImg;
-PropChangeListener _introAnimLsnr = pc -> showIntroAnim();
 
 }

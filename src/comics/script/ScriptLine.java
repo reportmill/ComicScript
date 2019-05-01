@@ -1,6 +1,6 @@
 package comics.script;
 import snap.gfx.Image;
-import snap.util.PropChangeListener;
+import snap.util.*;
 
 /**
  * A class to represent a line of script.
@@ -8,23 +8,22 @@ import snap.util.PropChangeListener;
 public class ScriptLine {
     
     // The Script
-    Script      _script;
+    Script             _script;
     
     // The line text
-    String      _text;
+    String             _text;
     
     // The words
-    String      _words[];
+    String             _words[];
     
     // The action
-    Action      _action;
+    Action             _action;
     
     // Whether this ScriptLine is loaded
-    boolean     _loaded = true;
-    Image       _img;
+    boolean            _loaded = true;
     
-    // A PropChangeListener to be called when image is loaded
-    PropChangeListener _imgLoadLsnr;
+    // A PropChangeListener specific to ScripLine.Loaded
+    PropChangeSupport  _loadLsnr;
     
 /**
  * Creates a new ScriptLine with given text.
@@ -68,19 +67,6 @@ public String[] getWords()
 }
 
 /**
- * Returns the action.
- */
-public Action getAction()
-{
-    // If already set, just return
-    if(_action!=null) return _action;
-    
-    // Get Star
-    Star star = getStar(); if(star==null) return null;
-    return _action = star.getAction(this);
-}
-
-/**
  * Returns the index.
  */
 public int getIndex()  { return _script.getLines().indexOf(this); }
@@ -101,26 +87,57 @@ public Star getStar()
 }
 
 /**
+ * Returns the action.
+ */
+public Action getAction()
+{
+    // If already set, just return
+    if(_action!=null) return _action;
+    
+    // Get Star
+    Star star = getStar(); if(star==null) return null;
+    if(star.getStarImage()!=null && !star.getStarImage().isLoaded())
+        addUnloadedImage(star.getStarImage());
+    return _action = star.getAction(this);
+}
+
+/**
  * Returns the runtime of this ScriptLine.
  */
 public int getRunTime()  { Action a = getAction(); return a!=null? a.getRunTime() : 0; }
+
+/**
+ * Returns whether this line is loaded.
+ */
+public boolean isLoaded()  { return _loaded; }
+
+/**
+ * Sets whether this line is loaded.
+ */
+protected void setLoaded(boolean aValue)
+{
+    if(aValue==_loaded) return;
+    _loaded = aValue;
+    if(aValue && _loadLsnr!=null) {
+        _loadLsnr.firePropChange(new PropChange(this, "Loaded", false, true)); _loadLsnr = null; }
+}
+
+/**
+ * Sets the LoadListener.
+ */
+public void setLoadListener(PropChangeListener aLoadLsnr)
+{
+    if(_loadLsnr==null) _loadLsnr = new PropChangeSupport(this);
+    _loadLsnr.addPropChangeListener(aLoadLsnr);
+}
 
 /**
  * Adds an unloaded image.
  */
 public void addUnloadedImage(Image anImage)
 {
-    if(!_loaded) return; _loaded = false; _img = anImage;
-    _img.addPropChangeListener(_imgLoadLsnr = pce -> imageLoaded());
-}
-
-/**
- * Called when image is loaded.
- */
-void imageLoaded()
-{
-    _loaded = true;
-    if(_imgLoadLsnr!=null) { _img.removePropChangeListener(_imgLoadLsnr); _imgLoadLsnr = null; }
+    _loaded = false;
+    anImage.addLoadListener(pce -> setLoaded(true));
 }
 
 /**
@@ -130,6 +147,12 @@ public String toString()
 {
     String str = getText(); if(str.trim().length()==0) str = "(empty)";
     return "SriptLine: " + str;
+}
+
+/**
+ * A class to Listen to whether ScriptLine is loaded.
+ */
+public static class LoadListener {
 }
 
 }

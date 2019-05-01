@@ -1,7 +1,5 @@
 package comics.script;
-import comics.app.Explode;
-import comics.app.SpeakView;
-import comics.app.StageView;
+import comics.app.*;
 import snap.gfx.*;
 import snap.util.ArrayUtils;
 import snap.view.*;
@@ -9,12 +7,29 @@ import snap.view.*;
 /**
  * A class to hold Actor Action subclasses.
  */
-public class ActorActions {
+public class ActorAction extends Action {
+    
+/**
+ * Override to return as Actor.
+ */
+public Actor getStar()  { return (Actor)super.getStar(); }
+
+/**
+ * Makes sure an anim image is loaded.
+ */
+public void loadAnim(String anAnimName)
+{
+    Actor star = getStar();
+    String starName = star.getStarName();
+    Asset.AnimImage asset = Asset.getAnimImageAsset(starName, anAnimName);
+    if(asset!=null && !asset.isImageLoaded())
+        _line.addUnloadedImage(asset.getImage());
+}
 
 /**
  * An Actor Action that makes actor appear.
  */
-public static class AppearsAction extends Action {
+public static class AppearsAction extends ActorAction {
     
     /** Creates the action. */
     public AppearsAction()  { setName("Appears"); setRunTime(2000); }
@@ -23,7 +38,7 @@ public static class AppearsAction extends Action {
     public void run()
     {
         // Get anim for final destination
-        Actor actor = (Actor)getStar();
+        Actor actor = getStar();
         ViewAnim anim = actor.getAnim(2000);
     
         // Handle walk in
@@ -37,17 +52,20 @@ public static class AppearsAction extends Action {
 /**
  * An Actor Action that makes actor walk.
  */
-public static class WalksAction extends Action {
+public static class WalksAction extends ActorAction {
     
     /** Creates the action. */
     public WalksAction()  { setName("Walks"); setRunTime(2000); }
+    
+    /** Override to load image. */
+    public void load()  { loadAnim("Walk"); }
     
     /** Runs the action. */
     public void run()
     {
         // Get anim for final destination
         ScriptLine line = getLine();
-        Actor actor = (Actor)getStar();
+        Actor actor = getStar();
         ViewAnim anim = actor.getAnim(2000);
         StageView stage = line.getScript().getStage();
     
@@ -80,7 +98,7 @@ public static class WalksAction extends Action {
 /**
  * An Actor Action that makes actor drop down from top.
  */
-public static class DropsAction extends Action {
+public static class DropsAction extends ActorAction {
     
     /** Creates the action. */
     public DropsAction()  { setName("Drops"); setRunTime(2000); }
@@ -89,7 +107,7 @@ public static class DropsAction extends Action {
     public void run()
     {
         // Get anim for final destination
-        Actor actor = (Actor)getStar();
+        Actor actor = getStar();
         ViewAnim anim = actor.getAnim(2000);
     
         // Handle drop right
@@ -113,7 +131,7 @@ public static class DropsAction extends Action {
 /**
  * An Actor Action that makes actor grow.
  */
-public static class GrowsAction extends Action {
+public static class GrowsAction extends ActorAction {
     
     /** Creates the action. */
     public GrowsAction()  { setName("Grows"); setRunTime(1000); }
@@ -122,7 +140,7 @@ public static class GrowsAction extends Action {
     public void run()
     {
         // Get anim for final destination
-        Actor actor = (Actor)getStar();
+        Actor actor = getStar();
         actor.getAnim(1000).setScale(actor.getScale()+.2);
     }
 }
@@ -130,7 +148,7 @@ public static class GrowsAction extends Action {
 /**
  * An Actor Action that makes actor flip.
  */
-public static class FlipsAction extends Action {
+public static class FlipsAction extends ActorAction {
     
     /** Creates the action. */
     public FlipsAction()  { setName("Flips"); setRunTime(1000); }
@@ -139,7 +157,7 @@ public static class FlipsAction extends Action {
     public void run()
     {
         // Get anim for final destination
-        Actor actor = (Actor)getStar();
+        Actor actor = getStar();
         actor.getAnim(1000).setRotate(actor.getRotate()+360);
     }
 }
@@ -147,7 +165,7 @@ public static class FlipsAction extends Action {
 /**
  * An Actor Action that makes actor say something with speech baloon.
  */
-public static class SaysAction extends Action {
+public static class SaysAction extends ActorAction {
     
     /** Creates the action. */
     public SaysAction()  { setName("Says"); setRunTime(3000); }
@@ -157,7 +175,7 @@ public static class SaysAction extends Action {
     {
         // Get anim for final destination
         ScriptLine line = getLine();
-        Actor actor = (Actor)getStar();
+        Actor actor = getStar();
         StageView stage = line.getScript().getStage();
         
         // Get text string
@@ -183,7 +201,7 @@ public static class SaysAction extends Action {
 /**
  * An Actor Action that makes actor explode.
  */
-public static class ExplodesAction extends Action {
+public static class ExplodesAction extends ActorAction {
     
     /** Creates the action. */
     public ExplodesAction()  { setName("Explodes"); setRunTime(2500); }
@@ -191,7 +209,7 @@ public static class ExplodesAction extends Action {
     /** Runs the action. */
     public void run()
     {
-        Actor actor = (Actor)getStar();
+        Actor actor = getStar();
         Explode.explode(actor, 0);
     }
 }
@@ -199,15 +217,18 @@ public static class ExplodesAction extends Action {
 /**
  * An Actor Action that makes actor dance.
  */
-public static class DanceAction extends Action {
+public static class DanceAction extends ActorAction {
     
     /** Creates the action. */
     public DanceAction()  { setName("Dance"); setRunTime(3000); }
     
+    /** Override to load image. */
+    public void load()  { loadAnim("Dance"); }
+    
     /** Runs the action. */
     public void run()
     {
-        Actor actor = (Actor)getStar();
+        Actor actor = getStar();
         actor.setAnimImage("Dance", 3000, 88);
     }
 }
@@ -215,15 +236,18 @@ public static class DanceAction extends Action {
 /**
  * An Actor Action that makes actor jump.
  */
-public static class JumpAction extends Action {
+public static class JumpAction extends ActorAction {
     
     /** Creates the action. */
-    public JumpAction()  { setName("Jumps"); setRunTime(3000); }
+    public JumpAction()  { setName("Jumps"); setRunTime(1000); }
+    
+    /** Override to load image. */
+    public void load()  { loadAnim("Jump"); }
     
     /** Runs the action. */
     public void run()
     {
-        Actor actor = (Actor)getStar();
+        Actor actor = getStar();
         actor.setAnimImage("Jump", 1000, 16);
     }
 }
@@ -231,15 +255,18 @@ public static class JumpAction extends Action {
 /**
  * An Actor Action that makes actor wave
  */
-public static class WaveAction extends Action {
+public static class WaveAction extends ActorAction {
     
     /** Creates the action. */
-    public WaveAction()  { setName("Waves"); setRunTime(3000); }
+    public WaveAction()  { setName("Waves"); setRunTime(1000); }
+    
+    /** Override to load image. */
+    public void load()  { loadAnim("Wave"); }
     
     /** Runs the action. */
     public void run()
     {
-        Actor actor = (Actor)getStar();
+        Actor actor = getStar();
         actor.setAnimImage("Wave", 1000, 17);
     }
 }

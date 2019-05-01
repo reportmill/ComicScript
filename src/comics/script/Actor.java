@@ -1,7 +1,6 @@
 package comics.script;
 import comics.app.*;
 import snap.gfx.*;
-import snap.util.*;
 import snap.view.*;
 import comics.script.Asset.*;
 
@@ -16,33 +15,29 @@ public class Actor extends ImageView implements Star {
     // The Asset
     Asset            _asset;
     
-    // The script line
-    ScriptLine       _scriptLine;
-    
     // The offset
     double           _offsetX;
     
-    // A PropChangeListener to be called when image is loaded
-    PropChangeListener _imgLoadLsnr;
-
 /**
  * Create new actor.
  */
 public Actor(Script aScript, Asset anAsset)
 {
-    _script = aScript;
-    _asset = anAsset;
+    // Set Script, Asset and Name
+    _script = aScript; _asset = anAsset;
     setName(anAsset.getName());
+    
+    // Set Asset image
     Image img = anAsset.getImage();
     setImage(img);
-    setFillHeight(true); setFillWidth(true); //setKeepAspect(true);
-    if(!img.isLoaded()) img.addPropChangeListener(_imgLoadLsnr = pce -> imageLoaded());
-    else imageLoaded();
-    setEffect(new ShadowEffect(6, Color.BLACK, 0, 0));
+    setFillHeight(true); setFillWidth(true);
     
-    double heightFeet = _asset.getHeight(), widthFeet = heightFeet/2;
-    double w = _script.feetToPoints(widthFeet), h = _script.feetToPoints(heightFeet);
-    setSize(w,h);
+    // Make sure size gets set when image loaded
+    if(!img.isLoaded()) img.addLoadListener(pce -> setSizeForAsset(_asset));
+    else setSizeForAsset(_asset);
+    
+    // Set ShadowEffect
+    setEffect(new ShadowEffect(6, Color.BLACK, 0, 0));
 }
 
 /**
@@ -77,7 +72,7 @@ private static String _actions[] = { "appears", "walks", "waves", "jumps", "danc
  */
 public Action getAction(ScriptLine aScriptLine)
 {
-    _scriptLine = aScriptLine;
+    // Get action name from script
     String words[] = aScriptLine.getWords();
     String cmd = words.length>1? words[1] : null;
     if(cmd==null)
@@ -86,32 +81,22 @@ public Action getAction(ScriptLine aScriptLine)
     // Jump to specific command
     Action action = null;
     switch(cmd) {
-        case "appears": action = new ActorActions.AppearsAction(); break;
-        case "walks": action = new ActorActions.WalksAction(); break;
-        case "drops": action = new ActorActions.DropsAction(); break;
-        case "grows": action = new ActorActions.GrowsAction(); break;
-        case "flips": action = new ActorActions.FlipsAction(); break;
-        case "says": action = new ActorActions.SaysAction(); break;
-        case "explodes": action = new ActorActions.ExplodesAction(); break;
-        case "dances": action = new ActorActions.DanceAction(); break;
-        case "jumps": action = new ActorActions.JumpAction(); break;
-        case "waves": action = new ActorActions.WaveAction(); break;
+        case "appears": action = new ActorAction.AppearsAction(); break;
+        case "walks": action = new ActorAction.WalksAction(); break;
+        case "drops": action = new ActorAction.DropsAction(); break;
+        case "grows": action = new ActorAction.GrowsAction(); break;
+        case "flips": action = new ActorAction.FlipsAction(); break;
+        case "says": action = new ActorAction.SaysAction(); break;
+        case "explodes": action = new ActorAction.ExplodesAction(); break;
+        case "dances": action = new ActorAction.DanceAction(); break;
+        case "jumps": action = new ActorAction.JumpAction(); break;
+        case "waves": action = new ActorAction.WaveAction(); break;
         default: return null;
     }
     
     // If image not loaded yet, just return
-    //if(!getImage().isLoaded()) { aScriptLine.addUnloadedImage(getImage()); }
     action.setLine(aScriptLine);
     return action;
-}
-
-/**
- * Called when image is loaded.
- */
-void imageLoaded()
-{
-    setSizeForAsset(_asset);
-    if(_imgLoadLsnr!=null) { getImage().removePropChangeListener(_imgLoadLsnr); _imgLoadLsnr = null; }
 }
 
 /**
@@ -147,42 +132,18 @@ protected void setSizeForAsset(Asset anAsset)
 }
 
 /**
- * Returns an anim asset for name.
- */
-public AnimImage getAnimImageAsset(String aName)
-{
-    String name = FilePathUtils.getFileNameSimple(getName());
-    return AssetIndex.get().getAnim(name, aName);
-}
-
-/**
- * Returns an anim image for name.
- */
-public Image getAnimImage(String aName)
-{
-    String name = FilePathUtils.getFileNameSimple(getName());
-    Image img = AssetIndex.get().getAnimImage(name, aName);
-    return img;
-}
-
-/**
  * Sets the animated image over given range (if found).
  */
 public void setAnimImage(String aName, int aTime, int aFrame)
 {
     // Get image for name and cache old image
-    AnimImage anim = getAnimImageAsset(aName); if(anim==null) return;
-    Image img = anim.getImage(); //getAnimImage(aName); if(img==null) return false;
+    String starName = getStarName();
+    AnimImage anim = Asset.getAnimImageAsset(starName, aName);
+    if(anim==null || !anim.isImageLoaded()) return;
     
-    // If image loading, just return
-    if(!img.isLoaded()) {
-        _scriptLine.addUnloadedImage(img); return; }
-    
-    // Get old image and offset
+    // Get old offset and set image and size
     double offsetX = _offsetX;
-    
-    // Set image and size
-    setAssetImage(anim, anim.getOffsetX()); //setImage(img, anim.getOffsetX());
+    setAssetImage(anim, anim.getOffsetX());
     
     // Configure anim
     getAnim(aTime).setValue("Frame", aFrame);

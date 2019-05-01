@@ -69,6 +69,11 @@ protected Image getImageImpl()
 }
 
 /**
+ * Returns whether image is loaded.
+ */
+public boolean isImageLoaded()  { Image img = getImage(); return img==null || img.isLoaded(); }
+
+/**
  * Returns the height in feet.
  */
 public double getHeight()  { return _height>0? _height : 5; }
@@ -119,7 +124,7 @@ public static class AnimImage extends Asset {
     {
         Image img = super.getImageImpl(), img0 = img;
         if(img.isLoaded()) img = img.getSpriteSheetFrames(_frameCount);
-        else img.addPropChangeListener(pc -> _img = img0.getSpriteSheetFrames(_frameCount));
+        else img.addLoadListener(pc -> _img = img0.getSpriteSheetFrames(_frameCount));
         return img;
     }
 }
@@ -166,6 +171,15 @@ private static void saveSpriteSheet(WebURL aURL)
     WebFile file = aURL.createFile(false);
     file.setBytes(bytes);
     file.save();
+}
+
+/**
+ * Returns an anim asset for name.
+ */
+public static AnimImage getAnimImageAsset(String aStarName, String anAnimName)
+{
+    String name = FilePathUtils.getFileNameSimple(aStarName);
+    return AssetIndex.get().getAnim(name, anAnimName);
 }
 
 }

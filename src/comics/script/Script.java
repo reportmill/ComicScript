@@ -22,12 +22,6 @@ public class Script {
     // The Script lines
     List <ScriptLine>  _lines;
     
-    // Whether script is loaded
-    boolean            _loaded;
-    
-    // A callback to be called when script is loaded
-    public Runnable    _loadLsnr;
-    
     // The runtimes
     int                _runTime;
     
@@ -88,32 +82,6 @@ public void setText(String aStr)
 }
 
 /**
- * Undo text.
- */
-public void undo()
-{
-    // Complain and bail if no more undos
-    if(_undoText.size()==0) { ViewUtils.beep(); return; }
-    
-    // Get last undo, add to redos and set
-    String str = _undoText.remove(_undoText.size()-1);
-    _undoing = true; setText(str); _undoing = false;
-}
-
-/**
- * Redo text.
- */
-public void redo()
-{
-    // Complain and bail if no more undos
-    if(_redoText.size()==0) { ViewUtils.beep(); return; }
-    
-    // Get last undo, add to redos and set
-    String str = _redoText.remove(_redoText.size()-1);
-    _redoing = true; setText(str); _redoing = false;
-}
-
-/**
  * Returns the number of lines.
  */
 public int getLineCount()  { return getLines().size(); }
@@ -137,7 +105,7 @@ public List <ScriptLine> getLines()
     _runTime = 0;
     for(int i=0;i<tlines.length;i++) { String tline = tlines[i];
         ScriptLine line = new ScriptLine(this, tline);
-        runLine(line);
+        Action action = line.getAction();
         _runTime += line.getRunTime();
         slines.add(line);
     }
@@ -194,19 +162,6 @@ void resetTextFromLines()
 }
 
 /**
- * Returns whether script is loaded.
- */
-public boolean isLoaded()
-{
-    if(_loaded) return true;
-    if(_text==null) return false;
-    for(ScriptLine line : getLines()) if(!line._loaded) return false;
-    _loaded = true;
-    if(_loadLsnr!=null) _loadLsnr.run(); _loadLsnr = null;
-    return _loaded;     //ViewUtils.runDelayed(() -> getRunTime(), 100, true);
-}
-
-/**
  * Returns the run time.
  */
 public int getRunTime()  { return _runTime; }
@@ -260,6 +215,32 @@ protected void runLine(ScriptLine aScriptLine)
 }
 
 /**
+ * Undo text.
+ */
+public void undo()
+{
+    // Complain and bail if no more undos
+    if(_undoText.size()==0) { ViewUtils.beep(); return; }
+    
+    // Get last undo, add to redos and set
+    String str = _undoText.remove(_undoText.size()-1);
+    _undoing = true; setText(str); _undoing = false;
+}
+
+/**
+ * Redo text.
+ */
+public void redo()
+{
+    // Complain and bail if no more undos
+    if(_redoText.size()==0) { ViewUtils.beep(); return; }
+    
+    // Get last undo, add to redos and set
+    String str = _redoText.remove(_redoText.size()-1);
+    _redoing = true; setText(str); _redoing = false;
+}
+
+/**
  * Returns the next image.
  */
 public View getView(ScriptLine aScriptLine)
@@ -276,10 +257,17 @@ public View getView(ScriptLine aScriptLine)
     
     // If actor not found, create
     if(child==null) {
+        
+        // Create new ActorView for Asset and add to Stage
         ImageView iview = new Actor(this,asset); child = iview; iview.setX(-999);
         _stage.addChild(child);
+        
+        // If image not loaded, tell ScriptLine
+        if(!asset.isImageLoaded())
+            aScriptLine.addUnloadedImage(asset.getImage());
     }
     
+    // Return child
     return child;
 }
 
