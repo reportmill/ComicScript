@@ -58,29 +58,21 @@ protected void scriptChanged()
  */
 protected View createUI()
 {
-    // Create ToolBar
-    RowView toolBar = new RowView(); toolBar.setSpacing(4);
-    Label label = new Label("Line:"); label.setFont(MAIN_FONT.getBold());
-    TextField text = new TextField(); text.setName("LineText"); text.setGrowWidth(true); text.setFont(MAIN_FONT);
-    text.setText("Setting is beach"); setFirstFocus(text);
-    Button btn = new Button("Edit Script"); btn.setName("EditScriptButton");
-    btn.setLeanX(HPos.RIGHT); btn.setPrefSize(95,26);
-    toolBar.setChildren(label, text, btn);
+    // Get MainColView from UI file
+    ColView mainColView =  (ColView)super.createUI(); mainColView.setFillWidth(true);
+
+    // Get/configure ToolBar
+    RowView toolBar = (RowView)mainColView.getChild(0);
+    Label toolBarLabel = (Label)toolBar.getChild("ToolBarLabel"); toolBarLabel.setFont(MAIN_FONT.getBold());
+    TextField text = (TextField)toolBar.getChild("LineText"); text.setFont(MAIN_FONT);
+    setFirstFocus(text);
     
-    // Create/configure SubjectsView
+    // Create/add StarListView
     _starsView = new StarListView(this);
+    mainColView.addChild(_starsView,1);
     
-    // Create ActionEditor
-    RowView rowView = (RowView)super.createUI();
-    
-    //<ColView Padding="8,4,4,4" GrowHeight="true" FillWidth="true" Title="Cast" />
-    ColView colView = new ColView(); colView.setPadding(8,5,5,5); colView.setSpacing(5);
-    colView.setGrowHeight(true); colView.setFillWidth(true);
-    colView.addChild(toolBar);
-    colView.addChild(_starsView);
-    colView.addChild(rowView);
-    
-    return colView;
+    // Return MainColView
+    return mainColView;
 }
 
 /**
@@ -120,7 +112,7 @@ protected void resetUI()
  */
 protected void respondUI(ViewEvent anEvent)
 {
-    if(anEvent.equals("EditScriptButton"))
+    if(anEvent.equals("DoneButton"))
         _editorPane.showScriptEditor();
 }
 

@@ -232,15 +232,12 @@ private class LineView extends Label {
     {
         _line = aLine;
         setText(aLine.getText());
-        setPadding(5,10,5,10);
+        setPadding(5,10,5,10); setRadius(10);
         setFont(ScriptView.this.getFont());
         setFill(LINEVIEW_FILL);
         enableEvents(MousePress);
     }
 
-    /** Returns bounds shape as rounded rect. */
-    public Shape getBoundsShape()  { return new RoundRect(0,0,getWidth(),getHeight(),10); }
-    
     /** Handle Events. */
     protected void processEvent(ViewEvent anEvent)
     {

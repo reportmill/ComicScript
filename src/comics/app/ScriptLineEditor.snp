@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RowView GrowHeight="true" FillHeight="true">
-  <ColView PrefWidth="180" Spacing="2" FillWidth="true">
-    <font name="Arial" size="13" />
-    <Label Name="Label" Padding="3" text="Actions">
-      <BevelBorder />
-      <font name="Arial Bold" size="13" />
+<ColView PrefWidth="400" Padding="8,5,5,5" GrowHeight="true" Spacing="5">
+  <RowView Padding="0" GrowWidth="true" Spacing="4">
+    <Label Name="ToolBarLabel" text="Line:">
+      <font name="Arial" size="18" />
     </Label>
-    <ListView Name="ListView" MinHeight="60" GrowHeight="true">
+    <TextField Name="LineText" GrowWidth="true">
       <LineBorder Color="#c0c0c0" />
-    </ListView>
-  </ColView>
-</RowView>
+    </TextField>
+    <Button Name="DoneButton" PrefWidth="95" PrefHeight="26" Padding="2" LeanX="RIGHT" text="Done" />
+  </RowView>
+  <RowView GrowHeight="true" FillHeight="true">
+    <ColView PrefWidth="180" Spacing="2" FillWidth="true">
+      <font name="Arial" size="13" />
+      <Label Name="Label" Padding="3" text="Actions">
+        <BevelBorder />
+        <font name="Arial Bold" size="13" />
+      </Label>
+      <ListView Name="ListView" MinHeight="60" GrowHeight="true">
+        <LineBorder Color="#c0c0c0" />
+      </ListView>
+    </ColView>
+  </RowView>
+</ColView>
