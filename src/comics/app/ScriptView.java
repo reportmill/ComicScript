@@ -256,8 +256,9 @@ private class LineView extends Label {
             
             // Handle multi-click
             else {
-                _scriptEditor._inputText.requestFocus();
-                _scriptEditor._inputText.selectAll();
+                //_scriptEditor._inputText.requestFocus();
+                //_scriptEditor._inputText.selectAll();
+                _scriptEditor._editorPane.showLineEditor();
             }
             
             // Consume event
