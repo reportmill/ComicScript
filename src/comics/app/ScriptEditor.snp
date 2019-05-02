@@ -27,7 +27,7 @@
     </ColView>
   </RowView>
   <RowView Name="InputRow" Padding="4" GrowWidth="true" Spacing="8">
-    <TextField Name="InputText" GrowWidth="true">
+    <TextField Name="InputText" GrowWidth="true" class="comics.app.ScriptEditor$ComicTextField">
       <LineBorder Color="#c0c0c0" />
       <font name="Arial" size="16" />
     </TextField>

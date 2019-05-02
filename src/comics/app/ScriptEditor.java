@@ -229,6 +229,7 @@ protected View createUI()
     RowView inputRow = (RowView)mainColView.getChild("InputRow"); inputRow.setFillHeight(true);
     _inputText = (TextField)inputRow.getChild("InputText"); _inputText.setRadius(10);
     _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
+    if(_inputText.getWidth()<0) ((ComicTextField)_inputText).paintSel(null); // Forces TeaVM to compile ComicTextField
     Button inputButton = (Button)inputRow.getChild("InputButton"); inputButton.setText("\u23CE");
     
     // Return MainColView    
@@ -320,5 +321,22 @@ protected void respondUI(ViewEvent anEvent)
     if(anEvent.equals("EditLineButton"))
         _editorPane.showLineEditor();
 }
+
+/**
+ * A TextField subclass to paint selection even when not focused.
+ */
+public static class ComicTextField extends TextField {
+   
+    /** Override to paint sel even when not focused. */ 
+    protected void paintSel(Painter aPntr)
+    {
+        super.paintSel(aPntr);
+        if(!isFocused() && !isSelEmpty()) {
+            Rect sbnds = getSelBounds();
+            aPntr.setPaint(_selColor); aPntr.fill(sbnds);
+        }
+    }
+}
+static Color _selColor = new Color("#CDECF6");
 
 }

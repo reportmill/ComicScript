@@ -86,8 +86,12 @@ protected View createUI()
  */
 protected void initUI()
 {
+    // Configure ActionListView
     _actionListView = getView("ListView", ListView.class);
     _actionListView.setFont(Font.Arial16);
+    
+    // Configure StarsView
+    _starsView.updateSubjects();
 }
 
 /**
