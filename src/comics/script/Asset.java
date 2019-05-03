@@ -58,7 +58,6 @@ public Image getImage()  { return _img!=null? _img : (_img=getImageImpl()); }
 protected Image getImageImpl()
 {
     WebURL url = WebURL.getURL(_urls);
-    if(SnapUtils.isTeaVM) snaptea.TVWebSite.addKnownPath(url.getPath());
     Image img = Image.get(url);
     
     if(isNewGifAvailable(url)) {

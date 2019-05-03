@@ -20,7 +20,7 @@ public class AssetIndex {
     List <SettingImage>  _settings;
     
     // The root path
-    static String ROOT = "/Temp/ComicScriptLib/";
+    static String ROOT = "/Temp/ComicLib/";
 
     // The shared index
     static AssetIndex  _shared = new AssetIndex();
@@ -30,10 +30,8 @@ public class AssetIndex {
  */
 public AssetIndex()
 {
-    if(SnapUtils.isTeaVM) {
-        ROOT = snaptea.TVViewEnv.getScriptRoot() + "!/files/"; // Was "http://localhost/files/"
-        snaptea.TVWebSite.addKnownPath("/files/index.json");
-    }
+    if(SnapUtils.isTeaVM)
+        ROOT = "http://reportmill.com/ComicLib/";
     
     WebURL url = WebURL.getURL(ROOT + "index.json");
     JSONNode root = JSONNode.readSource(url);
