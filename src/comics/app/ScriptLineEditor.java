@@ -2,6 +2,7 @@ package comics.app;
 import comics.script.*;
 import snap.gfx.*;
 import snap.view.*;
+import snap.viewx.TransitionPane;
 
 /**
  * A class to manage UI editing of a line.
@@ -11,14 +12,17 @@ public class ScriptLineEditor extends ViewOwner {
     // The EditorPane
     EditorPane         _editorPane;
     
+    // The StarPicker
+    StarPicker         _starPicker;
+    
+    // The ActionEditor
+    ActionEditor       _actionEditor;
+    
     // The LinePartsView holds the LinePartViews
     LinePartsView      _linePartsView;
 
-    // The view to show list of stars in script
-    StarListView       _starsView;
-
-    // The ListView
-    ListView <String>  _actionListView;
+    // TransitionPane
+    TransitionPane     _transPane;
     
     // Constants
     static Font     MAIN_FONT = new Font("Arial", 18);
@@ -33,7 +37,14 @@ public class ScriptLineEditor extends ViewOwner {
 public ScriptLineEditor(EditorPane anEP)
 {
     _editorPane = anEP;
+    _starPicker = new StarPicker(this);
+    _actionEditor = new ActionEditor(this);
 }
+
+/**
+ * Returns the Player.
+ */
+public PlayerView getPlayer()  { return _editorPane.getPlayer(); }
 
 /**
  * Returns the Script.
@@ -41,17 +52,36 @@ public ScriptLineEditor(EditorPane anEP)
 public Script getScript()  { return _editorPane.getScript(); }
 
 /**
- * Returns the ScriptLine.
+ * Returns the current ScriptLine.
  */
-public ScriptLine getScriptLine()  { return _editorPane.getScriptLine(); }
+public ScriptLine getSelLine()  { return _editorPane.getScriptLine(); }
+
+/**
+ * Sets the StarPicker.
+ */
+public void showStarPicker()
+{
+    _transPane.setTransition(TransitionPane.MoveLeft);
+    _transPane.setContent(_starPicker.getUI());
+    _starPicker.resetLater();
+}
+
+/**
+ * Sets the ActionEditor.
+ */
+public void showActionEditor()
+{
+    _transPane.setTransition(TransitionPane.MoveRight);
+    _transPane.setContent(_actionEditor.getUI());
+    _actionEditor.resetLater();
+}
 
 /**
  * Called when Script text changes.
  */
 protected void scriptChanged()
 {
-    if(_starsView==null) return;
-    _starsView.updateSubjects();
+    _starPicker.scriptChanged();
     resetLater();
 }
 
@@ -73,25 +103,19 @@ protected View createUI()
     _linePartsView = new LinePartsView();
     toolBar.addChild(_linePartsView, 1);
     
-    // Create/add StarListView
-    _starsView = new StarListView(this);
-    mainColView.addChild(_starsView,1);
+    // Create Divider line
+    Label label = new Label(); label.setPrefHeight(4);
+    mainColView.addChild(label);
+    RectView rectView = new RectView(0,0,100,1); rectView.setFill(Color.LIGHTGRAY);
+    mainColView.addChild(rectView);
+    
+    // Create TransPane
+    _transPane = new TransitionPane(); _transPane.setGrowHeight(true); //_transPane.setBorder(Color.PINK,1);
+    _transPane.setContent(_starPicker.getUI());
+    mainColView.addChild(_transPane);
     
     // Return MainColView
     return mainColView;
-}
-
-/**
- * Initialize UI.
- */
-protected void initUI()
-{
-    // Configure ActionListView
-    _actionListView = getView("ListView", ListView.class);
-    _actionListView.setFont(Font.Arial16);
-    
-    // Configure StarsView
-    _starsView.updateSubjects();
 }
 
 /**
@@ -100,19 +124,16 @@ protected void initUI()
 protected void resetUI()
 {
     // Get selected script line and star
-    ScriptLine line = getScriptLine();
+    ScriptLine line = getSelLine();
     Star star = line.getStar(); if(star==null) return;
     
     // Update LineText, LinePartsView
     setViewText("LineText", line.getText());
     _linePartsView.setLine(line);
     
-    // Update StarsView
-    _starsView.setSelStar(star);
-    
-    // Update ActionListView
-    String actionNames[] = star.getActionNames();
-    _actionListView.setItems(actionNames);
+    // Reset StarPicker/ActionEditor
+    if(_starPicker.isUISet() && _starPicker.getUI().isShowing()) _starPicker.resetLater();
+    if(_actionEditor.isUISet() && _actionEditor.getUI().isShowing()) _actionEditor.resetLater();
 }
 
 /**
@@ -123,6 +144,13 @@ protected void respondUI(ViewEvent anEvent)
     // Handle DoneButton
     if(anEvent.equals("DoneButton"))
         _editorPane.showScriptEditor();
+        
+    // Handle LinePartsView
+    if(anEvent.equals(_linePartsView)) {
+        if(_linePartsView.getSelIndex()==0)
+            showStarPicker();
+        else showActionEditor();
+    }
 }
 
 /**
@@ -142,7 +170,7 @@ class LinePartsView extends RowView {
         setGrowWidth(true); setPrefHeight(40);
         setPadding(5,5,5,5); setSpacing(8); //setFill(Color.WHITE); setBorder(Border.createLoweredBevelBorder());
         setFont(new Font("Arial", 15));
-        enableEvents(MousePress);
+        enableEvents(MousePress, Action);
     }
     
     /** Sets the ScriptLine. */
@@ -176,6 +204,9 @@ class LinePartsView extends RowView {
     }
     
     /** Returns the selected index. */
+    public int getSelIndex()  { return _selIndex; }
+    
+    /** Sets the selected index. */
     public void setSelIndex(int anIndex)
     {
         if(anIndex==_selIndex) return;
@@ -222,6 +253,7 @@ class LinePartView extends Label {
         if(anEvent.isMousePress()) {
             int ind = getParent().indexOfChild(this);
             _linePartsView.setSelIndex(ind);
+            ViewUtils.fireActionEvent(_linePartsView, anEvent);
             anEvent.consume();
         }
     }

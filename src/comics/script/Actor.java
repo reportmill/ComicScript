@@ -58,7 +58,7 @@ public String getStarName()  { return _asset.getName(); }
 /**
  * Returns the star image.
  */
-public Image getStarImage()  { return getImage(); }
+public Image getStarImage()  { return _asset.getImage(); }
 
 /**
  * Returns the action names for this star.

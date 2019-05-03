@@ -87,6 +87,17 @@ public Star getStar()
 }
 
 /**
+ * Sets the Star.
+ */
+public void setStar(Star aStar)
+{
+    String words[] = getWords();
+    String text = aStar.getStarName();
+    for(int i=1;i<words.length;i++) text += ' ' + words[i];
+    getScript().setLineText(text, getIndex());
+}
+
+/**
  * Returns the action.
  */
 public Action getAction()
@@ -99,6 +110,16 @@ public Action getAction()
     if(star.getStarImage()!=null && !star.getStarImage().isLoaded())
         addUnloadedImage(star.getStarImage());
     return _action = star.getAction(this);
+}
+
+/**
+ * Sets the action by name.
+ */
+public void setActionByName(String aName)
+{
+    Star star = getStar(); if(star==null) return;
+    String text = star.getStarName() + ' ' + aName;
+    getScript().setLineText(text, getIndex());
 }
 
 /**

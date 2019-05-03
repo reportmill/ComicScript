@@ -134,6 +134,17 @@ public void showScriptEditor()
 }
 
 /**
+ * Runs the current line.
+ */
+public void runCurrentLine()
+{
+    ScriptLine line = getScriptLine(); if(line==null) return;
+    int lineIndex = line.getIndex();
+    getPlayer().stop();
+    getPlayer().playLine(lineIndex);
+}
+
+/**
  * Updates the script.
  */
 protected void scriptChanged()
