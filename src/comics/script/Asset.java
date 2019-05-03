@@ -60,7 +60,7 @@ protected Image getImageImpl()
     WebURL url = WebURL.getURL(_urls);
     Image img = Image.get(url);
     
-    if(isNewGifAvailable(url)) {
+    if(!SnapUtils.isTeaVM && isNewGifAvailable(url)) {
         saveSpriteSheet(url);
         img = Image.get(url);
     }
