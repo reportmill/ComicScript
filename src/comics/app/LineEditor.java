@@ -164,7 +164,7 @@ class LinePartsView extends RowView {
     public LinePartsView()
     {
         setGrowWidth(true); setPrefHeight(40);
-        setPadding(5,5,5,5); setSpacing(8); //setFill(Color.WHITE); setBorder(Border.createLoweredBevelBorder());
+        setPadding(5,5,5,5); setSpacing(8);
         setFont(new Font("Arial", 15));
         enableEvents(MousePress, Action);
     }
@@ -173,7 +173,7 @@ class LinePartsView extends RowView {
     public void setLine(ScriptLine aLine)
     {
         // If already set, just return
-        //if(aLine==_line && aLine!=null) return;
+        if(aLine==_line && aLine!=null) return;
         _line = aLine;
         
         // Remove Children
