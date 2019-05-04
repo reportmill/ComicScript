@@ -10,23 +10,11 @@ import snap.viewx.TransitionPane;
  */
 public class EditorPane extends ViewOwner {
     
-    // The MenuBar
-    MenuBar           _menuBar;
-    
-    // The View that holds editor UI
-    ColView           _editorBox;
-    
     // The PlayerPane
     PlayerPane        _playerPane;
     
-    // The View that holds PlayerView
-    View              _playerBox;
-    
     // The PlayerView
     PlayerView        _player;
-    
-    // TransitionPane
-    TransitionPane    _transPane;
     
     // The ScriptEditor
     ScriptEditor      _scriptEditor = new ScriptEditor(this);
@@ -34,13 +22,15 @@ public class EditorPane extends ViewOwner {
     // The LineEditor
     LineEditor        _lineEditor = new LineEditor(this);
     
+    // TransitionPane
+    TransitionPane    _transPane;
+    
 /**
  * Creates an EditorPane.
  */
 public EditorPane(PlayerPane aPlayerPane)
 {
     _playerPane = aPlayerPane;
-    _playerBox = _playerPane._playerBox;
     _player = aPlayerPane.getPlayer();
     
     // Show editor
@@ -57,7 +47,7 @@ public void showEditor()
     win.setContent(getUI());
 
     // Configure PlayerBox
-    _playerBox.setPadding(20,20,20,20);
+    _playerPane._playerBox.setPadding(20,20,20,20);
     
     // Configure Player
     _player.setEffect(new ShadowEffect().copySimple());
@@ -86,10 +76,9 @@ public void showEditor()
 public void closeEditor()
 {
     _playerPane.getWindow().setContent(_playerPane.getUI());
-    _playerBox.setPadding(0,0,0,0);
-    ((ChildView)_playerBox).removeChild(_playerPane.getView("CloseButton"));
-    _player.setEffect(null);
-    _player._editorPane = null;
+    _playerPane._playerBox.setPadding(0,0,0,0);
+    _playerPane._playerBox.removeChild(_playerPane.getView("CloseButton"));
+    _player.setEffect(null); _player._editorPane = null;
     _playerPane.getWindow().setMaximized(false);
 }
 
@@ -160,14 +149,14 @@ protected void scriptChanged()
  */
 protected View createUI()
 {
-    // Create TransPane
+    // Create box to hold editor
+    ColView editorBox = new ColView(); editorBox.setPadding(4,4,4,4); editorBox.setFont(Font.Arial14);
+    editorBox.setGrowHeight(true); editorBox.setFillWidth(true); editorBox.setPrefHeight(400);
+    
+    // Create TransPane to swap ScriptEditor/LineEditor and make content of EditorBox
     _transPane = new TransitionPane(); _transPane.setGrowHeight(true); //_transPane.setBorder(Color.PINK,1);
     _transPane.setContent(_scriptEditor.getUI());
-    
-    //<ColView Padding="8,4,4,4" GrowHeight="true" FillWidth="true" Title="Cast" />
-    _editorBox = new ColView(); _editorBox.setPadding(4,4,4,4); _editorBox.setFont(Font.Arial14);
-    _editorBox.setGrowHeight(true); _editorBox.setFillWidth(true); _editorBox.setPrefHeight(400);
-    _editorBox.addChild(_transPane);
+    editorBox.addChild(_transPane);
     
     // Add close button
     Image img = Image.get(getClass(), "Close.png");
@@ -175,17 +164,18 @@ protected View createUI()
     closeBtn.setLean(Pos.TOP_RIGHT); closeBtn.setPadding(2,2,0,0); closeBtn.setManaged(false);
     closeBtn.setSize(20+2, 20+2);
     enableEvents(closeBtn, MouseRelease);
-    ((ChildView)_playerBox).addChild(closeBtn);
+    _playerPane._playerBox.addChild(closeBtn);
     
-    //<ColView PrefWidth="800" Spacing="5" FillWidth="true"> ColView colView = (ColView)super.createUI();
+    // Create MainColView to hold Player and Editor
     ColView colView = new ColView(); colView.setPrefWidth(800); colView.setSpacing(5); colView.setFillWidth(true);
-    colView.addChild(_playerBox);
-    colView.addChild(_editorBox);
+    colView.addChild(_playerPane._playerBox);
+    colView.addChild(editorBox);
     
-    // Return in SplitView
+    // Create SplitView from MainColView to separate Player/Editor
     SplitView splitView = SplitView.makeSplitView(colView);
     splitView.getDivider(0).setPrefSpan(10);
     
+    // Create MenuBar and wrap MenuBar and SplitView - return that view
     MenuBar mbar = getMenuBar(); mbar.setFont(Font.Arial14);
     View mbarView = MenuBar.createMenuBarView(mbar, splitView);
     return mbarView;
