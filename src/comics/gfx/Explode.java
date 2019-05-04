@@ -1,4 +1,4 @@
-package comics.app;
+package comics.gfx;
 import java.util.Random;
 import snap.gfx.*;
 import snap.view.*;
