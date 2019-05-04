@@ -8,8 +8,8 @@ import snap.view.*;
  */
 public class ActionEditor extends ViewOwner {
 
-    // The ScriptLineEditor
-    ScriptLineEditor   _lineEditor;
+    // The LineEditor
+    LineEditor         _lineEditor;
 
     // The ListView
     ListView <String>  _actionListView;
@@ -17,7 +17,7 @@ public class ActionEditor extends ViewOwner {
 /**
  * Creates ActionEditor.
  */
-public ActionEditor(ScriptLineEditor aLE)
+public ActionEditor(LineEditor aLE)
 {
     _lineEditor = aLE;
 }

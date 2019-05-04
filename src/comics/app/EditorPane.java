@@ -31,8 +31,8 @@ public class EditorPane extends ViewOwner {
     // The ScriptEditor
     ScriptEditor      _scriptEditor = new ScriptEditor(this);
     
-    // The ScriptLineEditor
-    ScriptLineEditor  _lineEditor = new ScriptLineEditor(this);
+    // The LineEditor
+    LineEditor        _lineEditor = new LineEditor(this);
     
 /**
  * Creates an EditorPane.

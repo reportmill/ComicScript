@@ -5,9 +5,9 @@ import snap.view.*;
 import snap.viewx.TransitionPane;
 
 /**
- * A class to manage UI editing of a line.
+ * A class to manage UI editing of a ScriptLine.
  */
-public class ScriptLineEditor extends ViewOwner {
+public class LineEditor extends ViewOwner {
     
     // The EditorPane
     EditorPane         _editorPane;
@@ -32,9 +32,9 @@ public class ScriptLineEditor extends ViewOwner {
     static Effect   SELECT_EFFECT_FOC = new ShadowEffect(8, SELECT_COLOR, 0, 0);
 
 /**
- * Creates a ScriptLineEditor.
+ * Creates a LineEditor.
  */
-public ScriptLineEditor(EditorPane anEP)
+public LineEditor(EditorPane anEP)
 {
     _editorPane = anEP;
     _starPicker = new StarPicker(this);

@@ -8,8 +8,8 @@ import snap.view.*;
  */
 public class StarPicker extends ViewOwner {
     
-    // The ScriptLineEditor
-    ScriptLineEditor   _lineEditor;
+    // The LineEditor
+    LineEditor         _lineEditor;
 
     // The view to show list of stars in script
     StarListView       _starsView;
@@ -17,7 +17,7 @@ public class StarPicker extends ViewOwner {
 /**
  * Creates StarPicker.
  */
-public StarPicker(ScriptLineEditor aLE)
+public StarPicker(LineEditor aLE)
 {
     _lineEditor = aLE;
 }
