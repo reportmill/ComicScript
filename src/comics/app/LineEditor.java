@@ -173,7 +173,7 @@ class LinePartsView extends RowView {
     public void setLine(ScriptLine aLine)
     {
         // If already set, just return
-        if(aLine==_line && aLine!=null) return;
+        //if(aLine==_line && aLine!=null) return;
         _line = aLine;
         
         // Remove Children
