@@ -1,6 +1,7 @@
 package comics.app;
 import comics.script.*;
 import snap.gfx.*;
+import snap.util.PropChangeListener;
 import snap.util.SnapUtils;
 import snap.view.*;
 import snap.viewx.TransitionPane;
@@ -11,25 +12,35 @@ import snap.viewx.TransitionPane;
 public class EditorPane extends ViewOwner {
     
     // The PlayerPane
-    PlayerPane        _playerPane;
+    PlayerPane          _playerPane;
     
     // The PlayerView
-    PlayerView        _player;
+    PlayerView          _player;
+    
+    // The index of selected script line (can be negative in editor to indicate insertion point)
+    int                 _selIndex;
     
     // The ScriptEditor
-    ScriptEditor      _scriptEditor = new ScriptEditor(this);
+    ScriptEditor        _scriptEditor = new ScriptEditor(this);
     
     // The LineEditor
-    LineEditor        _lineEditor = new LineEditor(this);
+    LineEditor          _lineEditor = new LineEditor(this);
     
     // TransitionPane
-    TransitionPane    _transPane;
+    TransitionPane      _transPane;
+    
+    // PropChangeListener to update when player updates
+    PropChangeListener  _pcLsnr = pc -> playerRunLineChanged();
+    
+    // Indicates to EditorPane whether Player RunLine Change originated from editor
+    boolean             _changingSelIndex;
     
 /**
  * Creates an EditorPane.
  */
 public EditorPane(PlayerPane aPlayerPane)
 {
+    // Set Player, PlayerPane
     _playerPane = aPlayerPane;
     _player = aPlayerPane.getPlayer();
     
@@ -68,6 +79,9 @@ public void showEditor()
     // Notify scriptChanged and reset UI
     scriptChanged();
     resetLater();
+    
+    // Start listening to player changes
+    _player.addPropChangeListener(pc -> playerRunLineChanged(), PlayerView.RunLine_Prop);
 }
 
 /**
@@ -93,13 +107,92 @@ public PlayerView getPlayer()  { return _player; }
 public Script getScript()  { return _player.getScript(); }
 
 /**
- * Returns the ScriptLine.
+ * Returns the index of selected script line (can be negative in editor to indicate insertion point).
  */
-public ScriptLine getScriptLine()
+public int getSelIndex()  { return _selIndex; }
+
+/**
+ * Sets the index of selected script line.
+ */
+public void setSelIndex(int anIndex)
 {
-    Script script = getScript();
-    int index = _player.getRunLine();
-    return script.getLine(index);
+    // If already set, just return
+    if(anIndex==_selIndex) return;
+    
+    // Set SelIndex and update player
+    _selIndex = anIndex;
+    int ind = _selIndex>=0? _selIndex : negateIndex(_selIndex);
+    _changingSelIndex = true;
+    getPlayer().setRunLine(ind); _changingSelIndex = false;
+}
+
+/**
+ * Returns the selected ScriptLine.
+ */
+public ScriptLine getSelLine()
+{
+    int ind = getSelIndex(); if(ind<0) return null;
+    return getScript().getLine(ind);
+}
+
+/**
+ * Selects previous line.
+ */
+public void selectPrev()
+{
+    int ind = getSelIndex(); if(ind<0) ind = negateIndex(ind);
+    if(ind==0) { beep(); return; }
+    setSelIndex(ind-1);
+}
+
+/**
+ * Selects next line.
+ */
+public void selectNext()
+{
+    int ind = getSelIndex(); if(ind<0) ind = negateIndex(ind);
+    if(ind+1>=getScript().getLineCount()) { beep(); return; }
+    setSelIndex(ind+1);
+}
+
+/**
+ * Selects next line.
+ */
+public void selectNextWithInsert()
+{
+    int ind = getSelIndex();
+    if(ind<0) { ind = negateIndex(ind); if(ind>=getScript().getLineCount()) ind = 0; }
+    else ind = negateIndex(ind) - 1;
+    setSelIndex(ind);
+}
+
+/**
+ * Adds a ScriptLine for given string at given index.
+ */
+public void addLineText(String aStr, int anIndex)
+{
+    getScript().addLineText(aStr, anIndex);
+    setSelIndex(anIndex);
+}
+
+/**
+ * Sets ScriptLine text to given string at given index.
+ */
+public void setLineText(String aStr, int anIndex)
+{
+    getScript().setLineText(aStr, anIndex);
+}
+
+/**
+ * Deletes the current selected line.
+ */
+public void delete()
+{
+    int ind = getSelIndex(); if(ind<0) { selectPrev(); return; }
+    setLineText("", ind);
+    if(ind<getScript().getLineCount())
+        selectPrev();
+    else runCurrentLine();
 }
 
 /**
@@ -127,10 +220,9 @@ public void showScriptEditor()
  */
 public void runCurrentLine()
 {
-    ScriptLine line = getScriptLine(); if(line==null) return;
-    int lineIndex = line.getIndex();
+    if(getSelIndex()<0) return;
     getPlayer().stop();
-    getPlayer().playLine(lineIndex);
+    getPlayer().playLine();
 }
 
 /**
@@ -142,6 +234,17 @@ protected void scriptChanged()
         _scriptEditor.scriptChanged();
     if(_lineEditor.isUISet())
         _lineEditor.scriptChanged();
+}
+
+/**
+ * Called when PlayerView.RunLine changes.
+ */
+void playerRunLineChanged()
+{
+    if(!_changingSelIndex) {
+        setSelIndex(getPlayer().getRunLine());
+        resetLater();
+    }
 }
 
 /**
@@ -231,6 +334,15 @@ protected MenuBar getMenuBar()
     MenuBar mbar = new MenuBar();
     mbar.addMenu(appMenu); mbar.addMenu(fileMenu); mbar.addMenu(editMenu);
     return mbar;
+}
+
+/**
+ * Negates an index.
+ */
+public static int negateIndex(int anIndex)
+{
+    if(anIndex>=0) return -anIndex - 1;
+    return -(anIndex + 1);
 }
 
 }

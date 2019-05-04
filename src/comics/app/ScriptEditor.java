@@ -24,7 +24,8 @@ public class ScriptEditor extends ViewOwner {
     int                  _scriptLineCount;
     
     // Constants
-    String _stars[] = { "Setting", "Camera", "Lady", "Man", "Car", "Cat", "Dog", "Trump", "Obama", "Duke" };
+    static Color INPUTTEXT_SEL_COLOR = new Color("#CDECF6");
+    static String _stars[] = { "Setting", "Camera", "Lady", "Man", "Car", "Cat", "Dog", "Trump", "Obama", "Duke" };
     
 /**
  * Creates a ScriptEditor.
@@ -47,33 +48,17 @@ public Script getScript()  { return _editorPane.getScript(); }
 /**
  * Adds a ScriptLine for given string at given index.
  */
-public void addLineText(String aStr, int anIndex)
-{
-    getScript().addLineText(aStr, anIndex);
-    scriptChanged();
-    _scriptView.setSelIndex(anIndex);
-}
+public void addLineText(String aStr, int anIndex)  { _editorPane.addLineText(aStr, anIndex); }
 
 /**
  * Sets ScriptLine text to given string at given index.
  */
-public void setLineText(String aStr, int anIndex)
-{
-    getScript().setLineText(aStr, anIndex);
-    scriptChanged();
-}
+public void setLineText(String aStr, int anIndex)  { _editorPane.setLineText(aStr, anIndex); }
 
 /**
  * Deletes the current selected line.
  */
-public void delete()
-{
-    int ind = getSelIndex(); if(ind<0) { selectPrev(); return; }
-    setLineText("", ind);
-    if(ind<getScript().getLineCount())
-        selectPrev();
-    else runCurrentLine();
-}
+public void delete()  { _editorPane.delete(); }
 
 /**
  * Sets selected ScriptLine to text for given string at given index.
@@ -102,7 +87,7 @@ public void setLineText(String aStr)
             selectNext(); return; }
             
         // Add new line
-        ind = ScriptView.negateIndex(ind);
+        ind = EditorPane.negateIndex(ind);
         addLineText(str, ind);
     }
     runCurrentLine();
@@ -112,64 +97,37 @@ public void setLineText(String aStr)
 /**
  * Returns the selected ScriptLine index.
  */
-public int getSelIndex()  { return _scriptView.getSelIndex(); }
+public int getSelIndex()  { return _editorPane.getSelIndex(); }
 
 /**
  * Sets the selected ScriptLine index.
  */
-public void setSelIndex(int anIndex)
-{
-    _scriptView.setSelIndex(anIndex);
-    if(anIndex>=0)
-        runCurrentLine();
-}
+public void setSelIndex(int anIndex)  { _editorPane.setSelIndex(anIndex); } //if(anIndex>=0) runCurrentLine();
 
 /**
  * Returns the selected ScriptLine.
  */
-public ScriptLine getSelLine()  { return _scriptView.getSelLine(); }
+public ScriptLine getSelLine()  { return _editorPane.getSelLine(); }
 
 /**
  * Selects previous line.
  */
-public void selectPrev()
-{
-    int ind = getSelIndex(); if(ind<0) ind = ScriptView.negateIndex(ind);
-    if(ind==0) { beep(); return; }
-    setSelIndex(ind-1);
-}
+public void selectPrev()  { _editorPane.selectPrev(); }
 
 /**
  * Selects next line.
  */
-public void selectNext()
-{
-    int ind = getSelIndex(); if(ind<0) ind = ScriptView.negateIndex(ind);
-    if(ind+1>=getScript().getLineCount()) { beep(); return; }
-    setSelIndex(ind+1);
-}
+public void selectNext()  { _editorPane.selectNext(); }
 
 /**
  * Selects next line.
  */
-public void selectNextWithInsert()
-{
-    int ind = getSelIndex();
-    if(ind<0) { ind = ScriptView.negateIndex(ind); if(ind>=getScript().getLineCount()) ind = 0; }
-    else ind = ScriptView.negateIndex(ind) - 1;
-    setSelIndex(ind);
-}
+public void selectNextWithInsert()  { _editorPane.selectNextWithInsert(); }
 
 /**
  * Runs the current line.
  */
-public void runCurrentLine()
-{
-    // Run line at index
-    int lineIndex = getSelIndex(); if(lineIndex<0) lineIndex = ScriptView.negateIndex(lineIndex);
-    getPlayer().stop();
-    getPlayer().playLine(lineIndex);
-}
+public void runCurrentLine()  { _editorPane.runCurrentLine(); }
 
 /**
  * Called when Script text changes.
@@ -177,14 +135,6 @@ public void runCurrentLine()
 protected void scriptChanged()
 {
     _scriptView.scriptChanged();
-}
-
-/**
- * Called when PlayerView.RunLine changes.
- */
-void playerRunLineChanged()
-{
-    _scriptView.setSelIndex(getPlayer().getRunLine());
     resetLater();
 }
 
@@ -194,9 +144,9 @@ void playerRunLineChanged()
 void inputTextDidKeyPress(ViewEvent anEvent)
 {
     if(anEvent.isTabKey() && getScript().getLineCount()>0) {
-        int ind = getSelIndex(); if(ind<0) ind = ScriptView.negateIndex(ind);
+        int ind = getSelIndex(); if(ind<0) ind = EditorPane.negateIndex(ind);
         ind = (ind+1) % getScript().getLineCount();
-        _scriptView.setSelIndex(ind);
+        setSelIndex(ind);
         runCurrentLine();
     }
     
@@ -251,9 +201,6 @@ protected void initUI()
     _helpListView = getView("HelpListView", ListView.class);
     _helpListView.setFont(Font.Arial16);
     _helpListView.setFocusWhenPressed(false); _helpListView.getListArea().setFocusWhenPressed(false);
-    
-    // List for Player RunLine changes
-    getPlayer().addPropChangeListener(pc -> playerRunLineChanged(), PlayerView.RunLine_Prop);
 }
 
 /**
@@ -264,6 +211,9 @@ protected void resetUI()
     // Get seleccted ScriptLine and star
     ScriptLine line = getSelLine();
     Star star = line!=null? line.getStar() : null;
+    
+    // Update ScriptView
+    _scriptView.setSelIndex(getSelIndex());
     
     // Update HelpListView
     String helpItems[] = star!=null? star.getActionNames() : _stars;
@@ -294,6 +244,15 @@ protected void respondUI(ViewEvent anEvent)
     // Handle SamplesButton
     if(anEvent.equals("SamplesButton"))
         new SamplesPane().showSamples(_editorPane);
+        
+    // Handle ScriptView
+    if(anEvent.equals(_scriptView)) {
+        getPlayer().stop();
+        int ind = _scriptView.getSelIndex();
+        setSelIndex(ind);
+        if(ind>=0) runCurrentLine();
+        else _inputText.requestFocus();
+    }
     
     // Handle HelpListView
     if(anEvent.equals("HelpListView")) {
@@ -333,10 +292,9 @@ public static class ComicTextField extends TextField {
         super.paintSel(aPntr);
         if(!isFocused() && !isSelEmpty()) {
             Rect sbnds = getSelBounds();
-            aPntr.setPaint(_selColor); aPntr.fill(sbnds);
+            aPntr.setPaint(INPUTTEXT_SEL_COLOR); aPntr.fill(sbnds);
         }
     }
 }
-static Color _selColor = new Color("#CDECF6");
 
 }

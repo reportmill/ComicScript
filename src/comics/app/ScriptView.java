@@ -7,13 +7,10 @@ import snap.view.*;
 /**
  * A TextView class to show script with line markers.
  */
-public class ScriptView extends ParentView {
+public class ScriptView extends ColView {
     
     // The ScriptEditor
     ScriptEditor       _scriptEditor;
-    
-    // The Script
-    Script             _script;
     
     // The selected index
     int                _selIndex = -1;
@@ -25,7 +22,6 @@ public class ScriptView extends ParentView {
     LineView           _cursorLineView;
     
     // Constants
-    static int SPACING = 6;
     static Color LINEVIEW_FILL = new Color(.9d);
     static Color SELECT_COLOR = Color.get("#039ed3");
     static Effect SELECT_EFFECT = new ShadowEffect(8, Color.DARKGRAY, 0, 0);
@@ -38,23 +34,18 @@ public ScriptView(ScriptEditor aSE)
 {
     _scriptEditor = aSE;
 
-    setPadding(8,8,8,12);
+    setPadding(8,8,8,12); setSpacing(6);
     setGrowWidth(true); setGrowHeight(true);
     setFont(new Font("Arial", 15));
     setFill(Color.WHITE);
     setFocusable(true); setFocusWhenPressed(true); setFocusKeysEnabled(false);
-    enableEvents(MousePress, KeyPress);
+    enableEvents(MousePress, KeyPress, Action);
     
     // Configure CursorLineView
-    _cursorLineView = new LineView(new ScriptLine(getScript(),"")); _cursorLineView.setPrefSize(150,1);
+    _cursorLineView = new LineView(null); _cursorLineView.setPrefSize(150,1);
     _cursorLineView.setMargin(0,0,0,5);
     _cursorLineView.setFill(Color.LIGHTGRAY); _cursorLineView.setEffect(SELECT_EFFECT_FOC);
 }
-
-/**
- * Returns the script.
- */
-public Script getScript()  { return _script; }
 
 /**
  * Called when Script changes.
@@ -62,25 +53,19 @@ public Script getScript()  { return _script; }
 protected void scriptChanged()
 {
     // Set script
-    _script = _scriptEditor.getScript();
+    Script script = _scriptEditor.getScript();
     
     // Iterate over lines and add LineView for each
     removeChildren(); _lineViews.clear();
-    for(ScriptLine sline : _script.getLines()) {
+    for(ScriptLine sline : script.getLines()) {
         LineView lview = new LineView(sline);
         addChild(lview); _lineViews.add(lview);
     }
     addChild(_cursorLineView);
     
     // Reset SelIndex
-    int ind = _scriptEditor.getPlayer().getRunLine();
-    _selIndex = -1; setSelIndex(ind);
+    _selIndex = -1;
 }
-
-/**
- * Returns the line count.
- */
-public int getLineCount()  { return _script.getLineCount(); }
 
 /**
  * Returns the selected index.
@@ -93,8 +78,7 @@ public int getSelIndex()  { return _selIndex; }
 public void setSelIndex(int anIndex)
 {
     // If already set or too high, just return
-    if(anIndex==_selIndex) return;
-    if(anIndex>=getChildCount()) return;
+    if(anIndex==_selIndex || anIndex>=getChildCount()) return;
     
     // Undecorate last selected LineView
     LineView oldSelLV = getSelLineView(); if(oldSelLV!=null) oldSelLV.setEffect(null);
@@ -109,48 +93,19 @@ public void setSelIndex(int anIndex)
         ViewUtils.runLater(() -> scrollToVisible(selLineView.getBoundsParent().getInsetRect(-5)));
     }
     
-    // Reset ScriptEditor
-    _scriptEditor.resetLater();
-        
     // Add/remove CursorLineView
     if(_selIndex<0) {
-        int ind0 = indexOfChild(_cursorLineView), ind1 = negateIndex(_selIndex);
+        int ind0 = indexOfChild(_cursorLineView), ind1 = EditorPane.negateIndex(_selIndex);
         if(ind1<ind0) addChild(_cursorLineView, ind1);
         else if(ind1>ind0) { removeChild(_cursorLineView); addChild(_cursorLineView, ind1); }
         ViewUtils.runLater(() -> scrollToVisible(_cursorLineView.getBoundsParent().getInsetRect(-5)));
     }
     _cursorLineView.setVisible(_selIndex<0);
+    repaint();
 }
 
-/**
- * Returns the selected ScriptLine.
- */
-public ScriptLine getSelLine()  { return _selIndex>=0? getScript().getLine(_selIndex) : null; }
-
-/**
- * Returns the selected index.
- */
-LineView getLineView(int anIndex)  { return _lineViews.get(anIndex); }
-
-/**
- * Returns the selected index.
- */
-LineView getSelLineView()  { return _selIndex>=0? getLineView(_selIndex) : null; }
-
-/**
- * Returns the preferred width.
- */
-protected double getPrefWidthImpl(double aH)  { return ColView.getPrefWidth(this, null, aH); }
-
-/**
- * Returns the preferred height.
- */
-protected double getPrefHeightImpl(double aW)  { return ColView.getPrefHeight(this, null, SPACING, aW); }
-
-/**
- * Layout children.
- */
-protected void layoutImpl()  { ColView.layout(this, null, null, false, SPACING); }
+/** Returns the selected index. */
+LineView getSelLineView()  { return _selIndex>=0? _lineViews.get(_selIndex) : null; }
 
 /**
  * Handle Events.
@@ -159,24 +114,19 @@ protected void processEvent(ViewEvent anEvent)
 {
     // Handle MousePress: Select negative index to trigger insert mode
     if(anEvent.isMousePress()) {
-        int index = 0; for(LineView lview : _lineViews) { if(lview.getY()+5>anEvent.getY()) break; index++; }
-        index = negateIndex(index);
-        setSelIndex(index);
-        _scriptEditor._inputText.requestFocus();
+        int ind = 0; for(LineView lview : _lineViews) { if(lview.getY()+5>anEvent.getY()) break; ind++; }
+        ind = EditorPane.negateIndex(ind);
+        setSelIndex(ind);
+        fireActionEvent(anEvent); anEvent.consume();
     }
     
     // Handle KeyPress
     else if(anEvent.isKeyPress()) {
         
-        // Handle Delete and BackSpaceKey: Delete current line
-        if(anEvent.isDeleteKey() || anEvent.isBackSpaceKey())
-            _scriptEditor.delete();
-            
-        // Handle Up/Down arrow
-        else if(anEvent.isUpArrow())
-            _scriptEditor.selectPrev();
-        else if(anEvent.isDownArrow())
-            _scriptEditor.selectNext();
+        // Handle Delete, BackSpaceKey, Up/Down arrow
+        if(anEvent.isDeleteKey() || anEvent.isBackSpaceKey()) _scriptEditor.delete();
+        else if(anEvent.isUpArrow()) _scriptEditor.selectPrev();
+        else if(anEvent.isDownArrow()) _scriptEditor.selectNext();
             
         // Handle tab key
         else if(anEvent.isTabKey()) {
@@ -203,19 +153,13 @@ protected void processEvent(ViewEvent anEvent)
     }
 }
 
-/**
- * Returns the Select effect.
- */
+/** Returns the Select effect. */
 Effect getSelEffect()  { return isFocused()? SELECT_EFFECT_FOC : SELECT_EFFECT; }
 
-/**
- * Override to reset Select effect.
- */
+/** Override to reset Select effect. */
 protected void setFocused(boolean aValue)
 {
-    // If already set, just return
     if(aValue==isFocused()) return; super.setFocused(aValue);
-    
     for(View child : _lineViews) if(child.getEffect()!=null) child.setEffect(getSelEffect());
 }
 
@@ -224,16 +168,11 @@ protected void setFocused(boolean aValue)
  */
 private class LineView extends Label {
     
-    // The ScriptLine
-    ScriptLine  _line;
-    
     /** Create LineView. */
     public LineView(ScriptLine aLine)
     {
-        _line = aLine;
-        setText(aLine.getText());
         setPadding(5,10,5,10); setRadius(10);
-        setFont(ScriptView.this.getFont());
+        if(aLine!=null) setText(aLine.getText()); setFont(ScriptView.this.getFont());
         setFill(LINEVIEW_FILL);
         enableEvents(MousePress);
     }
@@ -249,34 +188,18 @@ private class LineView extends Label {
             
             // Handle single-click
             if(anEvent.getClickCount()==1) {
-                _scriptEditor.getPlayer().stop();
                 int ind = _lineViews.indexOf(this);
-                _scriptEditor.setSelIndex(ind);
+                setSelIndex(ind);
+                ScriptView.this.fireActionEvent(anEvent);
             }
             
             // Handle multi-click
-            else {
-                //_scriptEditor._inputText.requestFocus();
-                //_scriptEditor._inputText.selectAll();
-                _scriptEditor._editorPane.showLineEditor();
-            }
+            else _scriptEditor._editorPane.showLineEditor();
             
             // Consume event
             anEvent.consume();
         }
     }
-    
-    /** Override to fix paint problem. */
-    public void setEffect(Effect anEff)  { super.setEffect(anEff); repaint(-10,-10,getWidth()+20,getHeight()+20); }
-}
-
-/**
- * Negates an index.
- */
-public static int negateIndex(int anIndex)
-{
-    if(anIndex>=0) return -anIndex - 1;
-    return -(anIndex + 1);
 }
 
 }

@@ -54,7 +54,7 @@ public Script getScript()  { return _editorPane.getScript(); }
 /**
  * Returns the current ScriptLine.
  */
-public ScriptLine getSelLine()  { return _editorPane.getScriptLine(); }
+public ScriptLine getSelLine()  { return _editorPane.getSelLine(); }
 
 /**
  * Sets the StarPicker.
@@ -96,8 +96,6 @@ protected View createUI()
     // Get/configure ToolBar
     RowView toolBar = (RowView)mainColView.getChild(0);
     Label toolBarLabel = (Label)toolBar.getChild("ToolBarLabel"); toolBarLabel.setFont(MAIN_FONT.getBold());
-    TextField text = (TextField)toolBar.getChild("LineText"); text.setFont(MAIN_FONT);
-    text.setVisible(false); //setFirstFocus(text);
     
     // Create LinePartsView
     _linePartsView = new LinePartsView();
@@ -125,10 +123,8 @@ protected void resetUI()
 {
     // Get selected script line and star
     ScriptLine line = getSelLine();
-    Star star = line.getStar(); if(star==null) return;
     
-    // Update LineText, LinePartsView
-    setViewText("LineText", line.getText());
+    // Update LinePartsView
     _linePartsView.setLine(line);
     
     // Reset StarPicker/ActionEditor
@@ -177,26 +173,28 @@ class LinePartsView extends RowView {
     public void setLine(ScriptLine aLine)
     {
         // If already set, just return
-        if(aLine==_line) return;
+        if(aLine==_line && aLine!=null) return;
         _line = aLine;
         
         // Remove Children
         removeChildren();
         
         // Add Star part
-        Star star = aLine.getStar();
-        LinePartView starView = new LinePartView(star.getStarName());
+        Star star = aLine!=null? aLine.getStar() : null;
+        String starName = star!=null? star.getStarName() : "?";
+        LinePartView starView = new LinePartView(starName);
         starView.setEffect(SELECT_EFFECT_FOC);
         addChild(starView);
         setSelIndex(0);
         
         // Add Action part
-        Action action = _line.getAction(); if(action==null) return;
-        LinePartView actView = new LinePartView(action.getNameUsed().toLowerCase());
+        Action action = aLine!=null? aLine.getAction() : null;
+        String actionName = action!=null? action.getNameUsed().toLowerCase() : "?";
+        LinePartView actView = new LinePartView(actionName);
         addChild(actView);
 
         // Add Action predicate
-        String predText = action.getText();
+        String predText = action!=null? action.getText() : "";
         if(predText.length()>0) {
             LinePartView predView = new LinePartView(predText);
             addChild(predView);

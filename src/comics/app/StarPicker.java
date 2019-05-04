@@ -89,7 +89,7 @@ protected void resetUI()
 {
     // Get current ScriptLine and Star
     ScriptLine line = getSelLine();
-    Star star = line.getStar();
+    Star star = line!=null? line.getStar() : null;
     
     // Update StarListView
     _starsView.setSelStar(star);
