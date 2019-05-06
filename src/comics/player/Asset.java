@@ -30,7 +30,7 @@ public class Asset {
 public Asset(Map aMap)
 {
     _name = (String)aMap.get("Name"); _nameLC = _name.toLowerCase();
-    _path = (String)aMap.get("File");
+    _path = '/' + (String)aMap.get("File");
     _urls = ROOT + "actors/" + _path;
     
     Number hnum = (Number)aMap.get("Height");
@@ -46,6 +46,11 @@ public String getName()  { return _name; }
  * Returns the full name.
  */
 public String getNameLC()  { return _nameLC; }
+
+/**
+ * Returns the path.
+ */
+public String getPath()  { return _path; }
 
 /**
  * Returns the image.
@@ -94,7 +99,7 @@ public String toString()
 public static class ActorImage extends Asset {
 
     /** Creates a new ActorImage for map. */
-    public ActorImage(Map aMap)  { super(aMap); _urls = ROOT + "actors/" + _path; }
+    public ActorImage(Map aMap)  { super(aMap); _urls = ROOT + "actors" + _path; }
 }
 
 /**
@@ -110,7 +115,7 @@ public static class AnimImage extends Asset {
     /** Creates a new AnimImage for map. */
     public AnimImage(Map aMap)
     {
-        super(aMap); _urls = ROOT + "actors/" + _path;
+        super(aMap); _urls = ROOT + "actors" + _path;
         _frameCount = SnapUtils.intValue(aMap.get("FrameCount"));
         _offsetX = SnapUtils.doubleValue(aMap.get("Offset"));
     }
@@ -131,10 +136,10 @@ public static class AnimImage extends Asset {
 /**
  * An Asset subclass to manage setting entries.
  */
-public static class SettingImage extends Asset {
+public static class SetImage extends Asset {
 
-    /** Creates a new SettingImage for map. */
-    public SettingImage(Map aMap)  { super(aMap); _urls = ROOT + "settings/" + _path; }
+    /** Creates a new SetImage for map. */
+    public SetImage(Map aMap)  { super(aMap); _urls = ROOT + "settings" + _path; }
 }
 
 private static boolean isNewGifAvailable(WebURL aURL)
@@ -175,10 +180,10 @@ private static void saveSpriteSheet(WebURL aURL)
 /**
  * Returns an anim asset for name.
  */
-public static AnimImage getAnimImageAsset(String aStarName, String anAnimName)
+public static AnimImage getAnimAsset(String aStarName, String anAnimName)
 {
     String name = FilePathUtils.getFileNameSimple(aStarName);
-    return AssetIndex.get().getAnim(name, anAnimName);
+    return AssetIndex.get().getAnimAsset(name, anAnimName);
 }
 
 }

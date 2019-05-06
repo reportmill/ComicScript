@@ -9,6 +9,9 @@ import comics.player.Asset.*;
  * A class to manage animation assets (images).
  */
 public class AssetIndex {
+    
+    // All Assets
+    List <Asset>         _assets;
 
     // The actors
     List <ActorImage>    _actors;
@@ -17,7 +20,7 @@ public class AssetIndex {
     List <AnimImage>     _anims;
     
     // The settings
-    List <SettingImage>  _settings;
+    List <SetImage>      _sets;
     
     // The root path
     static String ROOT = "/Temp/ComicLib/";
@@ -40,25 +43,36 @@ public AssetIndex()
     JSONNode settings = root.getNode("Settings");
     
     // Get Actors
-    _actors = new ArrayList();
+    _assets = new ArrayList(); _actors = new ArrayList();
     for(int i=0;i<actors.getNodeCount();i++) { Map map = actors.getNode(i).getAsMap();
-        _actors.add(new ActorImage(map)); }
+        addAsset(new ActorImage(map)); }
     
     // Get Anims
     _anims = new ArrayList();
     for(int i=0;i<anims.getNodeCount();i++) { Map map = anims.getNode(i).getAsMap();
-        _anims.add(new AnimImage(map)); }
+        addAsset(new AnimImage(map)); }
     
     // Get Settings
-    _settings = new ArrayList();
+    _sets = new ArrayList();
     for(int i=0;i<settings.getNodeCount();i++) { Map map = settings.getNode(i).getAsMap();
-        _settings.add(new SettingImage(map)); }
+        addAsset(new SetImage(map)); }
+}
+
+/**
+ * Adds a new Asset
+ */
+void addAsset(Asset aAsset)
+{
+    _assets.add(aAsset);
+    if(aAsset instanceof ActorImage) _actors.add((ActorImage)aAsset);
+    else if(aAsset instanceof AnimImage) _anims.add((AnimImage)aAsset);
+    else if(aAsset instanceof SetImage) _sets.add((SetImage)aAsset);
 }
 
 /**
  * Returns the actor image asset for given name.
  */
-public ActorImage getActor(String aName)
+public ActorImage getActorAsset(String aName)
 {
     String name = aName.toLowerCase();
     for(ActorImage asset : _actors) { if(name.equals(asset.getNameLC()))
@@ -71,14 +85,14 @@ public ActorImage getActor(String aName)
  */
 public Image getActorImage(String aName)
 {
-    ActorImage asset = getActor(aName); if(asset==null) return null;
+    ActorImage asset = getActorAsset(aName); if(asset==null) return null;
     return asset.getImage();
 }
 
 /**
  * Returns the anim with given actor and anim.
  */
-public AnimImage getAnim(String anActor, String anAnim)
+public AnimImage getAnimAsset(String anActor, String anAnim)
 {
     String name = anActor.toLowerCase() + '-' + anAnim.toLowerCase();
     for(AnimImage asset : _anims) { if(name.equals(asset.getNameLC()))
@@ -91,17 +105,17 @@ public AnimImage getAnim(String anActor, String anAnim)
  */
 public Image getAnimImage(String anActor, String anAnim)
 {
-    AnimImage asset = getAnim(anActor, anAnim); if(asset==null) return null;
+    AnimImage asset = getAnimAsset(anActor, anAnim); if(asset==null) return null;
     return asset.getImage();
 }
 
 /**
  * Returns the setting image asset for given name.
  */
-public SettingImage getSetting(String aName)
+public SetImage getSetAsset(String aName)
 {
     String name = aName.toLowerCase();
-    for(SettingImage asset : _settings) { if(name.equals(asset.getNameLC()))
+    for(SetImage asset : _sets) { if(name.equals(asset.getNameLC()))
             return asset; }
     return null;
 }
@@ -109,10 +123,27 @@ public SettingImage getSetting(String aName)
 /**
  * Returns the setting image for name.
  */
-public Image getSettingImage(String aName)
+public Image getSetImage(String aName)
 {
-    SettingImage asset = getSetting(aName); if(asset==null) return null;
+    SetImage asset = getSetAsset(aName); if(asset==null) return null;
     return asset.getImage();
+}
+
+/**
+ * Returns the paths for given directory.
+ */
+public String[] getDirPaths(String aPath)
+{
+    List <String> paths = new ArrayList();
+    String path = aPath; if(!path.endsWith("/")) path += '/';
+    for(Asset as : _actors) { String p = as.getPath();
+        if(p.startsWith(path)) {
+            int ind = p.indexOf('/', path.length());
+            if(ind>0) p = p.substring(0, ind+1);
+            if(!paths.contains(p)) paths.add(p);
+        }
+    }
+    return paths.toArray(new String[paths.size()]);
 }
 
 /**

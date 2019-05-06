@@ -21,7 +21,7 @@ public void loadAnim(String anAnimName)
 {
     Actor star = getStar();
     String starName = star.getStarName();
-    Asset.AnimImage asset = Asset.getAnimImageAsset(starName, anAnimName);
+    Asset.AnimImage asset = Asset.getAnimAsset(starName, anAnimName);
     if(asset!=null && !asset.isImageLoaded())
         _line.addUnloadedImage(asset.getImage());
 }
@@ -220,7 +220,7 @@ public static class ExplodesAction extends ActorAction {
 public static class DanceAction extends ActorAction {
     
     /** Creates the action. */
-    public DanceAction()  { setName("Dance"); setRunTime(3000); }
+    public DanceAction()  { setName("Dances"); setRunTime(3000); }
     
     /** Override to load image. */
     public void load()  { loadAnim("Dance"); }

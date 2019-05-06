@@ -2,6 +2,8 @@ package comics.app;
 import comics.player.*;
 import java.util.*;
 import snap.gfx.*;
+import snap.util.FilePathUtils;
+import snap.util.StringUtils;
 import snap.view.*;
 
 /**
@@ -10,10 +12,13 @@ import snap.view.*;
 public class StarPicker extends ViewOwner {
     
     // The LineEditor
-    LineEditor         _lineEditor;
+    LineEditor            _lineEditor;
 
     // The view to show list of stars in script
-    StarListView       _starsView;
+    StarListView          _starsView;
+    
+    // The stars browser
+    BrowserView <String>  _starsBrowser;
     
     // Constants
     static Color    SELECT_COLOR = Color.get("#039ed3");
@@ -85,6 +90,11 @@ protected void initUI()
 {
     // Configure StarsView
     setStarsForPlayer(_lineEditor.getPlayer());
+    
+    // Get StarsBrowser
+    _starsBrowser = getView("StarsBrowser", BrowserView.class); _starsBrowser.setRowHeight(24);
+    _starsBrowser.setResolver(new StarTreeResolver());
+    _starsBrowser.setItems(AssetIndex.get().getDirPaths("/"));
 }
 
 /**
@@ -269,6 +279,31 @@ private class StarView extends ImageView {
         if(anEvent.isMouseEnter() || anEvent.isMouseExit()) repaint();
         anEvent.consume();
     }
+}
+
+/**
+ * A TreeResolver for WebFile
+ */
+public static class StarTreeResolver extends TreeResolver <String> {
+
+    /** Returns the parent of given item. */
+    public String getParent(String anItem)  { return anItem.length()>1? FilePathUtils.getParent(anItem) : null; }
+    
+    // Return whether file is directory
+    public boolean isParent(String anItem)  { return anItem.endsWith("/"); }
+
+    // Return child files
+    public String[] getChildren(String aPar)  { return AssetIndex.get().getDirPaths(aPar); }
+
+    // Return child file name
+    public String getText(String anItem)
+    {
+        String name = FilePathUtils.getFileNameSimple(anItem);
+        return StringUtils.firstCharUpperCase(name);
+    }
+
+    // Return child file icon
+    public Image getImage(String anItem)  { return null; }
 }
 
 }

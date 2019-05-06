@@ -289,8 +289,8 @@ public Asset getNextAsset(String theWords[], int aStart)
     for(int i=aStart+1;i<theWords.length;i++) { String word = theWords[i];
         
         // Look for actor/setting
-        Asset asset = AssetIndex.get().getActor(word);
-        if(asset==null) asset = AssetIndex.get().getSetting(word);
+        Asset asset = AssetIndex.get().getActorAsset(word);
+        if(asset==null) asset = AssetIndex.get().getSetAsset(word);
         
         // Get file from URL and load image
         if(asset!=null)

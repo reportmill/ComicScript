@@ -7,6 +7,6 @@
     <Label text="All Stars:" />
   </RowView>
   <RowView Padding="0" GrowWidth="true" GrowHeight="true" Spacing="4">
-    <BrowserView MinWidth="120" MinHeight="60" GrowWidth="true" GrowHeight="true" />
+    <BrowserView Name="StarsBrowser" MinWidth="120" MinHeight="60" GrowWidth="true" GrowHeight="true" />
   </RowView>
 </ColView>

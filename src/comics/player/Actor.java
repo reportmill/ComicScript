@@ -137,7 +137,7 @@ public void setAnimImage(String aName, int aTime, int aFrame)
 {
     // Get image for name and cache old image
     String starName = getStarName();
-    AnimImage anim = Asset.getAnimImageAsset(starName, aName);
+    AnimImage anim = Asset.getAnimAsset(starName, aName);
     if(anim==null || !anim.isImageLoaded()) return;
     
     // Get old offset and set image and size
