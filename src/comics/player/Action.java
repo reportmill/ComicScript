@@ -1,4 +1,4 @@
-package comics.script;
+package comics.player;
 
 /**
  * A class to manage an action for a star.

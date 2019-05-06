@@ -1,4 +1,4 @@
-package comics.script;
+package comics.player;
 import snap.gfx.Image;
 
 /**

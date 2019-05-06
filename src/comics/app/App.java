@@ -1,4 +1,5 @@
 package comics.app;
+import comics.player.*;
 import org.teavm.jso.JSBody;
 import snap.util.SnapUtils;
 

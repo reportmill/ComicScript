@@ -1,5 +1,5 @@
 package comics.app;
-import comics.script.*;
+import comics.player.*;
 import snap.gfx.Font;
 import snap.view.*;
 

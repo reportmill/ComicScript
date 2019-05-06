@@ -1,4 +1,4 @@
-package comics.app;
+package comics.player;
 import snap.gfx.Color;
 import snap.view.ChildView;
 

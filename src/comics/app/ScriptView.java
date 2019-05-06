@@ -1,5 +1,5 @@
 package comics.app;
-import comics.script.*;
+import comics.player.*;
 import java.util.*;
 import snap.gfx.*;
 import snap.view.*;

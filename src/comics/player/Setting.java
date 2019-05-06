@@ -1,5 +1,4 @@
-package comics.script;
-import comics.app.StageView;
+package comics.player;
 import snap.gfx.Image;
 import snap.view.*;
 

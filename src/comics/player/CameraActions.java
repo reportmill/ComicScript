@@ -1,5 +1,4 @@
-package comics.script;
-import comics.app.CameraView;
+package comics.player;
 import snap.util.ArrayUtils;
 import snap.view.*;
 

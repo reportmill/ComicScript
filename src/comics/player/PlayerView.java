@@ -1,9 +1,8 @@
-package comics.app;
-import comics.script.*;
+package comics.player;
 import snap.gfx.*;
 import snap.util.PropChangeListener;
 import snap.view.*;
-import comics.app.PlayBar.*;
+import comics.player.PlayBar.*;
 
 /**
  * A View to play an animation. Encapsulates a CameraView, StageView and Script.
@@ -40,12 +39,10 @@ public class PlayerView extends ScaleBox {
     // The runnable to call playLineDone()
     Runnable            _playLineDoneRun = () -> playLineDone();
     
-    // The EditorPane
-    EditorPane          _editorPane;
-    
     // Constants for Property Changes
     public static final String RunLine_Prop = "RunLine";
     public static final String Playing_Prop = "Playing";
+    public static final String Script_Prop = "Script";
     
 /**
  * Creates a PlayerView.
@@ -110,7 +107,7 @@ public void scriptChanged()
     setRunLine(runLine);
     
     // Notify EditorPane
-    if(_editorPane!=null) _editorPane.scriptChanged();
+    firePropChange(Script_Prop, null, _script);
 }
 
 /**
@@ -172,7 +169,7 @@ public int getRunLine()  { return _runLine; }
 /**
  * Runs the script.
  */
-protected void setRunLine(int anIndex)
+public void setRunLine(int anIndex)
 {
     // If already set just return
     if(anIndex==_runLine) return;
@@ -223,7 +220,7 @@ public void playLine(int anIndex)
 /**
  * Plays until end of current RunLine - which then calls playLineDone().
  */
-protected void playLine()
+public void playLine()
 {
     // Stop animation
     _camera.stopAnimDeep();
@@ -451,7 +448,7 @@ protected void processEvent(ViewEvent anEvent)
 /**
  * Shows the title animation.
  */
-protected void showIntroAnim()
+public void showIntroAnim()
 {
     // If already running, just return
     if(_introView!=null) { removeChild(_introView); _introView = null; }

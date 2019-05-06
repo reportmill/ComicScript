@@ -1,5 +1,5 @@
 package comics.app;
-import comics.script.*;
+import comics.player.*;
 import snap.gfx.*;
 import snap.util.PropChangeListener;
 import snap.util.SnapUtils;
@@ -35,6 +35,9 @@ public class EditorPane extends ViewOwner {
     // Indicates to EditorPane whether Player RunLine Change originated from editor
     boolean             _changingSelIndex;
     
+    // A PropChangeListener to listen for when Player.Script changes
+    PropChangeListener  _playerLsnr = pc -> playerScriptChanged();
+    
 /**
  * Creates an EditorPane.
  */
@@ -58,11 +61,11 @@ public void showEditor()
     win.setContent(getUI());
 
     // Configure PlayerBox
-    _playerPane._playerBox.setPadding(20,20,20,20);
+    _playerPane.getPlayerBox().setPadding(20,20,20,20);
     
     // Configure Player
     _player.setEffect(new ShadowEffect().copySimple());
-    _player._editorPane = this;
+    _player.addPropChangeListener(_playerLsnr, PlayerView.Script_Prop);
     
     // If desktop, set Window.MaximizedBounds to window PrefSize
     if(!SnapUtils.isTeaVM) {
@@ -77,7 +80,7 @@ public void showEditor()
     win.setMaximized(true);
     
     // Notify scriptChanged and reset UI
-    scriptChanged();
+    playerScriptChanged();
     resetLater();
     
     // Start listening to player changes
@@ -90,9 +93,9 @@ public void showEditor()
 public void closeEditor()
 {
     _playerPane.getWindow().setContent(_playerPane.getUI());
-    _playerPane._playerBox.setPadding(0,0,0,0);
-    _playerPane._playerBox.removeChild(_playerPane.getView("CloseButton"));
-    _player.setEffect(null); _player._editorPane = null;
+    _playerPane.getPlayerBox().setPadding(0,0,0,0);
+    _playerPane.getPlayerBox().removeChild(_playerPane.getView("CloseButton"));
+    _player.setEffect(null); _player.removePropChangeListener(_playerLsnr, PlayerView.Script_Prop);
     _playerPane.getWindow().setMaximized(false);
 }
 
@@ -228,12 +231,10 @@ public void runCurrentLine()
 /**
  * Updates the script.
  */
-protected void scriptChanged()
+void playerScriptChanged()
 {
-    if(_scriptEditor.isUISet())
-        _scriptEditor.scriptChanged();
-    if(_lineEditor.isUISet())
-        _lineEditor.scriptChanged();
+    if(_scriptEditor.isUISet()) _scriptEditor.scriptChanged();
+    if(_lineEditor.isUISet()) _lineEditor.scriptChanged();
 }
 
 /**
@@ -267,11 +268,11 @@ protected View createUI()
     closeBtn.setLean(Pos.TOP_RIGHT); closeBtn.setPadding(2,2,0,0); closeBtn.setManaged(false);
     closeBtn.setSize(20+2, 20+2);
     enableEvents(closeBtn, MouseRelease);
-    _playerPane._playerBox.addChild(closeBtn);
+    _playerPane.getPlayerBox().addChild(closeBtn);
     
     // Create MainColView to hold Player and Editor
     ColView colView = new ColView(); colView.setPrefWidth(800); colView.setSpacing(5); colView.setFillWidth(true);
-    colView.addChild(_playerPane._playerBox);
+    colView.addChild(_playerPane.getPlayerBox());
     colView.addChild(editorBox);
     
     // Create SplitView from MainColView to separate Player/Editor

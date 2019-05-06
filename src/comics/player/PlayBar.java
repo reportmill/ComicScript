@@ -1,4 +1,4 @@
-package comics.app;
+package comics.player;
 import snap.gfx.*;
 import snap.view.*;
 

@@ -1,4 +1,5 @@
-package comics.app;
+package comics.player;
+import comics.app.EditorPane;
 import snap.gfx.*;
 import snap.view.*;
 
@@ -30,8 +31,6 @@ public void showPlayer()
     runLater(() -> {
         String scriptText = getSampleScript();
         _player.setScriptText(scriptText);
-        if(_editorPane!=null)
-            _editorPane.scriptChanged();
         _player.showIntroAnim();
     });
 }
@@ -40,6 +39,11 @@ public void showPlayer()
  * Returns the PlayerView.
  */
 public PlayerView getPlayer()  { return _player; }
+
+/**
+ * Returns the view that holds the player.
+ */
+public PlayerBox getPlayerBox()  { return _playerBox; }
 
 /**
  * Returns whether to show editor.
@@ -104,7 +108,7 @@ public String getSampleScript()
 /**
  * A class to layout PlayerView.
  */
-protected class PlayerBox extends ChildView {
+public class PlayerBox extends ChildView {
     
     /** Override. */
     protected double getPrefWidthImpl(double aH)  { return BoxView.getPrefWidth(this, _player, aH); }
