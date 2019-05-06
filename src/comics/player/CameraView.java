@@ -1,5 +1,6 @@
 package comics.player;
 import snap.gfx.*;
+import snap.util.ArrayUtils;
 import snap.util.SnapUtils;
 import snap.view.*;
 
@@ -83,8 +84,8 @@ public Action getAction(ScriptLine aScriptLine)
     // Jump to specific command
     Action action = null;
     switch(cmd) {
-        case "zoom": case "zooms": action = new CameraActions.ZoomAction(); break;
-        case "blur": case "blurs": action = new CameraActions.BlurAction(); break;
+        case "zoom": case "zooms": action = new ZoomAction(); break;
+        case "blur": case "blurs": action = new BlurAction(); break;
         default: return null;
     }
     
@@ -171,28 +172,59 @@ public void setValue(String aPropName, Object aValue)
 }
 
 /**
- * Override to paint PlayBar background shadow.
+ * An Camera Action that makes camera zoom.
  */
-protected void paintAbove(Painter aPntr)
-{
-    if(_player.getPlayBar().isShowing()) {
-        double h = _player.getPlayBar().getHeight() + 10, y = getHeight() - h;
-        aPntr.setOpacity(_player.getPlayBar().getOpacity());
-        aPntr.setPaint(_grad); aPntr.fillRect(0, y, getWidth(), h);
+public static class ZoomAction extends Action {
+    
+    /** Creates the action. */
+    public ZoomAction()  { setName("Zoom"); setRunTime(2000); }
+    
+    /** Runs the action. */
+    public void run()
+    {
+        // Get anim for final destination
+        CameraView camera = (CameraView)getStar();
+        ViewAnim anim = camera.getAnim(2000);
+    
+        // Handle Zooms Out
+        String words[] = getLine().getWords();
+        if(ArrayUtils.contains(words, "out")) {
+            anim.setValue("Zoom", 1);
+        }
+        
+        // Handle Zooms (anything else)
+        else {
+            anim.setValue("Zoom", 2);
+        }
     }
 }
-
-/** Gradient for  Bottom. */
-Color _c0 = Color.CLEAR, _c1 = new Color(0,0,0,.1), _c2 = new Color(0,0,0,.2), _c3 = new Color(0,0,0,.3);
-GradientPaint.Stop _stops[] = GradientPaint.getStops(0, _c0, .2, _c1, .35, _c2, 1, _c3);
-GradientPaint _grad = new GradientPaint(90, _stops);
-
-//aPntr.clipRect(0,0,getWidth(),getHeight());
-//aPntr.drawImage(getPlayBarShadowImage(), -_rad3, getHeight() - _player.getPlayBar().getHeight() - _rad2);
-/*Image getPlayBarShadowImage() {
-    if(_pbImg!=null && _pbImg.getWidth()==getWidth()+_rad6) return _pbImg;
-    Rect rect = new Rect(0,0,getWidth() + _rad2, _player.getPlayBar().getHeight() + _rad2);
-    return _pbImg = ShadowEffect.getShadowImage(rect, _rad, _c2); }
-Image _pbImg; int _rad = 15, _rad2 = _rad*2, _rad3 = _rad*3, _rad4 = _rad*4, _rad6 = _rad*6; */
+    
+/**
+ * An Camera Action that makes camera blur.
+ */
+public static class BlurAction extends Action {
+    
+    /** Creates the action. */
+    public BlurAction()  { setName("Blur"); setRunTime(1000); }
+    
+    /** Runs the action. */
+    public void run()
+    {
+        // Get anim for final destination
+        CameraView camera = (CameraView)getStar();
+        ViewAnim anim = camera.getAnim(1000);
+    
+        // Handle Zooms Out
+        String words[] = getLine().getWords();
+        if(ArrayUtils.contains(words, "out") || ArrayUtils.contains(words, "off")) {
+            anim.setValue("Blur", 0d);
+        }
+        
+        // Handle Zooms (anything else)
+        else {
+            anim.setValue("Blur", 8d);
+        }
+    }
+}
 
 }

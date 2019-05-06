@@ -81,7 +81,7 @@ public Star getStar()
     String word = words[0]; if(word.length()==0) return null;
     
     // Handle Setting, Camera, Actor
-    if(word.equals("setting")) return _script._setting;
+    if(word.equals("setting")) return _script.getStage();
     if(word.equals("camera")) return _script._player.getCamera();
     return (Actor)_script.getView(this);
 }

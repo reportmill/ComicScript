@@ -123,7 +123,7 @@ protected List <Star> getStarsForPlayer(PlayerView aPlayer)
     Script script = aPlayer.getScript();
     List <Star> stars = new ArrayList();
     
-    Star set = script.getSetting(); stars.add(set);
+    Star set = script.getStage(); stars.add(set);
     Star cam = aPlayer.getCamera(); stars.add(cam);
    
     // Iterate over lines
@@ -179,7 +179,7 @@ public class StarListView extends RowView {
     
         // Iterate over stars
         for(Star star : theStars) {
-            Image img = star instanceof Setting? _setImg : star instanceof CameraView? _camImg : star.getStarImage();
+            Image img = star instanceof StageView? _setImg : star instanceof CameraView? _camImg : star.getStarImage();
             StarView sview = new StarView(star, img);
             addChild(sview); _stars.add(star);
         }

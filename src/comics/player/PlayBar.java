@@ -23,10 +23,7 @@ public class PlayBar extends RowView {
     boolean      _mouseOverBar;
     
     // Constants
-    static final int BAR_Y = 4;
-    static final int BAR_HEIGHT = 3;
-    static final double BAR_MIDY = 6;
-    static final double BAR_MAXY = 12;
+    static final double BAR_MIDY = 16, BAR_MAXY = 22;
     static final Color MARK_COLOR = new Color("#F4D64A");
     static final Color BUTTON_COLOR = new Color(1,1,1, .8);
     static final String BarHeight_Prop = "BarHeight";
@@ -37,10 +34,15 @@ public class PlayBar extends RowView {
 public PlayBar(PlayerView aPV)
 {
     _player = aPV;
-    setHeight(36); setManaged(false); setLean(Pos.BOTTOM_LEFT); setGrowWidth(true);
-    setPadding(6,10,0,10); setAlign(HPos.LEFT); setSpacing(20);
+    setHeight(46); setManaged(false); setLean(Pos.BOTTOM_LEFT); setGrowWidth(true);
+    setPadding(16,10,0,10); setAlign(HPos.LEFT); setSpacing(20);
     enableEvents(MouseMove, MousePress, MouseDrag, MouseExit);
     setCursor(Cursor.HAND);
+    
+    // Create/set background gradient
+    Color c0 = Color.CLEAR, c1 = new Color(0,0,0,.1), _c2 = new Color(0,0,0,.2), _c3 = new Color(0,0,0,.3);
+    GradientPaint.Stop stops[] = GradientPaint.getStops(0, c0, .2, c1, .35, _c2, 1, _c3);
+    GradientPaint grad = new GradientPaint(90, stops); setFill(grad);
     
     // Create/configure/add PlayButton
     addChild(new PlayButton());
@@ -74,7 +76,7 @@ double getBarHeight()  { return _barHeight; }
 /**
  * Sets the bar height.
  */
-void setBarHeight(double aValue)  { _barHeight = aValue; repaint(0, 0, getWidth(), BAR_MAXY); }
+void setBarHeight(double aValue)  { _barHeight = aValue; repaint(); }
 
 /**
  * Sets whether mouse is over bar.
@@ -126,7 +128,7 @@ protected void processEvent(ViewEvent anEvent)
         
     if(anEvent.isMouseExit()) setMouseOverBar(false);
     if(anEvent.isMouseEvent())
-        setMouseOverBar(isMouseDown() || anEvent.getY()>=0 && anEvent.getY()<=BAR_MAXY);
+        setMouseOverBar(isMouseDown() || anEvent.getY()>0 && anEvent.getY()<=BAR_MAXY);
     anEvent.consume();
 }
 

@@ -24,9 +24,6 @@ public class Script {
     // The runtimes
     int                _runTime;
     
-    // The Setting
-    Setting            _setting = new Setting(this);
-    
     // Undo/Redo texts
     List <String>      _undoText = new ArrayList(), _redoText = new ArrayList();
     
@@ -51,11 +48,6 @@ public PlayerView getPlayer()  { return _player; }
  * Returns the Stage.
  */
 public StageView getStage()  { return _stage; }
-
-/**
- * Returns the setting.
- */
-public Setting getSetting()  { return _setting; }
 
 /**
  * Returns the Script text.
