@@ -156,17 +156,15 @@ void inputTextDidKeyPress(ViewEvent anEvent)
 /**
  * Called when HelpListView does Action event.
  */
-void helpListViewDidAction(ViewEvent anEvent)
+void helpListViewDidAction(String aStr)
 {
     ScriptLine line = getSelLine();
     String starName = line!=null && line.getStar()!=null? line.getStar().getStarName() : null;
-    String str = _helpListView.getSelItem();
-    String str2 = starName!=null? starName + ' ' + str : str;
-    setLineText(str2);
+    String str = starName!=null? starName + ' ' + aStr : aStr;
+    setLineText(str);
     
     // Reset UI
     _helpListView.setSelIndex(-1);
-    _scriptView.requestFocus();
     resetLater();
 }
 
@@ -268,8 +266,11 @@ protected void respondUI(ViewEvent anEvent)
     }
     
     // Handle HelpListView
-    if(anEvent.equals("HelpListView"))
-        ViewUtils.runOnMouseUp(() -> helpListViewDidAction(anEvent));
+    if(anEvent.equals("HelpListView")) {
+        _scriptView.requestFocus();
+        String str = _helpListView.getSelItem();
+        ViewUtils.runOnMouseUp(() -> helpListViewDidAction(str));
+    }
     
     // Handle InputText
     if(anEvent.equals("InputText"))
