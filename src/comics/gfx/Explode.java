@@ -1,6 +1,7 @@
 package comics.gfx;
-import java.util.Random;
+import java.util.*;
 import snap.gfx.*;
+import snap.util.PropChangeListener;
 import snap.view.*;
 
 /**
@@ -11,55 +12,32 @@ import snap.view.*;
  *    - Declare variable for PIECE_COUNT and replace occurances of constant "10"
  *    - Add Slider with bounds 220,220,220,20
  */
-public class Explode extends ViewOwner {
-    
-    // The main view
-    ChildView      _view;
+public class Explode {
     
     // The random number generator
     static Random _rand = new Random();
     
-protected View createUI()
-{
-    _view = new ChildView(); _view.setPrefSize(800,600);
-    addButton(250,250); addButton(100,100); addButton(500,100);
-    addButton(100,400); addButton(500,400);
-    return _view;
-}
-
-protected void respondUI(ViewEvent anEvent)
-{
-    if(anEvent.equals("Button"))
-        explode(anEvent.getView(),0);
-}
-
-void addButton(double aX, double aY)
-{
-    Button btn = new Button("Hello World"); btn.setBounds(aX, aY, 200, 80); btn.setName("Button");
-    btn.setFont(Font.Arial14.deriveFont(20));
-    _view.addChild(btn);
-}
-
+/**
+ * Configures the given view to explode.
+ */
 public static void explode(View aView, int aStart)
 {
-    aView.setOpacity(1);
-    
     if(aView instanceof ImageView && !((ImageView)aView).getImage().isLoaded()) {
         System.out.println("Image not loaded"); return; }
-    if(aView.getWidth()==0) {
-        System.out.println("Image width zero"); return; }
+    if(aView.getWidth()==0) { System.out.println("Image width zero"); return; }
      
     // Create explode pieces
-    for(int i=0;i<10;i++)
-        for(int j=0;j<10;j++)
-            explodePiece(aView, i, j, aStart);
+    List <View> pieces = new ArrayList(100);
+    for(int i=0;i<10;i++) for(int j=0;j<10;j++)
+        pieces.add(explodePiece(aView, i, j, aStart));
     
     // Hide view and make visible after delay
     aView.setOpacity(0);
-    //aView.getAnim(aStart).getAnim(aStart+2000).getAnim(aStart+2800).setOpacity(1).play();
+    aView.addPropChangeListener(PropChangeListener.getOneShot(pc -> removePieces(pieces)));
+    aView.getAnim(aStart+3000).setOnFinish(a -> removePieces(pieces));
 }
 
-public static void explodePiece(View aView, int aRow, int aCol, int aStart)
+public static View explodePiece(View aView, int aRow, int aCol, int aStart)
 {
     // Get bounds of piece
     int w = (int)aView.getWidth()/10;
@@ -93,12 +71,15 @@ public static void explodePiece(View aView, int aRow, int aCol, int aStart)
     // Configure animation for piece and play
     ViewAnim anim = iview.getAnim(aStart).getAnim(aStart+time);
     anim.setX(nx).setY(ny).setRotate(rot).setOpacity(0).startFast();
-    anim.setOnFinish(a -> view.removeChild(iview));//.play();
+    //anim.setOnFinish(a -> view.removeChild(iview));
+    return iview;
 }
 
-public static void main(String args[])
+static void removePieces(List <View> thePieces)
 {
-    new Explode().setWindowVisible(true);
+    for(View v : thePieces)
+        ((ChildView)v.getParent()).removeChild(v);
+    thePieces.clear();
 }
 
 }

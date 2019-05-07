@@ -153,7 +153,7 @@ public void setRunTime(int aTime)
     
     // If was playing, restart
     if(playing)
-        playLine();
+        playLineStart();
 }
 
 /**
@@ -204,6 +204,11 @@ public void setRunLine(int anIndex)
 }
 
 /**
+ * Runs the script line at current index.
+ */
+public void playLine()  { playLine(getRunLine()); }
+
+/**
  * Runs the script line at given index.
  */
 public void playLine(int anIndex)
@@ -214,13 +219,13 @@ public void playLine(int anIndex)
     // Set RunTime to Line.StartTime and playLine()
     int runTime = getLineStartTime(anIndex);
     setRunTime(runTime);
-    playLine();
+    playLineStart();
 }
 
 /**
  * Plays until end of current RunLine - which then calls playLineDone().
  */
-public void playLine()
+protected void playLineStart()
 {
     // Stop animation
     _camera.stopAnimDeep();
@@ -293,7 +298,7 @@ public void play()
     // Start anim and firePropChange
     _playing = true;
     firePropChange(Playing_Prop, !_playing, _playing);
-    playLine();
+    playLineStart();
 }
 
 /**

@@ -218,7 +218,7 @@ public void setLocXY(Pos aPos, double aX, double aY, ViewAnim anAnim)
  */
 public void resetStar()
 {
-    setVisible(false);
+    setVisible(false); setOpacity(1);
     setAssetImage(_asset, 0);
     getAnimCleared(0);
 }

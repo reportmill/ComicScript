@@ -5,7 +5,7 @@ import snap.util.*;
 /**
  * A class to represent a line of script.
  */
-public class ScriptLine implements Key.GetSet {
+public class ScriptLine implements PropChange.DoChange {
     
     // The Script
     Script             _script;
@@ -237,21 +237,15 @@ protected void firePropChange(String aProp, Object oldVal, Object newVal)
 }
 
 /**
- * Key.GetSet method.
+ * PropChange.DoChange method.
  */
-public Object getKeyValue(String aKey)
+public void doChange(PropChange aPC, Object oldVal, Object newVal)
 {
-    if(aKey==Text_Prop) return getText();
-    System.err.println("ScriptLine.getKeyValue: Unsupported key: " + aKey); return null;
-}
-    
-/**
- * Key.GetSet method.
- */
-public void setKeyValue(String aKey, Object aValue)
-{
-    if(aKey==Text_Prop) setText(SnapUtils.stringValue(aValue));
-    else System.err.println("ScriptLine.setKeyValue: Unsupported key: " + aKey);
+    String prop = aPC.getPropName();
+    if(prop==Text_Prop) {
+        setText(SnapUtils.stringValue(newVal));
+        getScript().getPlayer().playLine(getIndex());
+    }
 }
 
 }

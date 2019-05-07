@@ -156,6 +156,7 @@ class LinePartsView extends RowView {
     
     // The ScriptLine
     ScriptLine        _line;
+    String            _text = "";
     
     // The selected index
     int               _selIndex;
@@ -173,8 +174,14 @@ class LinePartsView extends RowView {
     public void setLine(ScriptLine aLine)
     {
         // If already set, just return
-        //if(aLine==_line && aLine!=null) return;
-        _line = aLine;
+        String text = aLine!=null? aLine.getText() : "";
+        if(aLine==_line && text.equals(_text)) return;
+
+        // Get index
+        int ind = _line==aLine? _selIndex : 0;
+        
+        // Set Line and Text
+        _line = aLine; _text = text;
         
         // Remove Children
         removeChildren();
@@ -199,6 +206,12 @@ class LinePartsView extends RowView {
             LinePartView predView = new LinePartView(predText);
             addChild(predView);
         }
+        
+        // Reset selection
+        if(ind>=getChildCount()) ind = getChildCount() - 1;
+        setSelIndex(ind);
+        if(ind==0 && !_starPicker.getUI().isShowing()) showStarPicker();
+        else if(ind>0 && !_actionEditor.getUI().isShowing()) showActionEditor();
     }
     
     /** Returns the selected index. */

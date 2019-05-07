@@ -245,7 +245,11 @@ public void doChange(PropChange aPC, Object oldVal, Object newVal)
 {
     String prop = aPC.getPropName();
     if(prop==Line_Prop) {
-        if(oldVal==null) addLine((ScriptLine)newVal, aPC.getIndex());
+        if(oldVal==null) {
+            int ind = aPC.getIndex();
+            addLine((ScriptLine)newVal, ind);
+            getPlayer().playLine(ind);
+        }
         else removeLine(aPC.getIndex());
     }
 }
