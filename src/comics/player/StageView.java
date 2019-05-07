@@ -95,6 +95,7 @@ public void setBackImage(Image anImage)
     if(anImage==_backImg) return;
     _backImg = anImage;
     repaint();
+    if(_backImg!=null && !_backImg.isLoaded()) _backImg.addLoadListener(pc -> repaint());
 }
 
 /**
