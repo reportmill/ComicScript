@@ -5,7 +5,7 @@ import snap.util.*;
 /**
  * A class to represent a line of script.
  */
-public class ScriptLine {
+public class ScriptLine implements Key.GetSet {
     
     // The Script
     Script             _script;
@@ -25,8 +25,14 @@ public class ScriptLine {
     // Whether this ScriptLine is loaded
     boolean            _loaded = true;
     
+    // PropertyChangeSupport
+    PropChangeSupport  _pcs = PropChangeSupport.EMPTY;
+
     // A PropChangeListener specific to ScripLine.Loaded
     PropChangeSupport  _loadLsnr;
+    
+    // Constants
+    public static final String Text_Prop = "Text";
     
 /**
  * Creates a new ScriptLine with given text.
@@ -34,6 +40,7 @@ public class ScriptLine {
 public ScriptLine(Script aScript, String aStr)
 {
     _script = aScript; _text = aStr;
+    addPropChangeListener(pc -> _script.scriptLineDidChange(pc));
 }
 
 /**
@@ -51,7 +58,8 @@ public String getText()  { return _text; }
  */
 public void setText(String aStr)
 {
-    _text = aStr; _words = null; _star = null; _action = null;
+    _words = null; _star = null; _action = null;
+    firePropChange(Text_Prop, _text, _text = aStr);
 }
 
 /**
@@ -206,9 +214,44 @@ public String toString()
 }
 
 /**
- * A class to Listen to whether ScriptLine is loaded.
+ * Add listener.
  */
-public static class LoadListener {
+public void addPropChangeListener(PropChangeListener aPCL)
+{
+    if(_pcs==PropChangeSupport.EMPTY) _pcs = new PropChangeSupport(this);
+    _pcs.addPropChangeListener(aPCL);
+}
+
+/**
+ * Remove listener.
+ */
+public void removePropChangeListener(PropChangeListener aPCL)  { _pcs.removePropChangeListener(aPCL); }
+
+/**
+ * Fires a property change for given property name, old value, new value and index.
+ */
+protected void firePropChange(String aProp, Object oldVal, Object newVal)
+{
+    if(!_pcs.hasListener(aProp)) return;
+    _pcs.firePropChange(new PropChange(this, aProp, oldVal, newVal));
+}
+
+/**
+ * Key.GetSet method.
+ */
+public Object getKeyValue(String aKey)
+{
+    if(aKey==Text_Prop) return getText();
+    System.err.println("ScriptLine.getKeyValue: Unsupported key: " + aKey); return null;
+}
+    
+/**
+ * Key.GetSet method.
+ */
+public void setKeyValue(String aKey, Object aValue)
+{
+    if(aKey==Text_Prop) setText(SnapUtils.stringValue(aValue));
+    else System.err.println("ScriptLine.setKeyValue: Unsupported key: " + aKey);
 }
 
 }

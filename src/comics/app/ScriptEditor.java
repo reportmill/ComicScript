@@ -223,6 +223,10 @@ protected void resetUI()
     ScriptLine line = getSelLine();
     Star star = line!=null? line.getStar() : null;
     
+    // Update UndoButton, RedoButton
+    setViewEnabled("UndoButton", getScript().getUndoer().hasUndos());
+    setViewEnabled("RedoButton", getScript().getUndoer().hasRedos());
+    
     // Update ScriptView
     _scriptView.setSelIndex(getSelIndex());
     

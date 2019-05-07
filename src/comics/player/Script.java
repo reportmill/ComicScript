@@ -1,18 +1,14 @@
 package comics.player;
 import java.util.*;
-import snap.util.SnapUtils;
-import snap.view.*;
+import snap.util.*;
 
 /**
  * A class to represent the instructions.
  */
-public class Script {
+public class Script implements PropChange.DoChange {
     
     // The PlayerView
     PlayerView          _player;
-    
-    // The StageView
-    StageView           _stage;
     
     // The View text
     String              _text = "";
@@ -24,19 +20,19 @@ public class Script {
     int                 _runTime;
     
     // Undo/Redo texts
-    List <String>       _undoText = new ArrayList(), _redoText = new ArrayList();
+    Undoer              _undoer = new Undoer();
     
-    // Whether undoing/redoing
-    boolean             _undoing, _redoing;
-    
+    // PropertyChangeSupport
+    PropChangeSupport   _pcs = PropChangeSupport.EMPTY;
+
+    // Constants
+    public static final String Line_Prop = "Line";
+    public static final String Text_Prop = "Text";
+
 /**
  * Creates a script for given PlayerView.
  */
-public Script(PlayerView aPlayer)
-{
-    _player = aPlayer;
-    _stage = aPlayer.getStage();
-}
+public Script(PlayerView aPlayer)  { _player = aPlayer; }
 
 /**
  * Returns the Player.
@@ -46,7 +42,7 @@ public PlayerView getPlayer()  { return _player; }
 /**
  * Returns the Stage.
  */
-public StageView getStage()  { return _stage; }
+public StageView getStage()  { return _player.getStage(); }
 
 /**
  * Returns the Script text.
@@ -60,11 +56,6 @@ public void setText(String aStr)
 {
     // If already set, just return
     if(SnapUtils.equals(aStr, _text)) return;
-    
-    // Add old to Undo/Redo lists
-    if(_undoing) _redoText.add(_text);
-    else if(_redoing) _undoText.add(_text);
-    else { _undoText.add(_text); _redoText.clear(); }
     
     // Set text, reset Lines, RunTime, notify player
     _text = aStr; _lines = null; _runTime = -1;
@@ -102,12 +93,31 @@ public List <ScriptLine> getLines()
 /**
  * Adds a line to script.
  */
+public void addLine(ScriptLine aLine, int anIndex)
+{
+    getLines().add(anIndex, aLine);
+    firePropChange(Line_Prop, null, aLine, anIndex);
+    _runTime = -1; _player.scriptChanged();
+}
+
+/**
+ * Removes a line.
+ */
+public ScriptLine removeLine(int anIndex)
+{
+    ScriptLine sline = getLines().remove(anIndex);
+    firePropChange(Line_Prop, sline, null, anIndex);
+    _runTime = -1; _player.scriptChanged();
+    return sline;
+}
+
+/**
+ * Adds a line to script.
+ */
 public void addLineText(String aStr, int anIndex)
 {
-    List <ScriptLine> lines = getLines();
     ScriptLine sline = new ScriptLine(this, aStr);
-    lines.add(anIndex, sline);
-    resetTextFromLines();
+    addLine(sline, anIndex);
 }
 
 /**
@@ -117,36 +127,6 @@ public void setLineText(String aStr, int anIndex)
 {
     ScriptLine sline = getLine(anIndex);
     sline.setText(aStr);
-    scriptLineDidChange(sline);
-}
-
-/**
- * Removes a line.
- */
-public ScriptLine removeLine(int anIndex)
-{
-    List <ScriptLine> lines = getLines();
-    ScriptLine sline = lines.remove(anIndex);
-    resetTextFromLines();
-    return sline;
-}
-
-/**
- * Sets the text from lines.
- */
-void resetTextFromLines()  { setText(getTextFromLines()); }
-
-/**
- * Returns the text from lines.
- */
-String getTextFromLines()
-{
-    StringBuffer sb = new StringBuffer();
-    for(ScriptLine sl : getLines()) { String str = sl.getText();
-        if(str.trim().length()>0)
-            sb.append(str).append('\n');
-    }
-    return sb.toString().trim();
 }
 
 /**
@@ -198,38 +178,28 @@ public void runLine(int anIndex)
 }
 
 /**
+ * Returns the Undoer.
+ */
+public Undoer getUndoer()  { return _undoer; }
+
+/**
  * Undo text.
  */
-public void undo()
-{
-    // Complain and bail if no more undos
-    if(_undoText.size()==0) { ViewUtils.beep(); return; }
-    
-    // Get last undo, add to redos and set
-    String str = _undoText.remove(_undoText.size()-1);
-    _undoing = true; setText(str); _undoing = false;
-}
+public void undo()  { _undoer.undo(); }
 
 /**
  * Redo text.
  */
-public void redo()
-{
-    // Complain and bail if no more undos
-    if(_redoText.size()==0) { ViewUtils.beep(); return; }
-    
-    // Get last undo, add to redos and set
-    String str = _redoText.remove(_redoText.size()-1);
-    _redoing = true; setText(str); _redoing = false;
-}
+public void redo()  { _undoer.redo(); }
 
 /**
  * Called when a ScriptLine changes.
  */
-void scriptLineDidChange(ScriptLine aLine)
+void scriptLineDidChange(PropChange aPC)
 {
-    _runTime = -1;
-    _player.scriptChanged();
+    _undoer.addPropertyChange(aPC);
+    _undoer.saveChanges();
+    _runTime = -1; _player.scriptChanged();
 }
 
 /**
@@ -241,6 +211,43 @@ public double feetToPoints(double aValue)
     double pointHeight = aValue*stageHeightPoints/stageHeightFeet;
     pointHeight = Math.round(pointHeight);
     return pointHeight;
+}
+
+/**
+ * Add listener.
+ */
+public void addPropChangeListener(PropChangeListener aPCL)
+{
+    if(_pcs==PropChangeSupport.EMPTY) _pcs = new PropChangeSupport(this);
+    _pcs.addPropChangeListener(aPCL);
+}
+
+/**
+ * Remove listener.
+ */
+public void removePropChangeListener(PropChangeListener aPCL)  { _pcs.removePropChangeListener(aPCL); }
+
+/**
+ * Fires a property change for given property name, old value, new value and index.
+ */
+protected void firePropChange(String aProp, Object oldVal, Object newVal, int anIndex)
+{
+    PropChange pc = new PropChange(this, aProp, oldVal, newVal, anIndex);
+    _pcs.firePropChange(pc);
+    _undoer.addPropertyChange(pc);
+    _undoer.saveChanges();
+}
+
+/**
+ * PropChange.DoChange method.
+ */
+public void doChange(PropChange aPC, Object oldVal, Object newVal)
+{
+    String prop = aPC.getPropName();
+    if(prop==Line_Prop) {
+        if(oldVal==null) addLine((ScriptLine)newVal, aPC.getIndex());
+        else removeLine(aPC.getIndex());
+    }
 }
 
 }

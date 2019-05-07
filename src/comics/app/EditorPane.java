@@ -192,9 +192,8 @@ public void setLineText(String aStr, int anIndex)
 public void delete()
 {
     int ind = getSelIndex(); if(ind<0) { selectPrev(); return; }
-    setLineText("", ind);
-    if(ind<getScript().getLineCount())
-        selectPrev();
+    getScript().removeLine(ind);
+    if(ind<getScript().getLineCount()) selectPrev();
     else runCurrentLine();
 }
 
@@ -303,8 +302,9 @@ protected void respondUI(ViewEvent anEvent)
     if(anEvent.equals("CloseButton") || anEvent.equals("CloseMenu"))
         _playerPane.setEditing(false);
         
-    // Handle IntroMenu
+    // Handle IntroMenu, DebugMenu
     if(anEvent.equals("IntroMenu")) _player.showIntroAnim();
+    if(anEvent.equals("DebugMenu")) ViewUpdater.setDebug(!ViewUpdater.isDebug());
 }
 
 /**
@@ -316,7 +316,8 @@ protected MenuBar getMenuBar()
     Menu appMenu = new Menu(); appMenu.setText("ComicCreator");
     MenuItem closeMenu = new MenuItem(); closeMenu.setName("CloseMenu"); closeMenu.setText("Close Editor");
     MenuItem introlMenu = new MenuItem(); introlMenu.setName("IntroMenu"); introlMenu.setText("Show Intro");
-    appMenu.addItem(closeMenu); appMenu.addItem(introlMenu);
+    MenuItem dbgMenu = new MenuItem(); dbgMenu.setName("DebugMenu"); dbgMenu.setText("Show Debug Paint");
+    appMenu.addItem(closeMenu); appMenu.addItem(introlMenu); appMenu.addItem(dbgMenu);
     
     // FileMenu
     Menu fileMenu = new Menu(); fileMenu.setText("File");
