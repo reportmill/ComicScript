@@ -26,4 +26,9 @@ public String[] getActionNames();
  */
 public Action getAction(ScriptLine aScriptLine);
 
+/**
+ * Resets the star to initial settings.
+ */
+void resetStar();
+
 }

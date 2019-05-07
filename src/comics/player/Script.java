@@ -1,6 +1,5 @@
 package comics.player;
 import java.util.*;
-import snap.gfx.Image;
 import snap.util.SnapUtils;
 import snap.view.*;
 
@@ -10,25 +9,25 @@ import snap.view.*;
 public class Script {
     
     // The PlayerView
-    PlayerView         _player;
+    PlayerView          _player;
     
     // The StageView
-    StageView          _stage;
+    StageView           _stage;
     
     // The View text
-    String             _text = "";
+    String              _text = "";
 
     // The Script lines
-    List <ScriptLine>  _lines;
+    List <ScriptLine>   _lines;
     
     // The runtimes
-    int                _runTime;
+    int                 _runTime;
     
     // Undo/Redo texts
-    List <String>      _undoText = new ArrayList(), _redoText = new ArrayList();
+    List <String>       _undoText = new ArrayList(), _redoText = new ArrayList();
     
     // Whether undoing/redoing
-    boolean            _undoing, _redoing;
+    boolean             _undoing, _redoing;
     
 /**
  * Creates a script for given PlayerView.
@@ -87,20 +86,16 @@ public ScriptLine getLine(int anIndex)  { return getLines().get(anIndex); }
  */
 public List <ScriptLine> getLines()
 {
+    // If already set, just return
     if(_lines!=null) return _lines;
     
+    // Get text lines from text
     List slines = new ArrayList();
     String tlines[] = _text.split("\\n");
     
-    // Iterate over lines
-    _runTime = 0;
-    for(int i=0;i<tlines.length;i++) { String tline = tlines[i];
-        ScriptLine line = new ScriptLine(this, tline);
-        Action action = line.getAction();
-        _runTime += line.getRunTime();
-        slines.add(line);
-    }
-
+    // Iterate over text lines and create ScriptLines
+    for(String tline : tlines)
+        slines.add(new ScriptLine(this, tline));
     return _lines = slines;
 }
 
@@ -122,7 +117,7 @@ public void setLineText(String aStr, int anIndex)
 {
     ScriptLine sline = getLine(anIndex);
     sline.setText(aStr);
-    resetTextFromLines();
+    scriptLineDidChange(sline);
 }
 
 /**
@@ -139,23 +134,30 @@ public ScriptLine removeLine(int anIndex)
 /**
  * Sets the text from lines.
  */
-void resetTextFromLines()
+void resetTextFromLines()  { setText(getTextFromLines()); }
+
+/**
+ * Returns the text from lines.
+ */
+String getTextFromLines()
 {
-    List <ScriptLine> lines = getLines();
     StringBuffer sb = new StringBuffer();
-    for(ScriptLine sl : lines) {
-        String str = sl.getText();
+    for(ScriptLine sl : getLines()) { String str = sl.getText();
         if(str.trim().length()>0)
             sb.append(str).append('\n');
     }
-    String text = sb.toString().trim();
-    setText(text);
+    return sb.toString().trim();
 }
 
 /**
  * Returns the run time.
  */
-public int getRunTime()  { return _runTime; }
+public int getRunTime()
+{
+    if(_runTime>=0) return _runTime;
+    _runTime = 0; for(ScriptLine line : getLines()) _runTime += line.getRunTime();
+    return _runTime;
+}
 
 /**
  * Returns the run time of line at index.
@@ -192,17 +194,7 @@ public void runLine(int anIndex)
 
     // Run requested line
     ScriptLine line = getLine(anIndex);
-    runLine(line);
-}
-
-/**
- * Executes line for Stage.
- */
-protected void runLine(ScriptLine aScriptLine)
-{
-    Action action = aScriptLine.getAction(); 
-    if(action!=null)
-        action.run();
+    line.run();
 }
 
 /**
@@ -232,71 +224,12 @@ public void redo()
 }
 
 /**
- * Returns the next image.
+ * Called when a ScriptLine changes.
  */
-public View getView(ScriptLine aScriptLine)
+void scriptLineDidChange(ScriptLine aLine)
 {
-    // Get image for word
-    String words[] = aScriptLine.getWords();
-    Asset asset = getNextAsset(words, -1);
-    if(asset==null)
-        return null;
-    
-    // Get actor for image
-    String name = asset.getName();
-    View child = getView(name);
-    
-    // If actor not found, create
-    if(child==null) {
-        
-        // Create new ActorView for Asset and add to Stage
-        ImageView iview = new Actor(this,asset); child = iview; iview.setX(-999);
-        _stage.addChild(child);
-        
-        // If image not loaded, tell ScriptLine
-        if(!asset.isImageLoaded())
-            aScriptLine.addUnloadedImage(asset.getImage());
-    }
-    
-    // Return child
-    return child;
-}
-
-/**
- * Returns the view with name.
- */
-public View getView(String aName)
-{
-    View child = aName!=null? _stage.getChild(aName) : null;
-    return child;
-}
-
-/**
- * Returns the next image.
- */
-public Image getNextImage(String theWords[], int aStart)
-{
-    Asset asset = getNextAsset(theWords, aStart);
-    Image img = asset!=null? asset.getImage() : null;
-    return img;
-}
-
-/**
- * Returns the next image.
- */
-public Asset getNextAsset(String theWords[], int aStart)
-{
-    for(int i=aStart+1;i<theWords.length;i++) { String word = theWords[i];
-        
-        // Look for actor/setting
-        Asset asset = AssetIndex.get().getActorAsset(word);
-        if(asset==null) asset = AssetIndex.get().getSetAsset(word);
-        
-        // Get file from URL and load image
-        if(asset!=null)
-            return asset;
-    }
-    return null;
+    _runTime = -1;
+    _player.scriptChanged();
 }
 
 /**

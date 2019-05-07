@@ -47,17 +47,6 @@ public Star getStar()
 }
 
 /**
- * Sets the Star for current ScriptLine.
- */
-public void setStar(Star aStar)
-{
-    ScriptLine line = getSelLine();
-    line.setStar(aStar);
-    _lineEditor._editorPane.runCurrentLine();
-    _lineEditor.resetLater();
-}
-
-/**
  * Called when Script text changes.
  */
 protected void scriptChanged()
@@ -121,7 +110,8 @@ protected void respondUI(ViewEvent anEvent)
     // Handle StarListView
     if(anEvent.equals(_starsView)) {
         Star star = _starsView.getSelStar();
-        setStar(star);
+        line.setStar(star);
+        _lineEditor._editorPane.runCurrentLine();
     }
 }
 
@@ -184,7 +174,11 @@ public class StarListView extends RowView {
     /** Sets the list of stars in this StarListView. */
     public void setStars(List <Star> theStars)
     {
+        // If already set, just return
+        if(theStars.equals(_stars)) return;
+        
         // Clear children, stars
+        Star selStar = getSelStar();
         removeChildren(); _stars.clear();
     
         // Iterate over stars
@@ -193,6 +187,7 @@ public class StarListView extends RowView {
             StarView sview = new StarView(star, img);
             addChild(sview); _stars.add(star);
         }
+        _selIndex = -1; setSelStar(selStar);
     }
 
     /** Returns the selected Subject index. */

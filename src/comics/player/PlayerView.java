@@ -318,10 +318,8 @@ public void stop()
  */
 protected void resetStage()
 {
-    _stage.removeChildren();
-    _camera.setZoom(1);
-    _camera.setBlur(0);
-    clearAnims();
+    _stage.resetStar();
+    _camera.resetStar();
 }
 
 /**

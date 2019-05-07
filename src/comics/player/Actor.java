@@ -25,11 +25,11 @@ public Actor(Script aScript, Asset anAsset)
     // Set Script, Asset and Name
     _script = aScript; _asset = anAsset;
     setName(anAsset.getName());
+    setVisible(false);
     
     // Set Asset image
     Image img = anAsset.getImage();
-    setImage(img);
-    setFillHeight(true); setFillWidth(true);
+    setImage(img); setFillHeight(true); setFillWidth(true);
     
     // Make sure size gets set when image loaded
     if(!img.isLoaded()) img.addLoadListener(pce -> setSizeForAsset(_asset));
@@ -211,6 +211,16 @@ public void setLocY(VPos aPos, double aVal, ViewAnim anAnim)
 public void setLocXY(Pos aPos, double aX, double aY, ViewAnim anAnim)
 {
     setLocX(aPos.getHPos(), aX, anAnim); setLocY(aPos.getVPos(), aY, anAnim);
+}
+
+/**
+ * Override to reset actors.
+ */
+public void resetStar()
+{
+    setVisible(false);
+    setAssetImage(_asset, 0);
+    getAnimCleared(0);
 }
 
 }

@@ -16,6 +16,9 @@ public class ScriptLine {
     // The words
     String             _words[];
     
+    // The star
+    Star               _star;
+    
     // The action
     Action             _action;
     
@@ -46,9 +49,9 @@ public String getText()  { return _text; }
 /**
  * Sets the text.
  */
-protected void setText(String aStr)
+public void setText(String aStr)
 {
-    _text = aStr; _words = null;
+    _text = aStr; _words = null; _star = null; _action = null;
 }
 
 /**
@@ -72,18 +75,35 @@ public String[] getWords()
 public int getIndex()  { return _script.getLines().indexOf(this); }
 
 /**
+ * Returns the star name.
+ */
+public String getStarName()
+{
+    String words[] = getWords(); if(words.length==0) return null;
+    String word = words[0];
+    return word.length()>0? word : null;
+}
+
+/**
  * Returns the Star of this line.
  */
 public Star getStar()
 {
-    // Get first word
-    String words[] = getWords(); if(words.length==0) return null;
-    String word = words[0]; if(word.length()==0) return null;
-    
-    // Handle Setting, Camera, Actor
-    if(word.equals("setting")) return _script.getStage();
-    if(word.equals("camera")) return _script._player.getCamera();
-    return (Actor)_script.getView(this);
+    if(_star!=null) return _star;
+    return getStarImpl();
+}
+
+/**
+ * Returns the Star of this line.
+ */
+protected Star getStarImpl()
+{
+    String name = getStarName(); if(name==null) return null;
+    if(name.equals("setting")) return _script.getStage();
+    if(name.equals("camera")) return _script._player.getCamera();
+    Star star = _script.getStage().getActor(this);
+    if(star==null) System.out.println("ScriptLine: Couldn't find star named: " + name);
+    return star;
 }
 
 /**
@@ -126,6 +146,21 @@ public void setActionByName(String aName)
  * Returns the runtime of this ScriptLine.
  */
 public int getRunTime()  { Action a = getAction(); return a!=null? a.getRunTime() : 0; }
+
+/**
+ * Executes line.
+ */
+public void run()
+{
+    // Get star and make sure it's visible
+    Star star = getStar(); if(star==null) return;
+    if(star instanceof Actor && !((Actor)star).isVisible())
+        ((Actor)star).setVisible(true);
+
+    // Get action and run        
+    Action action = getAction(); if(action==null) return;
+    action.run();
+}
 
 /**
  * Returns whether this line is loaded.

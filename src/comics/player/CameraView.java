@@ -172,6 +172,15 @@ public void setValue(String aPropName, Object aValue)
 }
 
 /**
+ * Override to reset camera.
+ */
+public void resetStar()
+{
+    setZoom(1); setBlur(0);
+    getAnimCleared(0);
+}
+
+/**
  * An Camera Action that makes camera zoom.
  */
 public static class ZoomAction extends Action {

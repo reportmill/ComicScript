@@ -1,4 +1,5 @@
 package comics.player;
+import java.util.*;
 import snap.gfx.*;
 import snap.view.*;
 
@@ -6,7 +7,13 @@ import snap.view.*;
  * A class to hold actors.
  */
 public class StageView extends ChildView implements Star {
+    
+    // The background image
+    Image               _backImg;
 
+    // The actors currently used by script
+    Map <String,Actor>  _actors = new HashMap();
+    
 /**
  * Creates a StageView.
  */
@@ -44,6 +51,73 @@ public Action getAction(ScriptLine aScriptLine)
 }
 
 /**
+ * Returns the actor for given name.
+ */
+public Actor getActor(ScriptLine aScriptLine)
+{
+    // Get image for word
+    String sname = aScriptLine.getStarName();
+    Asset asset = AssetIndex.get().getActorAsset(sname);
+    if(asset==null)
+        return null;
+    
+    // Get actor for name
+    String name = asset.getName();
+    Actor actor = _actors.get(name);
+    
+    // If actor not found, create
+    if(actor==null) {
+        
+        // Create new ActorView for Asset and add to Stage
+        actor = new Actor(aScriptLine.getScript(), asset);
+        _actors.put(name, actor);
+        addChild(actor);
+        
+        // If image not loaded, tell ScriptLine
+        if(!asset.isImageLoaded())
+            aScriptLine.addUnloadedImage(asset.getImage());
+    }
+    
+    // Return actor
+    return actor;
+}
+
+/**
+ * Returns the background image.
+ */
+public Image getBackImage()  { return _backImg; }
+
+/**
+ * Sets the background image.
+ */
+public void setBackImage(Image anImage)
+{
+    if(anImage==_backImg) return;
+    _backImg = anImage;
+    repaint();
+}
+
+/**
+ * Override to paint image.
+ */
+protected void paintBack(Painter aPntr)
+{
+    super.paintBack(aPntr);
+    if(_backImg!=null)
+        aPntr.drawImage(_backImg, 0, 0, getWidth(), getHeight());
+}
+
+/**
+ * Override to reset stage (and actors).
+ */
+public void resetStar()
+{
+    setBackImage(null); //getAnimCleared(0);
+    for(Actor actor : _actors.values())
+        actor.resetStar();
+}
+
+/**
  * An Setting Action that changes background image.
  */
 public class BackImageAction extends Action {
@@ -54,25 +128,25 @@ public class BackImageAction extends Action {
     /** Runs the action. */
     public void run()
     {
-        // Get Stage
         ScriptLine line = getLine();
-        Script script = line.getScript();
-        StageView stage = StageView.this;
-        
-        // Get setting Image and ImageView
         String words[] = line.getWords();
-        String iname = words.length>1? words[1] : null; if(iname==null) return;
-        Image img = script.getNextImage(words, 0); if(img==null) return;
-        ImageView iview = new ImageView(img, true, true);
-        iview.setSize(stage.getWidth(), stage.getHeight());
-        iview.setName("Setting");
-        
-        // If old setting, remove
-        View oldStg = script.getView("Setting"); if(oldStg!=null) stage.removeChild(oldStg);
-        
-        // Add new setting
-        stage.addChild(iview, 0);
+        Asset asset = getAsset(words, 1);
+        Image img = asset!=null? asset.getImage() : null;
+        StageView.this.setBackImage(img);
     }
+}
+
+/**
+ * Returns the first SetAsset with name matching any word in given string arry.
+ */
+static Asset getAsset(String theWords[], int aStart)
+{
+    for(int i=aStart;i<theWords.length;i++) { String word = theWords[i];
+        Asset asset = AssetIndex.get().getSetAsset(word);
+        if(asset!=null)
+            return asset;
+    }
+    return null;
 }
 
 }

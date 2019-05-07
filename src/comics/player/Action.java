@@ -44,7 +44,7 @@ protected void setName(String aName)  { _name = aName; }
 public String getNameUsed()
 {
     String str = _line.getText().toLowerCase(), name = getName().toLowerCase();
-    int ind = str.indexOf(name), end = ind + name.length();
+    int ind = str.indexOf(name), end = ind + name.length(); if(ind<0) return name; // Shouldn't happen
     while(end<str.length() && !Character.isWhitespace(str.charAt(end))) end++;
     return str.substring(ind, end);
 }
