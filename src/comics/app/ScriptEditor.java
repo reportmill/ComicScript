@@ -179,17 +179,12 @@ protected View createUI()
     
     // Create/configure ScriptView add to MainRowView
     _scriptView = new ScriptView();
-    _scriptView.addEventFilter(e -> scriptViewDidKeyPress(e), KeyPress);
     ScrollView scriptScrollView = new ScrollView(_scriptView);
     scriptScrollView.setGrowWidth(true); scriptScrollView.setGrowHeight(true); scriptScrollView.setPrefHeight(180);
     mainRowView.addChild(scriptScrollView, 0);
     
-    // Get/configure InputRow, InputText, InputButton
+    // Get/configure InputRow 
     RowView inputRow = (RowView)mainColView.getChild("InputRow"); inputRow.setFillHeight(true);
-    _inputText = (TextField)inputRow.getChild("InputText"); _inputText.setRadius(10);
-    _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
-    if(_inputText.getWidth()<0) ((ComicTextField)_inputText).paintSel(null); // Forces TeaVM to compile ComicTextField
-    Button inputButton = (Button)inputRow.getChild("InputButton"); inputButton.setText("\u23CE");
     
     // Return MainColView    
     return mainColView;
@@ -203,8 +198,9 @@ protected void initUI()
     // List for ScriptLabel MousePress
     enableEvents("ScriptLabel", MousePress);
     
-    // Make ScriptView FirstFocus
+    // Configure ScriptView
     _scriptView.setScript(getScript());
+    _scriptView.addEventFilter(e -> scriptViewDidKeyPress(e), KeyPress);
     _scriptView.addEventFilter(e -> scriptViewDidMouseRelease(e), MouseRelease);
     setFirstFocus(_scriptView);
     
@@ -212,6 +208,14 @@ protected void initUI()
     _helpListView = getView("HelpListView", ListView.class);
     _helpListView.setFont(Font.Arial16);
     _helpListView.setFocusWhenPressed(false); _helpListView.getListArea().setFocusWhenPressed(false);
+    
+    // Get/Configure InputText
+    _inputText = getView("InputText", TextField.class); _inputText.setRadius(10);
+    _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
+    if(_inputText.getWidth()<0) ((ComicTextField)_inputText).paintSel(null); // Forces TeaVM to compile ComicTextField
+    
+    // Get/Configure InputButton
+    Button inputButton = getView("InputButton", Button.class); inputButton.setText("\u23CE");
 }
 
 /**
@@ -257,10 +261,8 @@ protected void respondUI(ViewEvent anEvent)
     if(anEvent.equals("RedoButton")) getScript().redo();
     
     // Handle ClearButton, SamplesButton
-    if(anEvent.equals("ClearButton"))
-        getScript().setText("Setting is blank");
-    if(anEvent.equals("SamplesButton"))
-        new SamplesPane().showSamples(_editorPane);
+    if(anEvent.equals("ClearButton")) getScript().setText("Setting is blank");
+    if(anEvent.equals("SamplesButton")) new SamplesPane().showSamples(_editorPane);
         
     // Handle ScriptView
     if(anEvent.equals("ScriptView")) {

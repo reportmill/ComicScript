@@ -54,9 +54,6 @@ public String getText()  { return _text; }
  */
 public void setText(String aStr)
 {
-    // If already set, just return
-    if(SnapUtils.equals(aStr, _text)) return;
-    
     // Set text, reset Lines, RunTime, notify player
     _text = aStr; _lines = null; _runTime = -1;
     _player.scriptChanged();
