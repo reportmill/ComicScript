@@ -90,7 +90,7 @@ protected void rebuildLines()
     
     // Make sure selection is in range
     if(getSelIndex()>=_lineViews.size())
-        setSelIndex(getChildCount() - 1);
+        setSelIndex(_lineViews.size() - 1);
     else if(getSelView()!=null)
         getSelView().setEffect(getSelEffect());
 }
@@ -137,7 +137,7 @@ public void setSelIndex(int anIndex)
 }
 
 /** Returns the selected index. */
-LineView getSelView()  { return _selIndex>=0? _lineViews.get(_selIndex) : null; }
+LineView getSelView()  { return _selIndex>=0 && _selIndex<_lineViews.size()? _lineViews.get(_selIndex) : null; }
 
 /** Handle Events. */
 protected void processEvent(ViewEvent anEvent)
