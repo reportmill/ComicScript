@@ -220,6 +220,7 @@ public void resetStar()
 {
     setVisible(false); setOpacity(1);
     setAssetImage(_asset, 0);
+    setTransX(0); setTransY(0); setRotate(0); setScale(1);
     getAnimCleared(0);
 }
 

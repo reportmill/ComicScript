@@ -194,7 +194,7 @@ public void delete()
     int ind = getSelIndex(); if(ind<0) { selectPrev(); return; }
     getScript().removeLine(ind);
     if(ind<getScript().getLineCount()) selectPrev();
-    else runCurrentLine();
+    runCurrentLine();
 }
 
 /**

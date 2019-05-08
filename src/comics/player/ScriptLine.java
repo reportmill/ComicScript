@@ -153,7 +153,7 @@ public void setActionByName(String aName)
 /**
  * Returns the runtime of this ScriptLine.
  */
-public int getRunTime()  { Action a = getAction(); return a!=null? a.getRunTime() : 0; }
+public int getRunTime()  { Action a = getAction(); return a!=null? a.getRunTime() : 1; }
 
 /**
  * Executes line.

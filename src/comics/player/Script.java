@@ -244,13 +244,15 @@ protected void firePropChange(String aProp, Object oldVal, Object newVal, int an
 public void doChange(PropChange aPC, Object oldVal, Object newVal)
 {
     String prop = aPC.getPropName();
-    if(prop==Line_Prop) {
+    if(prop==Line_Prop) { int ind = aPC.getIndex();
         if(oldVal==null) {
-            int ind = aPC.getIndex();
             addLine((ScriptLine)newVal, ind);
             getPlayer().playLine(ind);
         }
-        else removeLine(aPC.getIndex());
+        else {
+            removeLine(ind);
+            if(ind>0) getPlayer().playLine(ind-1);
+        }
     }
 }
 
