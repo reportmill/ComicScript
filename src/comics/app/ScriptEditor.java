@@ -256,7 +256,9 @@ protected void respondUI(ViewEvent anEvent)
     if(anEvent.equals("UndoButton")) getScript().undo();
     if(anEvent.equals("RedoButton")) getScript().redo();
     
-    // Handle SamplesButton
+    // Handle ClearButton, SamplesButton
+    if(anEvent.equals("ClearButton"))
+        getScript().setText("Setting is blank");
     if(anEvent.equals("SamplesButton"))
         new SamplesPane().showSamples(_editorPane);
         

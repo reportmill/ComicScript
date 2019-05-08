@@ -191,7 +191,14 @@ public void setLineText(String aStr, int anIndex)
  */
 public void delete()
 {
+    // Get selcted index
     int ind = getSelIndex(); if(ind<0) { selectPrev(); return; }
+    
+    // If first and only line, reset line and return
+    if(ind==0 && getScript().getLineCount()==1) {
+        setLineText("Setting is blank", 0); runCurrentLine(); return; }
+    
+    // Remove selected line, select previous line and run
     getScript().removeLine(ind);
     if(ind<getScript().getLineCount()) selectPrev();
     runCurrentLine();

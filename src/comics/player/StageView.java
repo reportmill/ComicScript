@@ -20,7 +20,7 @@ public class StageView extends ChildView implements Star {
 public StageView()
 {
     setPrefSize(720, 405);
-    setFill(Color.BLACK); setBorder(Color.BLACK, 1);
+    setFill(Color.WHITE); setBorder(Color.BLACK, 1);
     setFocusable(false); setFocusWhenPressed(false); // Only need this because SnapScene superclass sets
 }
 
@@ -38,7 +38,7 @@ public Image getStarImage()  { return null; }
  * Returns the action names for this star.
  */
 public String[] getActionNames()  { return _actions; }
-private static String _actions[] = { "beach", "ovaloffice", "whitehouse" };
+private static String _actions[] = { "blank", "beach", "ovaloffice", "whitehouse" };
 
 /**
  * Returns an Action for this star and given ScriptLine.

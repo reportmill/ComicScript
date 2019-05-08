@@ -11,8 +11,9 @@
     <Separator PrefWidth="8" PrefHeight="18" Vertical="true" />
     <Button Name="UndoButton" PrefWidth="22" PrefHeight="22" ToolTip="Undo" image="Edit_Undo.png" ShowBorder="false" />
     <Button Name="RedoButton" PrefWidth="22" PrefHeight="22" ToolTip="Redo" image="Edit_Redo.png" ShowBorder="false" />
-    <Label PrefWidth="90" PrefHeight="18" />
-    <Button Name="SamplesButton" PrefWidth="110" PrefHeight="26" Padding="2" LeanX="RIGHT" text="Samples" />
+    <Label PrefWidth="20" PrefHeight="18" />
+    <Button Name="ClearButton" PrefWidth="85" PrefHeight="26" Padding="2" LeanX="RIGHT" text="Clear All" />
+    <Button Name="SamplesButton" PrefWidth="85" PrefHeight="26" Padding="2" LeanX="RIGHT" text="Samples" />
   </RowView>
   <RowView Name="MainRowView" MinWidth="400" GrowHeight="true" Spacing="5">
     <ColView PrefWidth="180" Spacing="2" FillWidth="true">
@@ -27,7 +28,7 @@
     </ColView>
   </RowView>
   <RowView Name="InputRow" Padding="4" GrowWidth="true" Spacing="8">
-    <TextField Name="InputText" GrowWidth="true" class="comics.app.ScriptEditor$ComicTextField">
+    <TextField Name="InputText" GrowWidth="true" Class="comics.app.ScriptEditor$ComicTextField">
       <LineBorder Color="#c0c0c0" />
       <font name="Arial" size="16" />
     </TextField>

@@ -1,5 +1,5 @@
 package comics.player;
-import snap.gfx.Image;
+import snap.gfx.*;
 import snap.util.*;
 
 /**
@@ -162,8 +162,8 @@ public void run()
 {
     // Get star and make sure it's visible
     Star star = getStar(); if(star==null) return;
-    if(star instanceof Actor && !((Actor)star).isVisible())
-        ((Actor)star).setVisible(true);
+    if(star instanceof Actor && !((Actor)star).isVisible()) { Actor actr = (Actor)star;
+        actr.setVisible(true); actr.setLocXY(Pos.BOTTOM_LEFT, 10, 10, null); }
 
     // Get action and run        
     Action action = getAction(); if(action==null) return;
