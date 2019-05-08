@@ -18,8 +18,8 @@ public class LineEditor extends ViewOwner {
     // The ActionEditor
     ActionEditor       _actionEditor;
     
-    // The LinePartsView holds the LinePartViews
-    LinePartsView      _linePartsView;
+    // The LineView shows the ScriptLine
+    LineView           _lineView;
 
     // TransitionPane
     TransitionPane     _transPane;
@@ -85,6 +85,17 @@ protected void scriptChanged()
     resetLater();
 }
 
+/** Called when LineView receives MousePress to have EditorPane go back to ScriptEditor. */
+void lineViewDidMousePress(ViewEvent anEvent)  { _editorPane.showScriptEditor(); anEvent.consume(); }
+
+/** Called when LineView.SelIndex changes to make sure correct sub-editor is showing. */
+void lineViewSelIndexChanged()
+{
+    int ind = _lineView.getSelIndex();
+    if(ind==0 && !_starPicker.getUI().isShowing()) showStarPicker();
+    else if(ind>0 && !_actionEditor.getUI().isShowing()) showActionEditor();
+}
+
 /**
  * Creates UI.
  */
@@ -97,9 +108,11 @@ protected View createUI()
     RowView toolBar = (RowView)mainColView.getChild(0);
     Label toolBarLabel = (Label)toolBar.getChild("ToolBarLabel"); toolBarLabel.setFont(MAIN_FONT.getBold());
     
-    // Create LinePartsView
-    _linePartsView = new LinePartsView();
-    toolBar.addChild(_linePartsView, 1);
+    // Create LineView
+    _lineView = new LineView();
+    _lineView.addPropChangeListener(pc -> lineViewSelIndexChanged(), LineView.SelIndex_Prop);
+    _lineView.addEventHandler(e -> lineViewDidMousePress(e), MousePress);
+    toolBar.addChild(_lineView, 1);
     
     // Create Divider line
     Label label = new Label(); label.setPrefHeight(4);
@@ -124,8 +137,8 @@ protected void resetUI()
     // Get selected script line and star
     ScriptLine line = getSelLine();
     
-    // Update LinePartsView
-    _linePartsView.setLine(line);
+    // Update LineView
+    _lineView.setLine(line);
     
     // Reset StarPicker/ActionEditor
     if(_starPicker.isUISet() && _starPicker.getUI().isShowing()) _starPicker.resetLater();
@@ -141,132 +154,11 @@ protected void respondUI(ViewEvent anEvent)
     if(anEvent.equals("DoneButton"))
         _editorPane.showScriptEditor();
         
-    // Handle LinePartsView
-    if(anEvent.equals(_linePartsView)) {
-        if(_linePartsView.getSelIndex()==0)
+    // Handle LineView
+    if(anEvent.equals(_lineView)) {
+        if(_lineView.getSelIndex()==0)
             showStarPicker();
         else showActionEditor();
-    }
-}
-
-/**
- * A class to show LineParts.
- */
-class LinePartsView extends RowView {
-    
-    // The ScriptLine
-    ScriptLine        _line;
-    String            _text = "";
-    
-    // The selected index
-    int               _selIndex;
-    
-    /** Creates a LinePartsView. */
-    public LinePartsView()
-    {
-        setGrowWidth(true); setPrefHeight(40);
-        setPadding(5,5,5,5); setSpacing(8);
-        setFont(new Font("Arial", 15));
-        enableEvents(MousePress, Action);
-    }
-    
-    /** Sets the ScriptLine. */
-    public void setLine(ScriptLine aLine)
-    {
-        // If already set, just return
-        String text = aLine!=null? aLine.getText() : "";
-        if(aLine==_line && text.equals(_text)) return;
-
-        // Get index
-        int ind = _line==aLine? _selIndex : 0;
-        
-        // Set Line and Text
-        _line = aLine; _text = text;
-        
-        // Remove Children
-        removeChildren();
-        
-        // Add Star part
-        Star star = aLine!=null? aLine.getStar() : null;
-        String starName = star!=null? star.getStarName() : "?";
-        LinePartView starView = new LinePartView(starName);
-        starView.setEffect(SELECT_EFFECT_FOC);
-        addChild(starView);
-        setSelIndex(0);
-        
-        // Add Action part
-        Action action = aLine!=null? aLine.getAction() : null;
-        String actionName = action!=null? action.getNameUsed().toLowerCase() : "?";
-        LinePartView actView = new LinePartView(actionName);
-        addChild(actView);
-
-        // Add Action predicate
-        String predText = action!=null? action.getText() : "";
-        if(predText.length()>0) {
-            LinePartView predView = new LinePartView(predText);
-            addChild(predView);
-        }
-        
-        // Reset selection
-        if(ind>=getChildCount()) ind = getChildCount() - 1;
-        setSelIndex(ind);
-        if(ind==0 && !_starPicker.getUI().isShowing()) showStarPicker();
-        else if(ind>0 && !_actionEditor.getUI().isShowing()) showActionEditor();
-    }
-    
-    /** Returns the selected index. */
-    public int getSelIndex()  { return _selIndex; }
-    
-    /** Sets the selected index. */
-    public void setSelIndex(int anIndex)
-    {
-        if(anIndex==_selIndex) return;
-        View selViewOld = getSelView(); if(selViewOld!=null) selViewOld.setEffect(null);
-        _selIndex = anIndex;
-        View selView = getSelView(); if(selView!=null) selView.setEffect(SELECT_EFFECT_FOC);
-        repaint();
-    }
-    
-    /** Returns the selected view. */
-    public LinePartView getSelView()  {
-        return _selIndex>=0 && _selIndex<getChildCount()? (LinePartView)getChild(_selIndex) : null;
-    }
-    
-    /** Handle Events. */
-    protected void processEvent(ViewEvent anEvent)
-    {
-        // Handle MousePress
-        if(anEvent.isMousePress()) {
-            _editorPane.showScriptEditor();
-            anEvent.consume();
-        }
-    }
-}
-
-/**
- * A class to represent a LineView.
- */
-class LinePartView extends Label {
-    
-    /** Creates LinePartView. */
-    public LinePartView(String aStr)
-    {
-        setText(aStr); setFont(_linePartsView.getFont());
-        setPadding(5,10,5,10); setRadius(10);
-        setFill(LINEPART_FILL); setBorder(LINEPART_BORDER, 1);
-        enableEvents(MousePress);
-    }
-    
-    /** Handle Events. */
-    protected void processEvent(ViewEvent anEvent)
-    {
-        // Handle MousePress
-        if(anEvent.isMousePress()) {
-            int ind = getParent().indexOfChild(this);
-            _linePartsView.setSelIndex(ind);
-            ViewUtils.fireActionEvent(_linePartsView, anEvent);
-            anEvent.consume();
-        }
     }
 }
 
