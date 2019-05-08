@@ -16,7 +16,7 @@ public class LineView extends RowView {
     int                 _selIndex;
     
     // A listener to watch for ScriptLine Text changes
-    PropChangeListener  _lineLsnr = pc -> rebuildLineFrags();
+    PropChangeListener  _lineLsnr = pc -> rebuildFrags();
     
     // Constants
     public static String SelIndex_Prop = "SelIndex";
@@ -36,6 +36,11 @@ public LineView()
 }
 
 /**
+ * Creates a LineView for given ScriptLine.
+ */
+public LineView(ScriptLine aLine)  { setLine(aLine); }
+
+/**
  * Sets the ScriptLine.
  */
 public void setLine(ScriptLine aLine)
@@ -49,14 +54,14 @@ public void setLine(ScriptLine aLine)
     if(_line!=null) _line.addPropChangeListener(_lineLsnr);
     
     // Rebuild Line FragViews and reset index
-    rebuildLineFrags();
+    rebuildFrags();
     setSelIndex(0);
 }
 
 /**
  * Rebuilds the line fragments.
  */
-void rebuildLineFrags()
+void rebuildFrags()
 {
     // Remove Children
     removeChildren();

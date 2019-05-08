@@ -26,10 +26,6 @@ public class LineEditor extends ViewOwner {
     
     // Constants
     static Font     MAIN_FONT = new Font("Arial", 18);
-    static Color    LINEPART_FILL = new Color("#FFDDDD"), LINEPART_BORDER = Color.GRAY;
-    static Color    SELECT_COLOR = Color.get("#039ed3");
-    static Effect   SELECT_EFFECT = new ShadowEffect(8, Color.DARKGRAY, 0, 0);
-    static Effect   SELECT_EFFECT_FOC = new ShadowEffect(8, SELECT_COLOR, 0, 0);
 
 /**
  * Creates a LineEditor.
