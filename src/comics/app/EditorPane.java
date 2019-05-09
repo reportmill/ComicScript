@@ -124,9 +124,10 @@ public void setSelIndex(int anIndex)
     
     // Set SelIndex and update player
     _selIndex = anIndex;
-    int ind = _selIndex>=0? _selIndex : negateIndex(_selIndex);
+    int ind = _selIndex; if(ind<0) ind = negateIndex(ind);
     _changingSelIndex = true;
     getPlayer().setRunLine(ind); _changingSelIndex = false;
+    resetLater();
 }
 
 /**
@@ -248,10 +249,8 @@ void playerScriptChanged()
  */
 void playerRunLineChanged()
 {
-    if(!_changingSelIndex) {
-        setSelIndex(getPlayer().getRunLine());
-        resetLater();
-    }
+    if(_changingSelIndex) return;
+    setSelIndex(getPlayer().getRunLine());
 }
 
 /**

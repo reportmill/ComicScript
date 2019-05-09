@@ -1,6 +1,7 @@
 package comics.app;
 import comics.player.*;
 import snap.gfx.*;
+import snap.util.Range;
 import snap.view.*;
 
 /**
@@ -120,7 +121,6 @@ void scriptViewDidKeyPress(ViewEvent anEvent)
         char c = anEvent.getKeyChar();
         if(Character.isLetterOrDigit(c)) {
             _inputText.requestFocus();
-            _inputText.selectAll();
             ViewUtils.processEvent(_inputText, anEvent);
         }
     }
@@ -154,7 +154,7 @@ void inputTextDidKeyPress(ViewEvent anEvent)
     if((anEvent.isSpaceKey() || anEvent.isEnterKey()) && _helpList.getSelIndex()>=0) {
         
         // Get completion chars and insert into InputText
-        ScriptLine line = getSelLine(); if(line==null) line = new ScriptLine(getScript(), _inputText.getText());
+        ScriptLine line = new ScriptLine(getScript(), _inputText.getText());
         int ind = _inputText.getSelStart();
         String str = HelpUtils.getFragCompletion(line, ind, _helpList.getSelItem());
         _inputText.replaceChars(str);
@@ -172,9 +172,8 @@ void inputTextDidKeyPress(ViewEvent anEvent)
  */
 void inputTextSelChanged()
 {
-    // Get Selected Line (create if missing)
-    ScriptLine line = getSelLine();
-    if(line==null) line = new ScriptLine(getScript(), _inputText.getText());
+    // Get ScriptLine for InputText
+    ScriptLine line = new ScriptLine(getScript(), _inputText.getText());
     int ind = _inputText.getSelStart();
 
     // Get HelpLabel string and HelpList items and set
@@ -274,7 +273,11 @@ protected void resetUI()
     
     // Update InputText
     _inputText.setText(line!=null? line.getText() : "");
-    _inputText.selectAll();
+    if(_scriptView.getSelCharIndex()>=0) {
+        Range range = HelpUtils.getFragRangeAtCharIndex(line, _scriptView.getSelCharIndex());
+        _inputText.setSel(range.start, range.end); _scriptView._selCharIndex = range.start;
+    }
+    else _inputText.selectAll();
 }
 
 /**

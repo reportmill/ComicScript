@@ -11,16 +11,19 @@ import snap.view.*;
 public class ScriptView extends ColView {
     
     // The Script
-    Script             _script;
+    Script              _script;
     
     // The selected index
-    int                _selIndex = -1;
+    int                 _selIndex = -1;
+    
+    // The selected char index - if LineView was clicked
+    int                 _selCharIndex = -1;
     
     // The current list of LineViews
-    List <LineView>    _lineViews = new ArrayList();
+    List <LineView>     _lineViews = new ArrayList();
     
     // The cursor lineview
-    LineView           _cursorLineView;
+    LineView            _cursorLineView;
     
     // A PropListener
     PropChangeListener  _scriptLsnr = pc -> rebuildLines();
@@ -114,6 +117,7 @@ public void setSelIndex(int anIndex)
     
     // Set new value
     _selIndex = anIndex;
+    _selCharIndex = -1;
     
     // Decorate new selected LineView
     LineView selLineView = getSelView();
@@ -138,6 +142,11 @@ public void setSelIndex(int anIndex)
 
 /** Returns the selected index. */
 LineView getSelView()  { return _selIndex>=0 && _selIndex<_lineViews.size()? _lineViews.get(_selIndex) : null; }
+
+/**
+ * Returns the selected character index (assuming Line was clicked).
+ */
+public int getSelCharIndex()  { return _selCharIndex; }
 
 /** Handle Events. */
 protected void processEvent(ViewEvent anEvent)
@@ -186,6 +195,8 @@ private class LineView extends Label {
             ScriptView.this.requestFocus();
             int ind = _lineViews.indexOf(this);
             setSelIndex(ind);
+            int cind = getStringView().getCharIndexForX(anEvent.getX() - getStringView().getX());
+            _selCharIndex = cind;
             ScriptView.this.fireActionEvent(anEvent);
         }
     }
