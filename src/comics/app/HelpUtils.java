@@ -64,13 +64,14 @@ public static Range getFragRangeAtCharIndex(ScriptLine aLine, int anIndex)
         return new Range(actInd, actEnd);
 
     // Return predicate
-    return new Range(actEnd + 1, text.length());
+    int predInd = Math.min(actEnd + 1, text.length()), predEnd = text.length();
+    return new Range(predInd, predEnd);
 }
 
 /**
  * Returns a list of Help strings.
  */
-public static String [] getHelpItems(ScriptLine aLine, int anIndex)
+public static String[] getHelpItems(ScriptLine aLine, int anIndex)
 {
     // Get all help items for frag type at index
     int type = getFragTypeAtCharIndex(aLine, anIndex);
@@ -90,6 +91,31 @@ public static String [] getHelpItems(ScriptLine aLine, int anIndex)
         
     // Return help items
     return helpItems;
+}
+
+/**
+ * Returns a whether help items are filtered for this line and index.
+ */
+public static boolean isHelpItemsFiltered(ScriptLine aLine, int anIndex)
+{
+    // Get all help items for frag type at index
+    int type = getFragTypeAtCharIndex(aLine, anIndex);
+    String helpItems[] = type==FRAG_STAR? ScriptEditor._stars :
+        type==FRAG_ACTION? aLine.getStar().getActionNames() : new String[0];
+    if(helpItems.length==0) return false;
+        
+    // If index at end of range, filter list
+    Range range = getFragRangeAtCharIndex(aLine, anIndex);
+    return anIndex==range.end && !range.isEmpty();
+}
+
+/**
+ * Returns the frag remainder string for this line and index.
+ */
+public static String getFragCompletion(ScriptLine aLine, int anIndex, String aFragStr)
+{
+    Range range = getFragRangeAtCharIndex(aLine, anIndex);
+    return aFragStr.substring(range.length);
 }
 
 }

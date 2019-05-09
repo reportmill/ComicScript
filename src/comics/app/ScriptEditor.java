@@ -15,7 +15,7 @@ public class ScriptEditor extends ViewOwner {
     ScriptView           _scriptView;
     
     // The ListView showing help suggestions
-    ListView <String>    _helpListView;
+    ListView <String>    _helpList;
     
     // The InputText
     TextField            _inputText;
@@ -149,6 +149,22 @@ void inputTextDidKeyPress(ViewEvent anEvent)
         delete();
         anEvent.consume();
     }
+    
+    // Handle Space, Enter keys: If HelpList 
+    if((anEvent.isSpaceKey() || anEvent.isEnterKey()) && _helpList.getSelIndex()>=0) {
+        
+        // Get completion chars and insert into InputText
+        ScriptLine line = getSelLine(); if(line==null) line = new ScriptLine(getScript(), _inputText.getText());
+        int ind = _inputText.getSelStart();
+        String str = HelpUtils.getFragCompletion(line, ind, _helpList.getSelItem());
+        _inputText.replaceChars(str);
+        
+        // If Enter key and chars were added, consume event to suppress action
+        if(anEvent.isEnterKey() && str.length()>0) {
+            anEvent.consume();
+            if(_inputText.getSelEnd()==_inputText.length()) _inputText.replaceChars(" ");
+        }
+    }
 }
 
 /**
@@ -161,17 +177,21 @@ void inputTextSelChanged()
     if(line==null) line = new ScriptLine(getScript(), _inputText.getText());
     int ind = _inputText.getSelStart();
 
-    // Get HelpListLabel string and HelpListView items and set
+    // Get HelpLabel string and HelpList items and set
     String helpName = HelpUtils.getFragTypeNameAtCharIndex(line, ind);
     String helpItems[] = HelpUtils.getHelpItems(line, ind);
-    setViewText("HelpListLabel", helpName);
-    _helpListView.setItems(helpItems);
+    setViewText("HelpLabel", helpName);
+    _helpList.setItems(helpItems);
+    
+    // Set selection if list is filtered
+    if(HelpUtils.isHelpItemsFiltered(line, ind)) _helpList.setSelIndex(0);
+    else _helpList.setSelIndex(-1);
 }
 
 /**
- * Called when HelpListView does Action event.
+ * Called when HelpList does Action event.
  */
-void helpListViewDidAction(String aStr)
+void helpListDidAction(String aStr)
 {
     ScriptLine line = getSelLine();
     String starName = line!=null && line.getStar()!=null? line.getStar().getStarName() : null;
@@ -179,7 +199,7 @@ void helpListViewDidAction(String aStr)
     setLineText(str);
     
     // Reset UI
-    _helpListView.setSelIndex(-1);
+    _helpList.setSelIndex(-1);
     resetLater();
 }
 
@@ -221,10 +241,10 @@ protected void initUI()
     _scriptView.addEventFilter(e -> scriptViewDidMouseRelease(e), MouseRelease);
     setFirstFocus(_scriptView);
     
-    // Get/configure HelpListView
-    _helpListView = getView("HelpListView", ListView.class);
-    _helpListView.setFont(Font.Arial16);
-    _helpListView.setFocusWhenPressed(false); _helpListView.getListArea().setFocusWhenPressed(false);
+    // Get/configure HelpList
+    _helpList = getView("HelpList", ListView.class);
+    _helpList.setFont(Font.Arial16);
+    _helpList.setFocusWhenPressed(false); _helpList.getListArea().setFocusWhenPressed(false);
     
     // Get/Configure InputText
     _inputText = getView("InputText", TextField.class); _inputText.setRadius(10);
@@ -252,11 +272,6 @@ protected void resetUI()
     // Update ScriptView
     _scriptView.setSelIndex(getSelIndex());
     
-    // Update HelpListView
-    //String helpItems[] = star!=null? star.getActionNames() : _stars;
-    //setViewText("HelpListLabel", star!=null? "Actions" : "Subjects");
-    //_helpListView.setItems(helpItems);
-
     // Update InputText
     _inputText.setText(line!=null? line.getText() : "");
     _inputText.selectAll();
@@ -291,11 +306,11 @@ protected void respondUI(ViewEvent anEvent)
         else _inputText.requestFocus();
     }
     
-    // Handle HelpListView
-    if(anEvent.equals("HelpListView")) {
+    // Handle HelpList
+    if(anEvent.equals("HelpList")) {
         _scriptView.requestFocus();
-        String str = _helpListView.getSelItem();
-        ViewUtils.runOnMouseUp(() -> helpListViewDidAction(str));
+        String str = _helpList.getSelItem();
+        ViewUtils.runOnMouseUp(() -> helpListDidAction(str));
     }
     
     // Handle InputText
