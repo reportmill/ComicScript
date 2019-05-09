@@ -14,6 +14,9 @@ public class StageView extends ChildView implements Star {
     // The actors currently used by script
     Map <String,Actor>  _actors = new HashMap();
     
+    // The list of settings
+    String              _sets[];
+    
 /**
  * Creates a StageView.
  */
@@ -37,8 +40,15 @@ public Image getStarImage()  { return null; }
 /**
  * Returns the action names for this star.
  */
-public String[] getActionNames()  { return _actions; }
-private static String _actions[] = { "blank", "beach", "ovaloffice", "whitehouse" };
+public String[] getActionNames()
+{
+    if(_sets!=null) return _sets;
+    
+    List <String> sets = new ArrayList(); sets.add("Blank");
+    for(Asset.SetImage set : AssetIndex.get()._sets)
+        sets.add(set.getName());
+    return _sets = sets.toArray(new String[sets.size()]);
+}
 
 /**
  * Returns an Action for this star and given ScriptLine.
