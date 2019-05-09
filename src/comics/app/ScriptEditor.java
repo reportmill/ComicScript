@@ -152,6 +152,23 @@ void inputTextDidKeyPress(ViewEvent anEvent)
 }
 
 /**
+ * Called when InputText does selection change.
+ */
+void inputTextSelChanged()
+{
+    // Get Selected Line (create if missing)
+    ScriptLine line = getSelLine();
+    if(line==null) line = new ScriptLine(getScript(), _inputText.getText());
+    int ind = _inputText.getSelStart();
+
+    // Get HelpListLabel string and HelpListView items and set
+    String helpName = HelpUtils.getFragTypeNameAtCharIndex(line, ind);
+    String helpItems[] = HelpUtils.getHelpItems(line, ind);
+    setViewText("HelpListLabel", helpName);
+    _helpListView.setItems(helpItems);
+}
+
+/**
  * Called when HelpListView does Action event.
  */
 void helpListViewDidAction(String aStr)
@@ -212,6 +229,7 @@ protected void initUI()
     // Get/Configure InputText
     _inputText = getView("InputText", TextField.class); _inputText.setRadius(10);
     _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
+    _inputText.addPropChangeListener(pc -> inputTextSelChanged(), TextField.Sel_Prop);
     if(_inputText.getWidth()<0) ((ComicTextField)_inputText).paintSel(null); // Forces TeaVM to compile ComicTextField
     
     // Get/Configure InputButton
@@ -235,9 +253,9 @@ protected void resetUI()
     _scriptView.setSelIndex(getSelIndex());
     
     // Update HelpListView
-    String helpItems[] = star!=null? star.getActionNames() : _stars;
-    setViewText("HelpListLabel", star!=null? "Actions" : "Subjects");
-    _helpListView.setItems(helpItems);
+    //String helpItems[] = star!=null? star.getActionNames() : _stars;
+    //setViewText("HelpListLabel", star!=null? "Actions" : "Subjects");
+    //_helpListView.setItems(helpItems);
 
     // Update InputText
     _inputText.setText(line!=null? line.getText() : "");

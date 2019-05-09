@@ -93,6 +93,16 @@ public String getStarName()
 }
 
 /**
+ * Returns the action name.
+ */
+public String getActionName()
+{
+    String words[] = getWords(); if(words.length<2) return null;
+    String word = words[1];
+    return word.length()>0? word : null;
+}
+
+/**
  * Returns the Star of this line.
  */
 public Star getStar()
