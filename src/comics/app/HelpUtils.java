@@ -75,8 +75,7 @@ public static String[] getHelpItems(ScriptLine aLine, int anIndex)
 {
     // Get all help items for frag type at index
     int type = getFragTypeAtCharIndex(aLine, anIndex);
-    String helpItems[] = type==FRAG_STAR? ScriptEditor._stars :
-        type==FRAG_ACTION? aLine.getStar().getActionNames() : new String[0];
+    String helpItems[] = getHelpItemsForType(aLine, type);
         
     // If index at end of range, filter list
     Range range = getFragRangeAtCharIndex(aLine, anIndex);
@@ -94,14 +93,28 @@ public static String[] getHelpItems(ScriptLine aLine, int anIndex)
 }
 
 /**
+ * Returns a list of Help strings.
+ */
+public static String[] getHelpItemsForType(ScriptLine aLine, int aType)
+{
+    if(aType==FRAG_STAR)
+        return ScriptEditor._stars;
+    if(aType==FRAG_ACTION) {
+        return aLine.getStar()!=null? aLine.getStar().getActionNames() : new String[0]; }
+    if(aType==FRAG_PREDICATE) {
+        return aLine.getAction()!=null? aLine.getAction().getPredicateStrings() : new String[0]; }
+    System.err.println("HelpUtils.getHelpItemsForType: Unknown type: " + aType);
+    return new String[0];
+}
+
+/**
  * Returns a whether help items are filtered for this line and index.
  */
 public static boolean isHelpItemsFiltered(ScriptLine aLine, int anIndex)
 {
     // Get all help items for frag type at index
     int type = getFragTypeAtCharIndex(aLine, anIndex);
-    String helpItems[] = type==FRAG_STAR? ScriptEditor._stars :
-        type==FRAG_ACTION? aLine.getStar().getActionNames() : new String[0];
+    String helpItems[] = getHelpItemsForType(aLine, type);
     if(helpItems.length==0) return false;
         
     // If index at end of range, filter list

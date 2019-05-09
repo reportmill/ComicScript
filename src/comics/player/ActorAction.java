@@ -57,6 +57,9 @@ public static class WalksAction extends ActorAction {
     /** Creates the action. */
     public WalksAction()  { setName("Walks"); setRunTime(2000); }
     
+    /** Returns the predicate strings. */
+    public String[] getPredicateStrings()  { return new String[] { "in", "in from right", "out" }; }
+
     /** Override to load image. */
     public void load()  { loadAnim("Walk"); }
     
@@ -103,6 +106,9 @@ public static class DropsAction extends ActorAction {
     /** Creates the action. */
     public DropsAction()  { setName("Drops"); setRunTime(2000); }
     
+    /** Returns the predicate strings. */
+    public String[] getPredicateStrings()  { return new String[] { "on right" }; }
+
     /** Runs the action. */
     public void run()
     {

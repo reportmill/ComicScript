@@ -50,14 +50,9 @@ public String getNameUsed()
 }
 
 /**
- * Returns the runtime of the action.
+ * Returns the star.
  */
-public int getRunTime()  { return _runTime; }
-
-/**
- * Sets the runtime of the action.
- */
-protected void setRunTime(int aTime)  { _runTime = aTime; }
+public Star getStar()  { return _line.getStar(); }
 
 /**
  * Returns the text that invoked this action and describes it.
@@ -71,9 +66,19 @@ public String getText()
 }
 
 /**
- * Returns the star.
+ * Returns the predicate strings.
  */
-public Star getStar()  { return _line.getStar(); }
+public String[] getPredicateStrings()  { return new String[0]; }
+
+/**
+ * Returns the runtime of the action.
+ */
+public int getRunTime()  { return _runTime; }
+
+/**
+ * Sets the runtime of the action.
+ */
+protected void setRunTime(int aTime)  { _runTime = aTime; }
 
 /**
  * Loads the Action.

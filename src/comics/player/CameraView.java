@@ -188,6 +188,9 @@ public static class ZoomAction extends Action {
     /** Creates the action. */
     public ZoomAction()  { setName("Zoom"); setRunTime(2000); }
     
+    /** Returns the predicate strings. */
+    public String[] getPredicateStrings()  { return new String[] { "in", "out" }; }
+
     /** Runs the action. */
     public void run()
     {
@@ -216,6 +219,9 @@ public static class BlurAction extends Action {
     /** Creates the action. */
     public BlurAction()  { setName("Blur"); setRunTime(1000); }
     
+    /** Returns the predicate strings. */
+    public String[] getPredicateStrings()  { return new String[] { "off" }; }
+
     /** Runs the action. */
     public void run()
     {

@@ -2,6 +2,7 @@ package comics.app;
 import comics.player.*;
 import snap.gfx.*;
 import snap.util.Range;
+import snap.util.StringUtils;
 import snap.view.*;
 
 /**
@@ -183,7 +184,7 @@ void inputTextSelChanged()
     _helpList.setItems(helpItems);
     
     // Set selection if list is filtered
-    if(HelpUtils.isHelpItemsFiltered(line, ind)) _helpList.setSelIndex(0);
+    if(helpItems.length>0 && HelpUtils.isHelpItemsFiltered(line, ind)) _helpList.setSelIndex(0);
     else _helpList.setSelIndex(-1);
 }
 
@@ -272,6 +273,7 @@ protected void resetUI()
     _scriptView.setSelIndex(getSelIndex());
     
     // Update InputText
+    if(_inputText.isFocused()) return;
     _inputText.setText(line!=null? line.getText() : "");
     if(_scriptView.getSelCharIndex()>=0) {
         Range range = HelpUtils.getFragRangeAtCharIndex(line, _scriptView.getSelCharIndex());
@@ -306,14 +308,34 @@ protected void respondUI(ViewEvent anEvent)
         int ind = _scriptView.getSelIndex();
         setSelIndex(ind);
         if(ind>=0) runCurrentLine();
-        else _inputText.requestFocus();
+        else {
+            _inputText.setText(null);
+            _inputText.requestFocus();
+        }
     }
     
     // Handle HelpList
     if(anEvent.equals("HelpList")) {
-        _scriptView.requestFocus();
-        String str = _helpList.getSelItem();
-        ViewUtils.runOnMouseUp(() -> helpListDidAction(str));
+        String text = _inputText.getText(), word = _helpList.getSelItem(); if(word==null) return;
+        ScriptLine line = new ScriptLine(getScript(), text);
+        int ind = _inputText.getSelStart();
+        Range range = HelpUtils.getFragRangeAtCharIndex(line, ind);
+        if(_inputText.isFocused()) {
+            boolean atEnd = _inputText.isSelEmpty() && _inputText.getSelEnd()==_inputText.length();
+            _inputText.replaceChars(word, range.start, range.end, false);
+            if(atEnd)
+                _inputText.replaceChars(" ", _inputText.length(), _inputText.length(), true);
+            else _inputText.setSel(range.start, range.start + word.length());
+            anEvent.setTriggersReset(false);
+        }
+        else {
+            String text2 = StringUtils.replace(text, range.start, range.end, word);
+            setLineText(text2);
+            _scriptView._selCharIndex = range.start;
+        }
+        //_scriptView.requestFocus();
+        //String str = _helpList.getSelItem();
+        //ViewUtils.runOnMouseUp(() -> helpListDidAction(str));
     }
     
     // Handle InputText
@@ -327,6 +349,11 @@ protected void respondUI(ViewEvent anEvent)
     // Handle EditLineButton
     if(anEvent.equals("EditLineButton"))
         _editorPane.showLineEditor();
+}
+
+public void resetLater()
+{
+    super.resetLater();
 }
 
 /**
