@@ -117,7 +117,7 @@ void scriptViewDidKeyPress(ViewEvent anEvent)
     }
     
     // Handle letter or digit
-    else {
+    else if(!anEvent.isShortcutDown()) {
         char c = anEvent.getKeyChar();
         if(Character.isLetterOrDigit(c)) {
             _inputText.requestFocus();
