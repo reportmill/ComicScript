@@ -71,9 +71,8 @@ public String[] getWords()
     if(_words!=null) return _words;
     
     // Get text and words
-    String text = getText().toLowerCase();
+    String text = getText().toLowerCase().replace(","," ").replace("\"","");
     String words[] = text.split("\\s");
-    for(int i=0;i<words.length;i++) words[i] = words[i].replace(",","").replace("\"","");
     return _words = words;
 }
 
