@@ -63,19 +63,18 @@ public void setLineText(String aStr)
     if(ind>=0) {
         
         // If text hasn't changed, select new
-        if(getScript().getLine(ind).getText().equals(str)) {
-           selectNextWithInsert(); return; }
+        if(getScript().getLine(ind).getText().equals(str)) { selectNextWithInsert(); return; }
            
         // Set line to new text
-        _editorPane.setLineText(str, ind);
+        if(str.length()==0) delete();
+        else _editorPane.setLineText(str, ind);
     }
     
     // If new line
     else {
         
         // If no new text, select next line
-        if(str.length()==0) {
-            selectNext(); return; }
+        if(str.length()==0) { selectNext(); return; }
             
         // Add new line
         ind = EditorPane.negateIndex(ind);
@@ -189,21 +188,6 @@ void inputTextSelChanged()
 }
 
 /**
- * Called when HelpList does Action event.
- */
-void helpListDidAction(String aStr)
-{
-    ScriptLine line = getSelLine();
-    String starName = line!=null && line.getStar()!=null? line.getStar().getStarName() : null;
-    String str = starName!=null? starName + ' ' + aStr : aStr;
-    setLineText(str);
-    
-    // Reset UI
-    _helpList.setSelIndex(-1);
-    resetLater();
-}
-
-/**
  * Creates UI.
  */
 protected View createUI()
@@ -273,7 +257,6 @@ protected void resetUI()
     _scriptView.setSelIndex(getSelIndex());
     
     // Update InputText
-    if(_inputText.isFocused()) return;
     _inputText.setText(line!=null? line.getText() : "");
     if(_scriptView.getSelCharIndex()>=0) {
         Range range = HelpUtils.getFragRangeAtCharIndex(line, _scriptView.getSelCharIndex());
@@ -314,28 +297,32 @@ protected void respondUI(ViewEvent anEvent)
         }
     }
     
-    // Handle HelpList
+    // Handle HelpList: Replace selected ScriptLine frag in InputText with selected item from HelpList
     if(anEvent.equals("HelpList")) {
-        String text = _inputText.getText(), word = _helpList.getSelItem(); if(word==null) return;
+        
+        // Get line text, frag string and range of selected frag in text
+        String text = _inputText.getText();
+        String frag = _helpList.getSelItem(); if(frag==null) return;
         ScriptLine line = new ScriptLine(getScript(), text);
         int ind = _inputText.getSelStart();
         Range range = HelpUtils.getFragRangeAtCharIndex(line, ind);
+        String text2 = StringUtils.replace(text, range.start, range.end, frag);
+        
+        // If InputText focused, replace chars
         if(_inputText.isFocused()) {
             boolean atEnd = _inputText.isSelEmpty() && _inputText.getSelEnd()==_inputText.length();
-            _inputText.replaceChars(word, range.start, range.end, false);
-            if(atEnd)
-                _inputText.replaceChars(" ", _inputText.length(), _inputText.length(), true);
-            else _inputText.setSel(range.start, range.start + word.length());
-            anEvent.setTriggersReset(false);
+            if(atEnd) text2 += ' ';
+            _inputText.setText(text2);
+            if(atEnd) _inputText.setSel(_inputText.length());
+            else _inputText.setSel(range.start, range.start + frag.length());
+            cancelReset();
         }
+        
+        // If anything else focused, replace text
         else {
-            String text2 = StringUtils.replace(text, range.start, range.end, word);
             setLineText(text2);
             _scriptView._selCharIndex = range.start;
         }
-        //_scriptView.requestFocus();
-        //String str = _helpList.getSelItem();
-        //ViewUtils.runOnMouseUp(() -> helpListDidAction(str));
     }
     
     // Handle InputText
@@ -349,11 +336,6 @@ protected void respondUI(ViewEvent anEvent)
     // Handle EditLineButton
     if(anEvent.equals("EditLineButton"))
         _editorPane.showLineEditor();
-}
-
-public void resetLater()
-{
-    super.resetLater();
 }
 
 /**
