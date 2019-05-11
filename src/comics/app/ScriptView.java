@@ -2,7 +2,7 @@ package comics.app;
 import comics.player.*;
 import java.util.*;
 import snap.gfx.*;
-import snap.util.PropChangeListener;
+import snap.util.*;
 import snap.view.*;
 
 /**
@@ -177,13 +177,24 @@ protected void setFocused(boolean aValue)
  */
 private class LineView extends Label {
     
+    // The line
+    ScriptLine  _line;
+    
+    // Hightlight rects
+    Rect        _selRect, _mouseRect;
+    
+    // Cached pointer to the string value
+    StringView  _stringView;
+    
     /** Create LineView. */
     public LineView(ScriptLine aLine)
     {
-        setPadding(5,10,5,10); setRadius(10);
+        _line = aLine;
+        setPadding(5,20,5,10); setRadius(10);
         if(aLine!=null) { setText(aLine.getText()); setFont(SCRIPTVIEW_FONT); }
         setFill(LINEVIEW_FILL);
-        enableEvents(MousePress);
+        enableEvents(MousePress, MouseMove, MouseExit);
+        _stringView = getStringView();
     }
 
     /** Handle Events. */
@@ -195,10 +206,46 @@ private class LineView extends Label {
             ScriptView.this.requestFocus();
             int ind = _lineViews.indexOf(this);
             setSelIndex(ind);
-            int cind = getStringView().getCharIndexForX(anEvent.getX() - getStringView().getX());
-            _selCharIndex = cind;
+            int cind = _stringView.getCharIndexForX(anEvent.getX() - _stringView.getX());
+            _selCharIndex = cind; _selRect = getFragRectForCharIndex(cind);
             ScriptView.this.fireActionEvent(anEvent);
         }
+        
+        // Handle MouseMove
+        else if(anEvent.isMouseMove()) { _mouseRect = null;
+            if(_stringView.getTextBounds().contains(anEvent.getX(), anEvent.getY())) {
+                int cind = _stringView.getCharIndexForX(anEvent.getX() - _stringView.getX());
+                _mouseRect = getFragRectForCharIndex(cind);
+            }
+            repaint();
+        }
+        
+        // Handle MouseMove
+        else if(anEvent.isMouseExit()) { _mouseRect = null; repaint(); }
+    }
+    
+    Rect getFragRectForCharIndex(int anIndex)
+    {
+        Range range = HelpUtils.getFragRangeAtCharIndex(_line, anIndex); if(range.start<0) return null;
+        Rect rect = _stringView.getTextBounds(range.start, range.end);
+        rect.offset(_stringView.getX(), _stringView.getY()); rect.inset(-1); rect.width--;
+        return rect;
+    }
+    
+    /** Override to paint frag highlight. */
+    protected void paintFront(Painter aPntr)
+    {
+        super.paintFront(aPntr);
+        if(_mouseRect!=null) paintHighlightRect(aPntr, _mouseRect);
+        else if(_selRect!=null && getEffect()!=null && _selCharIndex>=0 && ScriptView.this.isFocused())
+            paintHighlightRect(aPntr, _selRect);
+    }
+    
+    /** Override to paint frag highlight. */
+    protected void paintHighlightRect(Painter aPntr, Rect aRect)
+    {
+        aPntr.setColor(SELECT_COLOR);
+        aPntr.setOpacity(.1); aPntr.fill(aRect); aPntr.setOpacity(.2); aPntr.draw(aRect); aPntr.setOpacity(1);
     }
 }
 

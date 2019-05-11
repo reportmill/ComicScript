@@ -62,10 +62,12 @@ public static Range getFragRangeAtCharIndex(ScriptLine aLine, int anIndex)
     int actInd = text.indexOf(actName, starEnd+1), actEnd = actInd + actName.length();
     if(anIndex<actEnd+1)
         return new Range(actInd, actEnd);
-
-    // Return predicate
-    int predInd = Math.min(actEnd + 1, text.length()), predEnd = text.length();
-    return new Range(predInd, predEnd);
+        
+    // Get predicate start by to next valid char and return range to end of text
+    int predInd = actEnd;
+    while(predInd<text.length()) { char c = text.charAt(predInd);
+        if(c==',' || Character.isWhitespace(c)) predInd++; else break; }
+    return new Range(predInd, text.length());
 }
 
 /**
