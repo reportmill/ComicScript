@@ -14,8 +14,8 @@ public class StageView extends ChildView implements Star {
     // The actors currently used by script
     Map <String,Actor>  _actors = new HashMap();
     
-    // The list of settings
-    String              _sets[];
+    // The list of setting names
+    String              _setNames[];
     
 /**
  * Creates a StageView.
@@ -40,14 +40,19 @@ public Image getStarImage()  { return null; }
 /**
  * Returns the action names for this star.
  */
-public String[] getActionNames()
+public String[] getActionNames()  { return new String[] { "is" }; }
+
+/**
+ * Returns the action names for this star.
+ */
+public String[] getSetNames()
 {
-    if(_sets!=null) return _sets;
+    if(_setNames!=null) return _setNames;
     
     List <String> sets = new ArrayList(); sets.add("Blank");
     for(Asset.SetImage set : AssetIndex.get()._sets)
         sets.add(set.getName());
-    return _sets = sets.toArray(new String[sets.size()]);
+    return _setNames = sets.toArray(new String[sets.size()]);
 }
 
 /**
@@ -145,6 +150,9 @@ public class BackImageAction extends Action {
         Image img = asset!=null? asset.getImage() : null;
         StageView.this.setBackImage(img);
     }
+    
+    /** Returns the predicate strings. */
+    public String[] getPredicateStrings()  { return getSetNames(); }
 }
 
 /**
