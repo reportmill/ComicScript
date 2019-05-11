@@ -176,6 +176,9 @@ public static class SaysAction extends ActorAction {
     /** Creates the action. */
     public SaysAction()  { setName("Says"); setRunTime(3000); }
     
+    /** Returns the predicate strings. */
+    public String[] getPredicateStrings()  { return new String[] { "Good day!", "Howdy!" }; }
+
     /** Runs the action. */
     public void run()
     {

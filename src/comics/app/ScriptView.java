@@ -206,17 +206,21 @@ private class LineView extends Label {
             ScriptView.this.requestFocus();
             int ind = _lineViews.indexOf(this);
             setSelIndex(ind);
-            int cind = _stringView.getCharIndexForX(anEvent.getX() - _stringView.getX());
-            _selCharIndex = cind; _selRect = getFragRectForCharIndex(cind);
+            if(hitText(anEvent)) {
+                int cind = _stringView.getCharIndexForX(anEvent.getX() - _stringView.getX());
+                _selCharIndex = cind; _selRect = getFragRectForCharIndex(cind);
+            }
+            else { _selCharIndex = -1; _selRect = null; }
             ScriptView.this.fireActionEvent(anEvent);
         }
         
         // Handle MouseMove
         else if(anEvent.isMouseMove()) { _mouseRect = null;
-            if(_stringView.getTextBounds().contains(anEvent.getX(), anEvent.getY())) {
+            if(hitText(anEvent)) {
                 int cind = _stringView.getCharIndexForX(anEvent.getX() - _stringView.getX());
                 _mouseRect = getFragRectForCharIndex(cind);
             }
+            else _mouseRect = null;
             repaint();
         }
         
@@ -224,6 +228,14 @@ private class LineView extends Label {
         else if(anEvent.isMouseExit()) { _mouseRect = null; repaint(); }
     }
     
+    /** Returns whether event hit text bounds. */
+    boolean hitText(ViewEvent anEvent)
+    {
+        Rect sbnds = _stringView.getTextBounds();
+        return sbnds.contains(anEvent.getX() - _stringView.getX(), anEvent.getY() - _stringView.getX());
+    }
+    
+    /** Returns the frag rect for char index. */
     Rect getFragRectForCharIndex(int anIndex)
     {
         Range range = HelpUtils.getFragRangeAtCharIndex(_line, anIndex); if(range.start<0) return null;
