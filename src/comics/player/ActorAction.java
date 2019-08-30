@@ -1,13 +1,16 @@
 package comics.player;
 import comics.gfx.*;
 import snap.gfx.*;
-import snap.util.ArrayUtils;
+import snap.util.*;
 import snap.view.*;
 
 /**
  * A class to hold Actor Action subclasses.
  */
 public class ActorAction extends Action {
+    
+    // Any loadable that an action might require
+    Loadable         _loadable;
     
 /**
  * Override to return as Actor.
@@ -21,10 +24,15 @@ public void loadAnim(String anAnimName)
 {
     Actor star = getStar();
     String starName = star.getStarName();
-    Asset.AnimImage asset = Asset.getAnimAsset(starName, anAnimName);
-    if(asset!=null && !asset.isImageLoaded())
-        _line.addUnloadedImage(asset.getImage());
+    Asset asset = Asset.getAnimAsset(starName, anAnimName);
+    if(!asset.isLoaded())
+        _loadable = asset;
 }
+
+/**
+ * Returns the loadable.
+ */
+protected Loadable getLoadable()  { return _loadable; }
 
 /**
  * An Actor Action that makes actor appear.

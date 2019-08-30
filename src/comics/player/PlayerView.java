@@ -233,7 +233,7 @@ protected void playLineStart()
     // If current line not loaded, come back
     ScriptLine line = getScript().getLine(getRunLine());
     if(line!=null && !line.isLoaded())  {
-        line.setLoadListener(pc -> playLine(getRunLine())); return; }
+        line.addLoadListener(() -> playLine(getRunLine())); return; }
     
     // Get current line run time and current camera time
     int lineRunTime = getLineRunTime(getRunLine());
@@ -457,23 +457,22 @@ public void showIntroAnim()
     if(_introView!=null) { removeChild(_introView); _introView = null; }
         
     // Get IntroImage (come back later if image or Player not loaded)
-    Image img = getIntroImage(), img2 = getRealImage();
-    if(!img.isLoaded()) { img.addLoadListener(pc -> showIntroAnim()); return; }
-    if(!img2.isLoaded()) { img2.addLoadListener(pc -> showIntroAnim()); return; }
+    Image img = getIntroImage();
+    if(!img.isLoaded()) { img.addLoadListener(() -> showIntroAnim()); return; }
+    //Image img2 = getRealImage(); if(!img2.isLoaded()) { img2.addLoadListener(() -> showIntroAnim()); return; }
     if(!isShowing()) {
         addPropChangeListener(PropChangeListener.getOneShot(pc -> showIntroAnim()), Showing_Prop); return; }
     
     // Create IntroImageView and RealView
-    ImageView introImgView = new ImageView(img);
-    ImageView realImgView = new ImageView(img2);
-    realImgView.setScale(.8); realImgView.setTransY(-20);
+    ImageView introImgView = new ImageView(img); //ImageView realImgView = new ImageView(img2);
+    //realImgView.setScale(.8); realImgView.setTransY(-20);
     
     // Create ColView to hold images and add to player
     _introView = new ColView(); _introView.setAlign(Pos.TOP_CENTER); _introView.setSpacing(0);
     _introView.setPadding(30,20,20,20);
     _introView.setEffect(new ShadowEffect(20,Color.WHITE,0,0));
     _introView.setManaged(false); _introView.setLean(Pos.TOP_CENTER);
-    _introView.setChildren(introImgView, realImgView);
+    _introView.setChildren(introImgView);//, realImgView);
     _introView.setSize(_introView.getPrefSize());
     addChild(_introView);
     
@@ -490,8 +489,8 @@ void introFinished()  { removeChild(_introView); _introView = null; }
 /** Returns the Header/Reallusion images. */
 Image getIntroImage()  { if(_introImg!=null) return _introImg;
     return _introImg = Image.get(getClass(), "pkg.images/Header.png"); }
-Image getRealImage()  { if(_realImg!=null) return _realImg;
-    return _realImg = Image.get(getClass(), "pkg.images/RealLogo.png"); }
+//Image getRealImage()  { if(_realImg!=null) return _realImg;
+//    return _realImg = Image.get(getClass(), "pkg.images/RealLogo.png"); }
 
 // For IntroAnim
 ColView _introView; Image _introImg; Image _realImg;

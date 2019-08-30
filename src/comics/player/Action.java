@@ -1,9 +1,10 @@
 package comics.player;
+import snap.util.Loadable;
 
 /**
  * A class to manage an action for a star.
  */
-public class Action {
+public class Action implements Loadable {
     
     // The ScriptLine
     ScriptLine     _line;
@@ -90,4 +91,27 @@ public void load()  { }
  */
 public void run()  { }
 
+/**
+ * Returns whether resource is loaded.
+ */
+public boolean isLoaded()
+{
+    Loadable loadable = getLoadable();
+    return loadable==null || loadable.isLoaded();
+}
+
+/**
+ * Adds a callback to be triggered when resources loaded (cleared automatically when loaded).
+ */
+public void addLoadListener(Runnable aRun)
+{
+    Loadable loadable = getLoadable(); if(loadable==null) return;
+    loadable.addLoadListener(aRun);
+}
+
+/**
+ * Returns the loadable.
+ */
+protected Loadable getLoadable()  { return null; }
+    
 }

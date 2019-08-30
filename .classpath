@@ -5,4 +5,5 @@
   <classpathentry kind="output" path="bin" />
   <classpathentry kind="src" path="/SnapKit" />
   <classpathentry kind="src" path="/SnapTea" />
+  <classpathentry kind="src" path="/Puppets" />
 </classpath>

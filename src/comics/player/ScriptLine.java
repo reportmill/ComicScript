@@ -5,7 +5,7 @@ import snap.util.*;
 /**
  * A class to represent a line of script.
  */
-public class ScriptLine implements PropChange.DoChange {
+public class ScriptLine implements PropChange.DoChange, Loadable {
     
     // The Script
     Script             _script;
@@ -22,15 +22,9 @@ public class ScriptLine implements PropChange.DoChange {
     // The action
     Action             _action;
     
-    // Whether this ScriptLine is loaded
-    boolean            _loaded = true;
-    
     // PropertyChangeSupport
     PropChangeSupport  _pcs = PropChangeSupport.EMPTY;
 
-    // A PropChangeListener specific to ScripLine.Loaded
-    PropChangeSupport  _loadLsnr;
-    
     // Constants
     public static final String Text_Prop = "Text";
     
@@ -142,10 +136,8 @@ public Action getAction()
     // If already set, just return
     if(_action!=null) return _action;
     
-    // Get Star
+    // Get Star and action
     Star star = getStar(); if(star==null) return null;
-    if(star.getStarImage()!=null && !star.getStarImage().isLoaded())
-        addUnloadedImage(star.getStarImage());
     return _action = star.getAction(this);
 }
 
@@ -180,39 +172,38 @@ public void run()
 }
 
 /**
- * Returns whether this line is loaded.
+ * Returns whether resource is loaded.
  */
-public boolean isLoaded()  { return _loaded; }
-
-/**
- * Sets whether this line is loaded.
- */
-protected void setLoaded(boolean aValue)
+public boolean isLoaded()
 {
-    if(aValue==_loaded) return;
-    _loaded = aValue;
-    if(aValue && _loadLsnr!=null) {
-        _loadLsnr.firePropChange(new PropChange(this, "Loaded", false, true)); _loadLsnr = null; }
+    Loadable loadable = getLoadable();
+    return loadable==null || loadable.isLoaded();
 }
 
 /**
- * Sets the LoadListener.
+ * Adds a callback to be triggered when resources loaded (cleared automatically when loaded).
  */
-public void setLoadListener(PropChangeListener aLoadLsnr)
+public void addLoadListener(Runnable aRun)
 {
-    if(_loadLsnr==null) _loadLsnr = new PropChangeSupport(this);
-    _loadLsnr.addPropChangeListener(aLoadLsnr);
+    Loadable loadable = getLoadable(); if(loadable==null) return;
+    loadable.addLoadListener(aRun);
 }
 
 /**
- * Adds an unloaded image.
+ * Returns the loadable.
  */
-public void addUnloadedImage(Image anImage)
+protected Loadable getLoadable()
 {
-    _loaded = false;
-    anImage.addLoadListener(pce -> setLoaded(true));
+    if(_loadable!=null) return _loadable;
+    Star star = getStar();
+    Action action = getAction();
+    if(star!=null && !star.isLoaded()) System.out.println("ScriptLine.getLoadable: Star not loaded");
+    if(action!=null && !action.isLoaded()) System.out.println("ScriptLine.getLoadable: Action not loaded");
+    _loadable = Loadable.getAsLoadable(star, action);
+    return _loadable;
 }
-
+Loadable _loadable;
+    
 /**
  * Standard toString implementation.
  */

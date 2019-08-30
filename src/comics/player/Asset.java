@@ -7,7 +7,7 @@ import snap.web.*;
 /**
  * A class to manage animation images and other assets.
  */
-public class Asset {
+public class Asset implements Loadable {
 
     // The name and full name
     String          _name, _nameLC;
@@ -73,15 +73,33 @@ protected Image getImageImpl()
 }
 
 /**
- * Returns whether image is loaded.
- */
-public boolean isImageLoaded()  { Image img = getImage(); return img==null || img.isLoaded(); }
-
-/**
  * Returns the height in feet.
  */
 public double getHeight()  { return _height>0? _height : 5; }
 
+/**
+ * Returns whether resource is loaded.
+ */
+public boolean isLoaded()
+{
+    Loadable loadable = getLoadable();
+    return loadable==null || loadable.isLoaded();
+}
+
+/**
+ * Adds a callback to be triggered when resources loaded (cleared automatically when loaded).
+ */
+public void addLoadListener(Runnable aRun)
+{
+    Loadable loadable = getLoadable(); if(loadable==null) return;
+    loadable.addLoadListener(aRun);
+}
+
+/**
+ * Returns the loadable.
+ */
+protected Loadable getLoadable()  { return getImage(); }
+    
 /**
  * Standard toString implementation.
  */
@@ -128,7 +146,7 @@ public static class AnimImage extends Asset {
     {
         Image img = super.getImageImpl(), img0 = img;
         if(img.isLoaded()) img = img.getSpriteSheetFrames(_frameCount);
-        else img.addLoadListener(pc -> _img = img0.getSpriteSheetFrames(_frameCount));
+        else img.addLoadListener(() -> _img = img0.getSpriteSheetFrames(_frameCount));
         return img;
     }
 }

@@ -202,13 +202,21 @@ private class LineView extends Label {
     {
         // Handle MousePress: Select LineView and fireActionEvent
         if(anEvent.isMousePress()) {
+            
+            // Consume event, return if multi-click, make ScriptView focus
             anEvent.consume(); if(anEvent.getClickCount()>1) return;
             ScriptView.this.requestFocus();
+            
+            // Select this view
+            boolean isSel = getSelView()==this;
             int ind = _lineViews.indexOf(this);
             setSelIndex(ind);
-            if(hitText(anEvent)) {
+            
+            // If hit a word, select that word
+            if(isSel && hitText(anEvent)) {
                 int cind = _stringView.getCharIndexForX(anEvent.getX() - _stringView.getX());
-                _selCharIndex = cind; _selRect = getFragRectForCharIndex(cind);
+                _selCharIndex = cind;
+                _selRect = getFragRectForCharIndex(cind);
             }
             else { _selCharIndex = -1; _selRect = null; }
             ScriptView.this.fireActionEvent(anEvent);
@@ -216,6 +224,7 @@ private class LineView extends Label {
         
         // Handle MouseMove
         else if(anEvent.isMouseMove()) { _mouseRect = null;
+            if(getSelView()!=this) return;
             if(hitText(anEvent)) {
                 int cind = _stringView.getCharIndexForX(anEvent.getX() - _stringView.getX());
                 _mouseRect = getFragRectForCharIndex(cind);

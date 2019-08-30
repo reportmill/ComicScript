@@ -181,6 +181,16 @@ public void resetStar()
 }
 
 /**
+ * Returns whether resource is loaded.
+ */
+public boolean isLoaded()  { return true; }
+
+/**
+ * Adds a callback to be triggered when resources loaded (cleared automatically when loaded).
+ */
+public void addLoadListener(Runnable aRun)  { }
+    
+/**
  * An Camera Action that makes camera zoom.
  */
 public static class ZoomAction extends Action {

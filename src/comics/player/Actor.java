@@ -1,5 +1,6 @@
 package comics.player;
 import snap.gfx.*;
+import snap.util.Loadable;
 import snap.view.*;
 import comics.player.Asset.*;
 
@@ -32,7 +33,7 @@ public Actor(Script aScript, Asset anAsset)
     setImage(img); setFillHeight(true); setFillWidth(true);
     
     // Make sure size gets set when image loaded
-    if(!img.isLoaded()) img.addLoadListener(pce -> setSizeForAsset(_asset));
+    if(!img.isLoaded()) img.addLoadListener(() -> setSizeForAsset(_asset));
     else setSizeForAsset(_asset);
     
     // Set ShadowEffect
@@ -138,7 +139,7 @@ public void setAnimImage(String aName, int aTime, int aFrame)
     // Get image for name and cache old image
     String starName = getStarName();
     AnimImage anim = Asset.getAnimAsset(starName, aName);
-    if(anim==null || !anim.isImageLoaded()) return;
+    if(anim==null || !anim.isLoaded()) return;
     
     // Get old offset and set image and size
     double offsetX = _offsetX;
@@ -224,4 +225,27 @@ public void resetStar()
     getAnimCleared(0);
 }
 
+/**
+ * Returns whether resource is loaded.
+ */
+public boolean isLoaded()
+{
+    Loadable loadable = getLoadable();
+    return loadable==null || loadable.isLoaded();
+}
+
+/**
+ * Adds a callback to be triggered when resources loaded (cleared automatically when loaded).
+ */
+public void addLoadListener(Runnable aRun)
+{
+    Loadable loadable = getLoadable(); if(loadable==null) return;
+    loadable.addLoadListener(aRun);
+}
+
+/**
+ * Returns the loadable.
+ */
+protected Loadable getLoadable()  { return getAsset(); }
+    
 }

@@ -1,6 +1,7 @@
 package comics.player;
 import java.util.*;
 import snap.gfx.*;
+import snap.util.Loadable;
 import snap.view.*;
 
 /**
@@ -87,10 +88,6 @@ public Actor getActor(ScriptLine aScriptLine)
         actor = new Actor(aScriptLine.getScript(), asset);
         _actors.put(name, actor);
         addChild(actor);
-        
-        // If image not loaded, tell ScriptLine
-        if(!asset.isImageLoaded())
-            aScriptLine.addUnloadedImage(asset.getImage());
     }
     
     // Return actor
@@ -110,7 +107,7 @@ public void setBackImage(Image anImage)
     if(anImage==_backImg) return;
     _backImg = anImage;
     repaint();
-    if(_backImg!=null && !_backImg.isLoaded()) _backImg.addLoadListener(pc -> repaint());
+    if(_backImg!=null && !_backImg.isLoaded()) _backImg.addLoadListener(() -> repaint());
 }
 
 /**
@@ -134,6 +131,16 @@ public void resetStar()
 }
 
 /**
+ * Returns whether resource is loaded.
+ */
+public boolean isLoaded()  { return true; }
+
+/**
+ * Adds a callback to be triggered when resources loaded (cleared automatically when loaded).
+ */
+public void addLoadListener(Runnable aRun)  { }
+    
+/**
  * An Setting Action that changes background image.
  */
 public class BackImageAction extends Action {
@@ -141,13 +148,23 @@ public class BackImageAction extends Action {
     /** Creates the action. */
     public BackImageAction()  { setName("is"); setRunTime(1); }
     
-    /** Runs the action. */
-    public void run()
+    /** Returns the background image. */
+    public Image getImage()
     {
         ScriptLine line = getLine();
         String words[] = line.getWords();
         Asset asset = getAsset(words, 1);
         Image img = asset!=null? asset.getImage() : null;
+        return img;
+    }
+    
+    /** Returns the loadable. */
+    protected Loadable getLoadable()  { return getImage(); }
+    
+    /** Runs the action. */
+    public void run()
+    {
+        Image img = getImage();
         StageView.this.setBackImage(img);
     }
     
