@@ -228,7 +228,7 @@ public static class ExplodesAction extends ActorAction {
     public void run()
     {
         Actor actor = getStar();
-        Explode.explode(actor, 0);
+        Explode.explode(actor);
     }
 }
     

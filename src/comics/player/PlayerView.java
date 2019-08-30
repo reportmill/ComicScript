@@ -147,6 +147,10 @@ public void setRunTime(int aTime)
     int runLine = getLineForTime(time);
     int lineTime = time - getLineStartTime(runLine);
     
+    // If already at line, but line has finished, reset run line
+    if(runLine==getRunLine() && getRunTime()>=getLineEndTime(runLine))
+        setRunLine(-1);
+    
     // Set RunLine and LineTime for time
     setRunLine(runLine);
     _camera.setAnimTimeDeep(lineTime);
@@ -181,7 +185,11 @@ public void setRunLine(int anIndex)
     if(anIndex<0) { resetStage(); _runLine = -1; return; }
     
     // If current line undefined or beyond new line, reset stage
-    if(runLine<0 || runLine>anIndex) { resetStage(); runLine = -1; }
+    if(runLine<0 || runLine>anIndex) {
+        if(runLine>=0) // Make sure anims finish
+            _camera.setAnimTimeDeep(getLineRunTime(runLine));
+        resetStage(); runLine = -1;
+    }
     
     // Otherwise, reset current line to end
     else {
@@ -213,9 +221,6 @@ public void playLine()  { playLine(getRunLine()); }
  */
 public void playLine(int anIndex)
 {
-    // If replaying line, reset RunLine
-    if(anIndex==getRunLine()) setRunLine(-1);
-    
     // Set RunTime to Line.StartTime and playLine()
     int runTime = getLineStartTime(anIndex);
     setRunTime(runTime);
