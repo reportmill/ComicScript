@@ -1,5 +1,6 @@
 package comics.player;
 import java.util.*;
+import puppets.puppet.*;
 import snap.gfx.Image;
 import snap.util.*;
 import snap.web.*;
@@ -14,10 +15,10 @@ public class AssetIndex {
     List <Asset>         _assets;
 
     // The actors
-    List <ActorImage>    _actors;
+    List <ActorImage>    _actors, _actorsPup = new ArrayList();
     
     // The anims
-    List <AnimImage>     _anims;
+    List <AnimImage>     _anims, _animsPup = new ArrayList();
     
     // The settings
     List <SetImage>      _sets;
@@ -64,7 +65,9 @@ public AssetIndex()
 void addAsset(Asset aAsset)
 {
     _assets.add(aAsset);
-    if(aAsset instanceof ActorImage) _actors.add((ActorImage)aAsset);
+    if(aAsset instanceof ActorImagePup) _actorsPup.add((ActorImage)aAsset);
+    else if(aAsset instanceof AnimImagePup) _animsPup.add((AnimImagePup)aAsset);
+    else if(aAsset instanceof ActorImage) _actors.add((ActorImage)aAsset);
     else if(aAsset instanceof AnimImage) _anims.add((AnimImage)aAsset);
     else if(aAsset instanceof SetImage) _sets.add((SetImage)aAsset);
 }
@@ -74,9 +77,32 @@ void addAsset(Asset aAsset)
  */
 public ActorImage getActorAsset(String aName)
 {
+    ActorImage aip = getActorPupAsset(aName);
+    if(aip!=null)
+        return aip;
+        
     String name = aName.toLowerCase();
     for(ActorImage asset : _actors) { if(name.equals(asset.getNameLC()))
         return asset; }
+    return null;
+}
+
+/**
+ * Returns the actor image asset for given name.
+ */
+public ActorImage getActorPupAsset(String aName)
+{
+    String name = aName.toLowerCase();
+    for(ActorImage asset : _actorsPup) { if(name.equals(asset.getNameLC()))
+        return asset; }
+    
+    Puppet pup = PuppetUtils.getPuppetFile().getPuppetForName(aName);
+    if(pup!=null) {
+        ActorImage ai = new ActorImagePup(aName);
+        addAsset(ai);
+        return ai;
+    }
+    
     return null;
 }
 
@@ -94,9 +120,33 @@ public Image getActorImage(String aName)
  */
 public AnimImage getAnimAsset(String anActor, String anAnim)
 {
+    AnimImage aip = getAnimAssetPup(anActor, anAnim);
+    if(aip!=null)
+        return aip;
+        
     String name = anActor.toLowerCase() + '-' + anAnim.toLowerCase();
     for(AnimImage asset : _anims) { if(name.equals(asset.getNameLC()))
         return asset; }
+    return null;
+}
+
+/**
+ * Returns the anim with given actor and anim.
+ */
+public AnimImage getAnimAssetPup(String anActor, String anAnim)
+{
+    String name = anActor.toLowerCase() + '-' + anAnim.toLowerCase();
+    for(AnimImage asset : _animsPup) { if(name.equals(asset.getNameLC()))
+        return asset; }
+        
+    Puppet pup = PuppetUtils.getPuppetFile().getPuppetForName(anActor);
+    PuppetAction act = PuppetUtils.getActionFile().getActionForName(anAnim);
+    if(pup!=null && act!=null) {
+        AnimImage aip = new AnimImagePup(anActor, anAnim, pup.getName() + '-' + act.getName());
+        addAsset(aip);
+        return aip;
+    }
+    
     return null;
 }
 

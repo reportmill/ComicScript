@@ -18,6 +18,9 @@ public class Actor extends ImageView implements Star {
     // The offset
     double           _offsetX;
     
+    // Whether actor is flipped along x
+    boolean          _flipX;
+    
 /**
  * Create new actor.
  */
@@ -132,6 +135,29 @@ protected void setSizeForAsset(Asset anAsset)
 }
 
 /**
+ * Returns whether actor is flipped along X.
+ */
+public boolean isFlipX()  { return _flipX; }
+
+/**
+ * Sets whether actor is flipped along X.
+ */
+public void setFlipX(boolean aValue)
+{
+    _flipX = aValue;
+}
+
+/**
+ * Makes sure an anim image is loaded.
+ */
+public Asset.AnimImage getAnim(String anAnimName)
+{
+    String starName = getStarName();
+    Asset.AnimImage aimg = Asset.getAnimAsset(starName, anAnimName);
+    return aimg;
+}
+
+/**
  * Sets the animated image over given range (if found).
  */
 public void setAnimImage(String aName, int aTime, int aFrame)
@@ -141,12 +167,18 @@ public void setAnimImage(String aName, int aTime, int aFrame)
     AnimImage anim = Asset.getAnimAsset(starName, aName);
     if(anim==null || !anim.isLoaded()) return;
     
+    // Get time and frame
+    Image img = anim.getImage();
+    ImageSet iset = img.getImageSet();
+    int time = aTime; if(time<0) time = iset.getCount()*25;
+    int frame = aFrame; if(frame<0) frame = time/25;
+    
     // Get old offset and set image and size
     double offsetX = _offsetX;
     setAssetImage(anim, anim.getOffsetX());
     
     // Configure anim
-    getAnim(aTime).setValue("Frame", aFrame);
+    getAnim(time).setValue("Frame", frame);
     getAnim(0).setOnFinish(a -> { setAssetImage(_asset, offsetX); });
 }
 
@@ -156,7 +188,8 @@ public void setAnimImage(String aName, int aTime, int aFrame)
 public void setAssetImage(Asset anAsset, double offsetX)
 {
     /// Get old/new offsets (corrected if scale is flipped)
-    double offOld = _offsetX, offNew = offsetX; if(getScaleX()<0) { offOld = -offOld; offNew = -offNew; }
+    double offOld = _offsetX, offNew = offsetX;
+    if(isFlipX()) { offOld = -offOld; offNew = -offNew; }
     
     // Get old/new width & height
     double oldW = getWidth(), oldH = getHeight();
@@ -168,7 +201,10 @@ public void setAssetImage(Asset anAsset, double offsetX)
     double by = getY() - (newH - oldH);
     
     // Set new image, bounds, offset and reset frame
-    Image img = anAsset.getImage();
+    Image img;
+    if(anAsset.getClass().getName().endsWith("Pup"))
+        img = isFlipX()? anAsset.getImage() : anAsset.getImageFlipX();
+    else img = isFlipX()? anAsset.getImageFlipX() : anAsset.getImage();
     setImage(img);
     setBounds(bx, by, newW, newH);
     setFrame(0); _offsetX = offsetX;

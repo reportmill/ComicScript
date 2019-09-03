@@ -20,13 +20,18 @@ public Actor getStar()  { return (Actor)super.getStar(); }
 /**
  * Makes sure an anim image is loaded.
  */
-public void loadAnim(String anAnimName)
+public Asset.AnimImage getAnim(String anAnimName)
 {
     Actor star = getStar();
-    String starName = star.getStarName();
-    Asset asset = Asset.getAnimAsset(starName, anAnimName);
-    if(!asset.isLoaded())
-        _loadable = asset;
+    Asset.AnimImage aimg = star.getAnim(anAnimName);
+    if(aimg!=null && !aimg.isLoaded())
+        _loadable = aimg;
+    if(aimg!=null) {
+        int frameCount = aimg.getFrameCount();
+        int time = frameCount*25;
+        setRunTime(time);
+    }
+    return aimg;
 }
 
 /**
@@ -63,13 +68,17 @@ public static class AppearsAction extends ActorAction {
 public static class WalksAction extends ActorAction {
     
     /** Creates the action. */
-    public WalksAction()  { setName("Walks"); setRunTime(2000); }
+    public WalksAction()  { setName("Walks"); }
     
     /** Returns the predicate strings. */
     public String[] getPredicateStrings()  { return new String[] { "in", "in from right", "out" }; }
 
     /** Override to load image. */
-    public void load()  { loadAnim("Walk"); }
+    public void load()
+    {
+        getAnim("Walk");
+        setRunTime(2000);
+    }
     
     /** Runs the action. */
     public void run()
@@ -81,12 +90,12 @@ public static class WalksAction extends ActorAction {
         StageView stage = line.getScript().getStage();
     
         // Look for animation
-        actor.setAnimImage("Walk", 2000, 30);
+        actor.setAnimImage("Walk", getRunTime(), -1);
     
         // Handle walk in from right
         String words[] = getLine().getWords();
         if(ArrayUtils.contains(words, "right")) {
-            actor.setScaleX(-1);
+            actor.setFlipX(true);
             actor.setLocX(HPos.LEFT, stage.getWidth(), null);
             actor.setLocY(VPos.BOTTOM, 10, null);
             actor.setLocX(HPos.CENTER, 60, actor.getAnim(2000));
@@ -127,7 +136,7 @@ public static class DropsAction extends ActorAction {
         // Handle drop right
         String words[] = getLine().getWords();
         if(ArrayUtils.contains(words, "right")) {
-            actor.setScaleX(-1);
+            actor.setFlipX(true);
             actor.setLocX(HPos.CENTER, 60, null);
             actor.setLocY(VPos.TOP, -actor.getHeight(), null);
             actor.setLocY(VPos.BOTTOM, 10, anim);
@@ -238,16 +247,20 @@ public static class ExplodesAction extends ActorAction {
 public static class DanceAction extends ActorAction {
     
     /** Creates the action. */
-    public DanceAction()  { setName("Dances"); setRunTime(3000); }
+    public DanceAction()  { setName("Dances"); }
     
     /** Override to load image. */
-    public void load()  { loadAnim("Dance"); }
+    public void load()
+    {
+        getAnim("Dance");
+        setRunTime(getRunTime()*2);
+    }
     
     /** Runs the action. */
     public void run()
     {
         Actor actor = getStar();
-        actor.setAnimImage("Dance", 3000, 88);
+        actor.setAnimImage("Dance", getRunTime(), -1);
     }
 }
     
@@ -257,16 +270,19 @@ public static class DanceAction extends ActorAction {
 public static class JumpAction extends ActorAction {
     
     /** Creates the action. */
-    public JumpAction()  { setName("Jumps"); setRunTime(1000); }
+    public JumpAction()  { setName("Jumps"); }
     
     /** Override to load image. */
-    public void load()  { loadAnim("Jump"); }
+    public void load()
+    {
+        getAnim("Jump");
+    }
     
     /** Runs the action. */
     public void run()
     {
         Actor actor = getStar();
-        actor.setAnimImage("Jump", 1000, 16);
+        actor.setAnimImage("Jump", getRunTime(), -1); // Was 1000, 16
     }
 }
     
@@ -276,16 +292,19 @@ public static class JumpAction extends ActorAction {
 public static class WaveAction extends ActorAction {
     
     /** Creates the action. */
-    public WaveAction()  { setName("Waves"); setRunTime(1000); }
+    public WaveAction()  { setName("Waves"); }
     
     /** Override to load image. */
-    public void load()  { loadAnim("Wave"); }
+    public void load()
+    {
+        getAnim("Wave");
+    }
     
     /** Runs the action. */
     public void run()
     {
         Actor actor = getStar();
-        actor.setAnimImage("Wave", 1000, 17);
+        actor.setAnimImage("Wave", getRunTime(), -1);
     }
 }
     

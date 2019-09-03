@@ -98,10 +98,16 @@ protected void respondUI(ViewEvent anEvent)
  */
 public String getSampleScript()
 {
-    return "Setting is beach\n" + "Lady walks in\n" + "Man walks in from right\n" +
+    /*return "Setting is beach\n" + "Lady walks in\n" + "Man walks in from right\n" +
         "Lady says, \"Welcome to ComicScript animator!\"\n" +
         "Man says, \"Build animations with natural language!\"\n" +
         "Camera zooms in on Lady\n" + "Lady waves\n" + "Man jumps\n" + "Camera zooms out\n" +
+        "Lady dances\n" + "Man explodes\n";*/
+    return "Setting is beach\n" + "Lady walks in\n" + "Man walks in from right\n" +
+        "Lady jumps\n" +
+        "Man jumps\n" +
+        "Lady waves\n" +
+        "Man waves\n" +
         "Lady dances\n" + "Man explodes\n";
 }
 

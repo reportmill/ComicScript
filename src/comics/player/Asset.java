@@ -1,6 +1,7 @@
 package comics.player;
 import java.util.*;
-import snap.gfx.Image;
+import puppets.puppet.*;
+import snap.gfx.*;
 import snap.util.*;
 import snap.web.*;
 
@@ -16,7 +17,7 @@ public class Asset implements Loadable {
     String          _path, _urls;
     
     // The image
-    Image           _img;
+    Image           _img, _imgFlipX;
     
     // The height
     double          _height;
@@ -24,6 +25,11 @@ public class Asset implements Loadable {
     // The Index Root
     static String ROOT = AssetIndex.ROOT;
     
+/**
+ * Creates an Asset.
+ */
+protected Asset()  { }
+
 /**
  * Creates an Asset for map.
  */
@@ -45,7 +51,7 @@ public String getName()  { return _name; }
 /**
  * Returns the full name.
  */
-public String getNameLC()  { return _nameLC; }
+public String getNameLC()  { return _nameLC!=null? _nameLC : (_nameLC=_name.toLowerCase()); }
 
 /**
  * Returns the path.
@@ -70,6 +76,17 @@ protected Image getImageImpl()
         img = Image.get(url);
     }
     return img;
+}
+
+/**
+ * Returns the image.
+ */
+public Image getImageFlipX()
+{
+    if(_imgFlipX!=null) return _imgFlipX;
+    Image img = getImage(); if(!img.isLoaded()) return img;
+    _imgFlipX = PuppetUtils.getImagesFlipped(img);
+    return _imgFlipX;
 }
 
 /**
@@ -117,6 +134,7 @@ public String toString()
 public static class ActorImage extends Asset {
 
     /** Creates a new ActorImage for map. */
+    public ActorImage()  { }
     public ActorImage(Map aMap)  { super(aMap); _urls = ROOT + "actors" + _path; }
 }
 
@@ -131,12 +149,16 @@ public static class AnimImage extends Asset {
     double  _offsetX;
     
     /** Creates a new AnimImage for map. */
+    public AnimImage()  { }
     public AnimImage(Map aMap)
     {
         super(aMap); _urls = ROOT + "actors" + _path;
         _frameCount = SnapUtils.intValue(aMap.get("FrameCount"));
         _offsetX = SnapUtils.doubleValue(aMap.get("Offset"));
     }
+    
+    /** Returns the frame count. */
+    public int getFrameCount()  { return _frameCount; }
     
     /** Returns the offset. */
     public double getOffsetX()  { return _offsetX; }
@@ -147,6 +169,66 @@ public static class AnimImage extends Asset {
         Image img = super.getImageImpl(), img0 = img;
         if(img.isLoaded()) img = img.getSpriteSheetFrames(_frameCount);
         else img.addLoadListener(() -> _img = img0.getSpriteSheetFrames(_frameCount));
+        return img;
+    }
+}
+
+/**
+ * An Asset subclass to manage actor entries.
+ */
+public static class ActorImagePup extends ActorImage {
+    
+    // The Puppet
+    Puppet   _pup;
+
+    /** Creates a new ActorImage for map. */
+    public ActorImagePup(String aName)
+    {
+        _name = aName;
+        _path = "/people/" + _name.toLowerCase() + '/' + aName + ".png";
+        _pup = PuppetUtils.getPuppetFile().getPuppetForName(aName);
+        _height = _pup.getBounds().height/100;
+    }
+    
+    /** Returns the image. */
+    protected Image getImageImpl()
+    {
+        PuppetAction act = PuppetUtils.getActionFile().getActionForName("Resting");
+        Insets ins = new Insets(0,0,10,0);
+        Image img = PuppetUtils.getImage(_pup, act, 1, ins);
+        return img;
+    }
+}
+
+/**
+ * An Asset subclass to manage actor animation entries.
+ */
+public static class AnimImagePup extends AnimImage {
+    
+    // The Puppet
+    Puppet   _pup;
+    
+    // The Action
+    PuppetAction _act;
+    
+    /** Creates a new AnimImage for map. */
+    public AnimImagePup(String aPupName, String anActName, String animName)
+    {
+        _name = animName;
+        _path = "/people/" + _name.toLowerCase() + '/' + animName.replace("-", "") + ".png";
+        _pup = PuppetUtils.getPuppetFile().getPuppetForName(aPupName);
+        _act = PuppetUtils.getActionFile().getActionForName(anActName);
+        
+        _frameCount = _act.getMaxTime()/25 + 1;
+        _offsetX = .25;
+    }
+    
+    /** Returns the image. */
+    public Image getImageImpl()
+    {
+        Insets ins = new Insets(50,50,10,50);
+        Image img = PuppetUtils.getImage(_pup, _act, 1, ins);
+        _height = (_pup.getBounds().height+ins.top+17.3)/100;
         return img;
     }
 }

@@ -24,7 +24,8 @@ public class ScriptEditor extends ViewOwner {
     
     // Constants
     static Color INPUTTEXT_SEL_COLOR = new Color("#CDECF6");
-    static String _stars[] = { "Setting", "Camera", "Lady", "Man", "Car", "Cat", "Dog", "Trump", "Obama", "Duke" };
+    static String _stars[] = { "Setting", "Camera", "Lady", "Man", "Car", "Cat", "Dog", "Trump", "Obama",
+       "PeeWee", "Duke" };
     
 /**
  * Creates a ScriptEditor.
