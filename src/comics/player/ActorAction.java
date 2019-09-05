@@ -88,14 +88,18 @@ public static class WalksAction extends ActorAction {
         Actor actor = getStar();
         ViewAnim anim = actor.getAnim(2000);
         StageView stage = line.getScript().getStage();
+        
+        // Find out if walk is from right
+        String words[] = getLine().getWords();
+        boolean fromRight = ArrayUtils.contains(words, "right");
+        if(fromRight)
+            actor.setFlipX(true);
     
         // Look for animation
         actor.setAnimImage("Walk", getRunTime(), -1);
     
         // Handle walk in from right
-        String words[] = getLine().getWords();
-        if(ArrayUtils.contains(words, "right")) {
-            actor.setFlipX(true);
+        if(fromRight) {
             actor.setLocX(HPos.LEFT, stage.getWidth(), null);
             actor.setLocY(VPos.BOTTOM, 10, null);
             actor.setLocX(HPos.CENTER, 60, actor.getAnim(2000));

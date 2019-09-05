@@ -195,6 +195,11 @@ private class LineView extends Label {
         setFill(LINEVIEW_FILL);
         enableEvents(MousePress, MouseMove, MouseExit);
         _stringView = getStringView();
+        
+        if(aLine!=null && !aLine.isLoaded()) {
+            setTextFill(Color.WHITE);
+            aLine.addLoadListener(() -> ViewUtils.runLater(() -> setTextFill(Color.BLACK)));
+        }
     }
 
     /** Handle Events. */

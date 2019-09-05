@@ -238,7 +238,7 @@ protected void playLineStart()
     // If current line not loaded, come back
     ScriptLine line = getScript().getLine(getRunLine());
     if(line!=null && !line.isLoaded())  {
-        line.addLoadListener(() -> playLine(getRunLine())); return; }
+        line.addLoadListener(() -> ViewUtils.runLater(() -> playLine(getRunLine()))); return; }
     
     // Get current line run time and current camera time
     int lineRunTime = getLineRunTime(getRunLine());

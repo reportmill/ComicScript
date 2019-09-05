@@ -195,7 +195,7 @@ public static class ActorImagePup extends ActorImage {
     {
         PuppetAction act = PuppetUtils.getActionFile().getActionForName("Resting");
         Insets ins = new Insets(0,0,10,0);
-        Image img = PuppetUtils.getImage(_pup, act, 1, ins);
+        Image img = new PuppetImager(_pup, act, 1, ins).getImage();
         return img;
     }
 }
@@ -227,7 +227,7 @@ public static class AnimImagePup extends AnimImage {
     public Image getImageImpl()
     {
         Insets ins = new Insets(50,50,10,50);
-        Image img = PuppetUtils.getImage(_pup, _act, 1, ins);
+        Image img = new PuppetImager(_pup, _act, 1, ins).getImage();
         _height = (_pup.getBounds().height+ins.top+17.3)/100;
         return img;
     }
