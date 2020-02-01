@@ -196,7 +196,8 @@ void setImage(Image anImg, int anIndex)
  */
 private class SheetDialogBox extends DialogBox {
     
-    ChildView _cview, _clipBox;
+    ChildView _cview;
+    BoxView _clipBox;
     boolean _cancelled;
     
     /**
@@ -213,7 +214,10 @@ private class SheetDialogBox extends DialogBox {
         ui.setFill(ViewUtils.getBackFill()); ui.setBorder(Color.DARKGRAY, 1);
         Size size = ui.getPrefSize(); ui.setSize(size);
         
-        _clipBox = new BoxView(ui); _clipBox.setSize(size); _clipBox.setManaged(false); _clipBox.setLeanX(HPos.CENTER);
+        _clipBox = new BoxView(ui);
+        _clipBox.setSize(size);
+        _clipBox.setManaged(false);
+        _clipBox.setLeanX(HPos.CENTER);
         _clipBox.setClipToBounds(true);
         _cview.addChild(_clipBox);
         ui.setTransY(-size.height); ui.getAnim(1000).setTransY(-1).play();

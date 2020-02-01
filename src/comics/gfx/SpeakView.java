@@ -32,8 +32,11 @@ public class SpeakView extends ParentView {
 public SpeakView()
 {
     // Create/configure/add TextArea
-    _textArea = new TextArea(); _textArea.setFont(Font.Arial10.deriveFont(24)); _textArea.setAlign(Pos.CENTER);
-    _textArea.setWrapText(true); _textArea.setPadding(5,5,5,5);
+    _textArea = new TextArea();
+    _textArea.setFont(Font.Arial10.deriveFont(24));
+    _textArea.setAlign(Pos.CENTER);
+    _textArea.setWrapLines(true);
+    _textArea.setPadding(5,5,5,5);
     addChild(_textArea);
     
     // Configure

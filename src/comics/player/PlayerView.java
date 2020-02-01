@@ -138,7 +138,7 @@ public void setRunTime(int aTime)
     // If playing, stop anim
     boolean playing = isPlaying();
     if(playing) {
-        _camera.getAnim(0).setOnFinish(null);
+        _camera.getAnim(0).setOnFinish((Runnable)null);
         _camera.stopAnimDeep();
     }
     
@@ -260,7 +260,7 @@ protected void playLineStart()
 protected void playLineDone()
 {
     // Clear Anim.OnFinish so this this doesn't get called again
-    _camera.getAnim(0).setOnFinish(null);
+    _camera.getAnim(0).setOnFinish((Runnable)null);
     
     // If not Playing, just return
     if(!_playing) return;

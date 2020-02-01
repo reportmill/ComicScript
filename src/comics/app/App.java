@@ -1,6 +1,6 @@
 package comics.app;
 import comics.player.*;
-import org.teavm.jso.JSBody;
+//import org.teavm.jso.JSBody;
 import snap.util.SnapUtils;
 
 /**
@@ -19,19 +19,19 @@ public class App {
  */
 public static void main(String args[])
 {
-    snaptea.TV.set();
+    //snaptea.TV.set();
     
     // If not TeaVM, just show new player
     if(!SnapUtils.isTeaVM) {
         show(null, null); return; }
     
-    // Get args
-    String arg0 = getMainArg0();
-    String arg1 = getMainArg1();
-    
-    if(arg0!=null && arg0.equals("showEditor"))
-        showEditor(arg1);
-    else show(arg0, null);
+//    // Get args
+//    String arg0 = getMainArg0();
+//    String arg1 = getMainArg1();
+//
+//    if(arg0!=null && arg0.equals("showEditor"))
+//        showEditor(arg1);
+//    else show(arg0, null);
 }
 
 /**
@@ -68,10 +68,10 @@ public static void showEditor(String anEmtId)
         _player.setEditing(!_player.isEditing());
 }
 
-@JSBody(params = { }, script = "return CSMainArg0!=null? CSMainArg0 : '';")
-public static native String getMainArg0();
-
-@JSBody(params = { }, script = "return CSMainArg1!=null? CSMainArg1 : '';")
-public static native String getMainArg1();
+//@JSBody(params = { }, script = "return CSMainArg0!=null? CSMainArg0 : '';")
+//public static native String getMainArg0();
+//
+//@JSBody(params = { }, script = "return CSMainArg1!=null? CSMainArg1 : '';")
+//public static native String getMainArg1();
 
 }

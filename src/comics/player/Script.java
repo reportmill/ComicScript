@@ -194,7 +194,7 @@ public void redo()  { _undoer.redo(); }
  */
 void scriptLineDidChange(PropChange aPC)
 {
-    _undoer.addPropertyChange(aPC);
+    _undoer.addPropChange(aPC);
     _undoer.saveChanges();
     _runTime = -1; _player.scriptChanged();
 }
@@ -231,7 +231,7 @@ protected void firePropChange(String aProp, Object oldVal, Object newVal, int an
 {
     PropChange pc = new PropChange(this, aProp, oldVal, newVal, anIndex);
     _pcs.firePropChange(pc);
-    _undoer.addPropertyChange(pc);
+    _undoer.addPropChange(pc);
     _undoer.saveChanges();
 }
 

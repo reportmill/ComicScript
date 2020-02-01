@@ -24,7 +24,7 @@ public class AssetIndex {
     List <SetImage>      _sets;
     
     // The root path
-    static String ROOT = "/Temp/ComicLib/";
+    static String ROOT = "/Users/jeff/Dev/ComicLib/";
 
     // The shared index
     static AssetIndex  _shared = new AssetIndex();
