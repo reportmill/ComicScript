@@ -1,4 +1,5 @@
 package comics.gfx;
+import snap.geom.*;
 import snap.gfx.*;
 import snap.util.MathUtils;
 import snap.view.*;
@@ -18,10 +19,10 @@ public class SpeakView extends ParentView {
     double      _tailLen = 90;
     
     // The bubble bounds in local coords
-    Rect        _bubbleBnds;
+    Rect _bubbleBnds;
     
     // The text shape
-    Shape       _textShape;
+    Shape _textShape;
     
     // The background shape
     Shape       _backShape;

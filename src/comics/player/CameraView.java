@@ -1,4 +1,5 @@
 package comics.player;
+import snap.geom.Insets;
 import snap.gfx.*;
 import snap.util.ArrayUtils;
 import snap.util.SnapUtils;

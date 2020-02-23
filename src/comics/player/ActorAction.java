@@ -1,5 +1,8 @@
 package comics.player;
 import comics.gfx.*;
+import snap.geom.HPos;
+import snap.geom.Rect;
+import snap.geom.VPos;
 import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;

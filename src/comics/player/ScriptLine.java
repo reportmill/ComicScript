@@ -1,5 +1,5 @@
 package comics.player;
-import snap.gfx.*;
+import snap.geom.Pos;
 import snap.util.*;
 
 /**

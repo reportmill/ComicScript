@@ -1,6 +1,7 @@
 package comics.player;
 import comics.app.EditorPane;
-import snap.gfx.*;
+import snap.geom.Insets;
+import snap.geom.Pos;
 import snap.view.*;
 
 /**

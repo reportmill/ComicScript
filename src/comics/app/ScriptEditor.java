@@ -1,5 +1,6 @@
 package comics.app;
 import comics.player.*;
+import snap.geom.Rect;
 import snap.gfx.*;
 import snap.util.Range;
 import snap.util.StringUtils;

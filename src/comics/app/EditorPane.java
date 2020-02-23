@@ -1,5 +1,8 @@
 package comics.app;
 import comics.player.*;
+import snap.geom.Pos;
+import snap.geom.Rect;
+import snap.geom.Size;
 import snap.gfx.*;
 import snap.util.PropChangeListener;
 import snap.util.SnapUtils;

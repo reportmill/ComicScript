@@ -1,5 +1,9 @@
 package comics.gfx;
 import java.util.*;
+
+import snap.geom.Point;
+import snap.geom.Rect;
+import snap.geom.Transform;
 import snap.gfx.*;
 import snap.util.Interpolator;
 import snap.view.*;
@@ -63,7 +67,7 @@ public void play()
 {
     // Get View x/y in parent
     ParentView par = _view.getParent();
-    Point pnt = new Point(0,0); for(View v=_view;v!=par;v=v.getParent()) { pnt.x += v.getX(); pnt.y += v.getY(); }
+    Point pnt = new Point(0,0); for(View v = _view; v!=par; v=v.getParent()) { pnt.x += v.getX(); pnt.y += v.getY(); }
     
     // Create image if needed
     if(_img==null)

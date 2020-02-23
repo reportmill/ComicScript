@@ -1,6 +1,8 @@
 package comics.app;
 import comics.player.*;
 import java.util.*;
+
+import snap.geom.RoundRect;
 import snap.gfx.*;
 import snap.util.FilePathUtils;
 import snap.util.StringUtils;

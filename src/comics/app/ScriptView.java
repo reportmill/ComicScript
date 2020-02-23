@@ -1,6 +1,8 @@
 package comics.app;
 import comics.player.*;
 import java.util.*;
+
+import snap.geom.Rect;
 import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;
@@ -181,7 +183,7 @@ private class LineView extends Label {
     ScriptLine  _line;
     
     // Hightlight rects
-    Rect        _selRect, _mouseRect;
+    Rect _selRect, _mouseRect;
     
     // Cached pointer to the string value
     StringView  _stringView;
