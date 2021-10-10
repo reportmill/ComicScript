@@ -13,11 +13,17 @@ java {
 }
 
 repositories {
+
+    // Use jcenter for resolving dependencies like jbox2d
+    jcenter()
 }
 
 dependencies {
+
     compile project(':SnapKit')
+
     compile project(':Puppets')
+
 }
 
 mainClassName = 'comics.app.App'
