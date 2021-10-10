@@ -35,7 +35,7 @@ public class AssetIndex {
 public AssetIndex()
 {
     if(SnapUtils.isTeaVM)
-        ROOT = "http://reportmill.com/ComicLib/";
+        ROOT = "https://reportmill.com/ComicLib/";
     
     WebURL url = WebURL.getURL(ROOT + "index.json");
     JSONNode root = JSONNode.readSource(url);

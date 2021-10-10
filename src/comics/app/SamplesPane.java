@@ -140,7 +140,7 @@ void itemBoxWasPressed(ColView anItemBox, ViewEvent anEvent)
 static String getDoc(int anIndex)
 {
     String name = SALL[anIndex];
-    String urls = "http://reportmill.com/jars/ccsamples/" + name;
+    String urls = "https://reportmill.com/jars/ccsamples/" + name;
     WebURL url = WebURL.getURL(urls);
     String str = url.getText(); if(str==null) System.err.println("SamplesPane.getDoc: Couldn't load " + url);
     return str;
@@ -156,7 +156,7 @@ public Image getDocImage(int anIndex)
     
     // Get image name, URL string, URL and Image. Then make sure image is loaded by requesting Image.Native.
     String name = SALL[anIndex].replace(".txt", ".png");
-    String urls = "http://reportmill.com/jars/ccsamples/" + name;
+    String urls = "https://reportmill.com/jars/ccsamples/" + name;
     WebURL imgURL = WebURL.getURL(urls);
     img = DOC_IMAGES[anIndex] = Image.get(imgURL);
     img.getNative();
