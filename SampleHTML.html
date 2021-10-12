@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+
+    <title>Main page</title>
+
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+
+  </head>
+
+  <body>
+
+    <!-- Container to hold player -->
+    <div id="ComicDiv" style="min-width:310px;max-width:800px;height:400px;margin-left:18px;box-shadow:1px 1px 6px grey;"></div>
+
+  </body>
+
+    <script type="text/javascript" charset="utf-8" src="classes.js" defer></script>
+
+    <script type="text/javascript" defer>
+
+      var CSMainArg0 = null;
+      var CSMainArg1 = null;
+ 
+      var ComicScript = {
+
+          // Show a JSON script
+          show: function show(anId, anObj) {
+  
+              CSMainArg0 = anId;
+              CSMainArg1 = anObj != null ? JSON.stringify(anObj) : null;
+              main();
+          },
+
+          // Show editor
+          showEditor: function showEditor(anId) {
+
+              CSMainArg0 = "showEditor";
+              CSMainArg1 = anId;
+              main();
+          }
+
+      };
+
+      // When window loaded, show sample in container
+      window.onload = function() {
+
+          //ComicScript.show('ComicDiv');
+          ComicScript.show(null, null);
+      }
+
+    </script>
+
+</html>
