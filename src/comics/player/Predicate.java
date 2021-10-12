@@ -6,21 +6,30 @@ package comics.player;
 public class Predicate {
 
     // The text
-    String       _text;
+    String _text;
 
-/**
- * Creates a Predicate.
- */
-public Predicate(String aStr)  { setText(aStr); }
+    /**
+     * Creates a Predicate.
+     */
+    public Predicate(String aStr)
+    {
+        setText(aStr);
+    }
 
-/**
- * Returns the text.
- */
-public String getText()  { return _text; }
+    /**
+     * Returns the text.
+     */
+    public String getText()
+    {
+        return _text;
+    }
 
-/**
- * Sets the text.
- */
-protected void setText(String aStr)  { _text = aStr; }
+    /**
+     * Sets the text.
+     */
+    protected void setText(String aStr)
+    {
+        _text = aStr;
+    }
 
 }

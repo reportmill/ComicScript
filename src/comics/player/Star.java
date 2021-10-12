@@ -7,29 +7,29 @@ import snap.util.Loadable;
  */
 public interface Star extends Loadable {
 
-/**
- * Returns the name.
- */
-public String getStarName();
+    /**
+     * Returns the name.
+     */
+    public String getStarName();
 
-/**
- * Returns the image.
- */
-public Image getStarImage();
+    /**
+     * Returns the image.
+     */
+    public Image getStarImage();
 
-/**
- * Returns the action names for this star.
- */
-public String[] getActionNames();
+    /**
+     * Returns the action names for this star.
+     */
+    public String[] getActionNames();
 
-/**
- * Returns an action for given ScriptLine.
- */
-public Action getAction(ScriptLine aScriptLine);
+    /**
+     * Returns an action for given ScriptLine.
+     */
+    public Action getAction(ScriptLine aScriptLine);
 
-/**
- * Resets the star to initial settings.
- */
-void resetStar();
+    /**
+     * Resets the star to initial settings.
+     */
+    void resetStar();
 
 }
