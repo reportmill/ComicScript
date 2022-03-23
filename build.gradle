@@ -20,9 +20,9 @@ repositories {
 
 dependencies {
 
-    compile project(':SnapKit')
+    implementation project(':SnapKit')
 
-    compile project(':Puppets')
+    implementation project(':Puppets')
 
 }
 
