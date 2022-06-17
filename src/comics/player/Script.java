@@ -2,7 +2,9 @@ package comics.player;
 
 import java.util.*;
 
-import snap.util.*;
+import snap.props.PropChange;
+import snap.props.PropObject;
+import snap.props.Undoer;
 
 /**
  * A class to represent the instructions.

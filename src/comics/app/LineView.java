@@ -2,7 +2,7 @@ package comics.app;
 
 import comics.player.*;
 import snap.gfx.*;
-import snap.util.PropChangeListener;
+import snap.props.PropChangeListener;
 import snap.view.*;
 
 /**
