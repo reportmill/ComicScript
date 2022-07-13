@@ -40,30 +40,33 @@ public class AssetIndex {
             ROOT = "https://reportmill.com/ComicLib/";
 
         WebURL url = WebURL.getURL(ROOT + "index.json");
-        JSONNode root = JSONNode.readSource(url);
-        JSONNode actors = root.getNode("Actors");
-        JSONNode anims = root.getNode("Anims");
-        JSONNode settings = root.getNode("Settings");
+        JSObject root = (JSObject) JSValue.readSource(url);
+        JSArray actors = (JSArray) root.getValue("Actors");
+        JSArray anims = (JSArray) root.getValue("Anims");
+        JSArray settings = (JSArray) root.getValue("Settings");
 
         // Get Actors
         _assets = new ArrayList();
         _actors = new ArrayList();
-        for (int i = 0; i < actors.getNodeCount(); i++) {
-            Map map = actors.getNode(i).getAsMap();
+        for (int i = 0; i < actors.getValueCount(); i++) {
+            JSObject actor = (JSObject) actors.getValue(i);
+            Map map = actor.getAsMap();
             addAsset(new ActorImage(map));
         }
 
         // Get Anims
         _anims = new ArrayList();
-        for (int i = 0; i < anims.getNodeCount(); i++) {
-            Map map = anims.getNode(i).getAsMap();
+        for (int i = 0; i < anims.getValueCount(); i++) {
+            JSObject anim = (JSObject) anims.getValue(i);
+            Map map = anim.getAsMap();
             addAsset(new AnimImage(map));
         }
 
         // Get Settings
         _sets = new ArrayList();
-        for (int i = 0; i < settings.getNodeCount(); i++) {
-            Map map = settings.getNode(i).getAsMap();
+        for (int i = 0; i < settings.getValueCount(); i++) {
+            JSObject setting = (JSObject) settings.getValue(i);
+            Map map = setting.getAsMap();
             addAsset(new SetImage(map));
         }
     }
