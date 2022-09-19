@@ -241,7 +241,7 @@ public class ScriptView extends ColView {
         {
             _line = aLine;
             setPadding(5, 20, 5, 10);
-            setRadius(10);
+            setBorderRadius(10);
             if (aLine != null) {
                 setText(aLine.getText());
                 setFont(SCRIPTVIEW_FONT);

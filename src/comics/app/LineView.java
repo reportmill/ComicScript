@@ -147,7 +147,7 @@ public class LineView extends RowView {
             setText(aStr);
             setFont(LineView.this.getFont());
             setPadding(5, 10, 5, 10);
-            setRadius(10);
+            setBorderRadius(10);
             setFill(LINEPART_FILL);
             setBorder(LINEPART_BORDER, 1);
             enableEvents(MousePress);
