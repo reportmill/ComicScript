@@ -296,7 +296,7 @@ public class ScriptEditor extends ViewOwner {
 
         // Get/Configure InputText
         _inputText = getView("InputText", TextField.class);
-        _inputText.setRadius(10);
+        _inputText.setBorderRadius(10);
         _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
         _inputText.addPropChangeListener(pc -> inputTextSelChanged(), TextField.Sel_Prop);
         if (_inputText.getWidth() < 0)
