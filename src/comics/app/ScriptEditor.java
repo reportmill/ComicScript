@@ -255,7 +255,7 @@ public class ScriptEditor extends ViewOwner {
         mainColView.setFillWidth(true);
 
         // Get main RowView
-        RowView mainRowView = (RowView) mainColView.getChild("MainRowView");
+        RowView mainRowView = (RowView) mainColView.getChildForName("MainRowView");
         mainRowView.setFillHeight(true);
 
         // Create/configure ScriptView add to MainRowView
@@ -267,7 +267,7 @@ public class ScriptEditor extends ViewOwner {
         mainRowView.addChild(scriptScrollView, 0);
 
         // Get/configure InputRow
-        RowView inputRow = (RowView) mainColView.getChild("InputRow");
+        RowView inputRow = (RowView) mainColView.getChildForName("InputRow");
         inputRow.setFillHeight(true);
 
         // Return MainColView

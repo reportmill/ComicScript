@@ -121,7 +121,7 @@ public class LineEditor extends ViewOwner {
 
         // Get/configure ToolBar
         RowView toolBar = (RowView) mainColView.getChild(0);
-        Label toolBarLabel = (Label) toolBar.getChild("ToolBarLabel");
+        Label toolBarLabel = (Label) toolBar.getChildForName("ToolBarLabel");
         toolBarLabel.setFont(MAIN_FONT.getBold());
 
         // Create LineView
