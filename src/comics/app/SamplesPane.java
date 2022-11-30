@@ -1,6 +1,4 @@
 package comics.app;
-
-import snap.geom.HPos;
 import snap.geom.Pos;
 import snap.geom.Size;
 import snap.geom.VPos;
@@ -8,6 +6,7 @@ import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;
 import snap.viewx.DialogBox;
+import snap.viewx.DialogSheet;
 import snap.web.WebURL;
 
 /**
@@ -17,7 +16,7 @@ public class SamplesPane extends ViewOwner {
 
     //
     EditorPane _epane;
-    SheetDialogBox _dbox;
+    DialogSheet _dbox;
 
     // The selected index
     int _selIndex;
@@ -40,9 +39,10 @@ public class SamplesPane extends ViewOwner {
         _epane = anEP;
         ChildView aView = (ChildView) anEP.getUI();
 
-        _dbox = new SheetDialogBox();
+        _dbox = new DialogSheet();
         _dbox.setContent(getUI());
         _dbox.showConfirmDialog(aView);
+        _dbox.addPropChangeListener(pc -> dialogBoxClosed(), DialogBox.Showing_Prop);
     }
 
     /**
@@ -52,7 +52,7 @@ public class SamplesPane extends ViewOwner {
     {
         _epane._scriptEditor._scriptView.requestFocus();
 
-        if (_dbox._cancelled) return;
+        if (_dbox.isCancelled()) return;
 
         String script = getDoc(_selIndex);
         if (script != null) {
@@ -231,81 +231,4 @@ public class SamplesPane extends ViewOwner {
         ImageView iview = getView("ImageView" + String.valueOf(anIndex), ImageView.class);
         iview.setImage(anImg);
     }
-
-    /**
-     * A DialogBox subclass that shows as a sheet.
-     */
-    private class SheetDialogBox extends DialogBox {
-
-        ChildView _cview;
-        BoxView _clipBox;
-        boolean _cancelled;
-
-        /**
-         * Show Dialog in sheet.
-         */
-        protected boolean showPanel(View aView)
-        {
-            _cview = aView instanceof ChildView ? (ChildView) aView : null;
-            if (_cview == null) return super.showPanel(aView);
-
-            for (View v : _cview.getChildren()) v.setPickable(false);
-
-            View ui = getUI();
-            ui.setManaged(false); //ui.setLeanX(HPos.CENTER);
-            ui.setFill(ViewUtils.getBackFill());
-            ui.setBorder(Color.DARKGRAY, 1);
-            Size size = ui.getPrefSize();
-            ui.setSize(size);
-
-            _clipBox = new BoxView(ui);
-            _clipBox.setSize(size);
-            _clipBox.setManaged(false);
-            _clipBox.setLeanX(HPos.CENTER);
-            _clipBox.setClipToBounds(true);
-            _cview.addChild(_clipBox);
-            ui.setTransY(-size.height);
-            ui.getAnim(1000).setTransY(-1).play();
-
-            // Make sure stage and Builder.FirstFocus are focused
-            runLater(() -> notifyDidShow());
-
-            return true;
-        }
-
-        /**
-         * Hide dialog.
-         */
-        protected void hide()
-        {
-            View ui = getUI();
-            ui.getAnimCleared(1000).setTransY(-ui.getHeight()).setOnFinish(a -> hideFinished()).play();
-        }
-
-        void hideFinished()
-        {
-            _cview.removeChild(_clipBox); //_cview.removeChild(getUI());
-            for (View v : _cview.getChildren()) v.setPickable(true);
-            dialogBoxClosed();
-        }
-
-        /**
-         * Hides the dialog box.
-         */
-        public void confirm()
-        {
-            _cancelled = false;
-            hide();
-        }
-
-        /**
-         * Cancels the dialog box.
-         */
-        public void cancel()
-        {
-            _cancelled = true;
-            hide();
-        }
-    }
-
 }
