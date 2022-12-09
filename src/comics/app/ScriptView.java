@@ -57,7 +57,8 @@ public class ScriptView extends ColView {
         setFocusable(true);
         setFocusWhenPressed(true);
         setFocusKeysEnabled(false);
-        enableEvents(MousePress, Action);
+        enableEvents(MousePress);
+        setActionable(true);
 
         // Configure CursorLineView
         _cursorLineView = new LineView(null);

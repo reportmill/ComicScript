@@ -68,11 +68,12 @@ public class PlayBar extends RowView {
         _editButton.setName("EditButton");
         _editButton.setTextFill(Color.WHITE);
         _editButton.setFont(Font.Arial14);
+        _editButton.setActionable(true);
         _editButton.addEventHandler(e -> ViewUtils.fireActionEvent(_editButton, e), MousePress);
         _editButton.addEventHandler(e -> e.consume(), MouseDrag, MouseRelease);
         _editButton.addEventHandler(e -> _editButton.setFont(Font.Arial14.getBold()), MouseEnter);
         _editButton.addEventHandler(e -> _editButton.setFont(Font.Arial14), MouseExit);
-        ViewUtils.enableEvents(_editButton, Action);
+        ViewUtils.enableEvents(_editButton);
         addChild(_editButton);
     }
 
@@ -225,7 +226,8 @@ public class PlayBar extends RowView {
         {
             setPrefSize(24, 24);
             setName("PlayButton");
-            enableEvents(MousePress, MouseDrag, Action);
+            setActionable(true);
+            enableEvents(MousePress, MouseDrag);
         }
 
         /**
@@ -293,7 +295,8 @@ public class PlayBar extends RowView {
             setName("PlayButtonBig");
             setManaged(false);
             setLean(Pos.CENTER);
-            enableEvents(MouseEnter, MouseExit, MousePress, Action);
+            setActionable(true);
+            enableEvents(MouseEnter, MouseExit, MousePress);
         }
 
         /**

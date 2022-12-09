@@ -182,7 +182,8 @@ public class StarPicker extends ViewOwner {
             setGrowWidth(true);
             setFill(Color.WHITE);
             setBorder(Border.createLoweredBevelBorder());
-            enableEvents(MousePress, Action);
+            enableEvents(MousePress);
+            setActionable(true);
         }
 
         /**

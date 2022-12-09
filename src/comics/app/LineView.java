@@ -1,5 +1,4 @@
 package comics.app;
-
 import comics.player.*;
 import snap.gfx.*;
 import snap.props.PropChangeListener;
@@ -35,7 +34,7 @@ public class LineView extends RowView {
         setPadding(5, 5, 5, 5);
         setSpacing(8);
         setFont(new Font("Arial", 15));
-        enableEvents(Action);
+        setActionable(true);
     }
 
     /**
