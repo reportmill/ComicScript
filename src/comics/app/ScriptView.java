@@ -232,9 +232,6 @@ public class ScriptView extends ColView {
         // Hightlight rects
         Rect _selRect, _mouseRect;
 
-        // Cached pointer to the string value
-        StringView _stringView;
-
         /**
          * Create LineView.
          */
@@ -249,7 +246,6 @@ public class ScriptView extends ColView {
             }
             setFill(LINEVIEW_FILL);
             enableEvents(MousePress, MouseMove, MouseExit);
-            _stringView = getStringView();
 
             if (aLine != null && !aLine.isLoaded()) {
                 setTextFill(Color.WHITE);
@@ -352,5 +348,4 @@ public class ScriptView extends ColView {
             aPntr.setOpacity(1);
         }
     }
-
 }
