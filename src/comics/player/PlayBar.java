@@ -41,7 +41,7 @@ public class PlayBar extends RowView {
         setLean(Pos.BOTTOM_LEFT);
         setGrowWidth(true);
         setPadding(16, 10, 0, 10);
-        setAlign(HPos.LEFT);
+        setAlignX(HPos.LEFT);
         setSpacing(20);
         enableEvents(MouseMove, MousePress, MouseDrag, MouseExit);
         setCursor(Cursor.HAND);
