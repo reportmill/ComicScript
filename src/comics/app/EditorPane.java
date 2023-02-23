@@ -330,7 +330,7 @@ public class EditorPane extends ViewOwner {
 
         // Create SplitView from MainColView to separate Player/Editor
         SplitView splitView = SplitView.makeSplitView(colView);
-        splitView.getDivider(0).setPrefSpan(10);
+        splitView.getDivider(0).setSpan(10);
 
         // Create MenuBar and wrap MenuBar and SplitView - return that view
         MenuBar mbar = getMenuBar();
