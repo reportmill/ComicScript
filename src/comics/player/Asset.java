@@ -315,7 +315,7 @@ public class Asset implements Loadable {
         if (!aURL.getPath().endsWith(".png")) return false;
 
         // Get GIF URL
-        WebURL url2 = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getPathNameSimple() + ".gif"));
+        WebURL url2 = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
 
         // If no gif file or it's older than
         long pngMod = aURL.isFound() ? aURL.getHead().getModTime() : 0;
@@ -329,7 +329,7 @@ public class Asset implements Loadable {
     private static void saveSpriteSheet(WebURL aURL)
     {
         // Get URL for GIF file
-        WebURL url = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getPathNameSimple() + ".gif"));
+        WebURL url = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
         Image img = Image.get(url);
 
         // Scale image
