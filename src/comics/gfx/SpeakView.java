@@ -168,7 +168,7 @@ public class SpeakView extends ParentView {
         double p0x = x + w / 2 - 10, p0y = y + h / 2, p1x = x + w / 2 + 10, p1y = y + h / 2;
         Point tp = getTailPoint(_bubbleBnds, _tailAngle, _tailLen);
         Shape tailShape = new Polygon(p0x, p0y, p1x, p1y, tp.x, tp.y);
-        _backShape = Shape.add(_textShape, tailShape);
+        _backShape = Shape.addShapes(_textShape, tailShape);
     }
 
     /**

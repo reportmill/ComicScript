@@ -310,7 +310,7 @@ public class PlayBar extends RowView {
             aPntr.fill(c1);
             Ellipse c2 = new Ellipse(10, 10, w - 20, h - 20);
             Ellipse c3 = new Ellipse(20, 20, w - 40, h - 40);
-            Shape c4 = Shape.subtract(c2, c3);
+            Shape c4 = Shape.subtractShapes(c2, c3);
             aPntr.setColor(new Color(1, 1, 1, .3));
             aPntr.fill(c4);
 
