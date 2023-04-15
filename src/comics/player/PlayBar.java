@@ -1,5 +1,4 @@
 package comics.player;
-
 import snap.geom.*;
 import snap.gfx.*;
 import snap.view.*;
@@ -237,13 +236,14 @@ public class PlayBar extends RowView {
         {
             double w = getWidth(), h = getHeight(), pw = 18, ph = 18;
 
-            Path path = new Path();
+            Path2D path = new Path2D();
             if (!_player.isPlaying()) {
                 path.moveTo(w / 2 - pw * 1 / 3, h / 2 - ph / 2);
                 path.lineBy(pw, ph / 2);
                 path.lineBy(-pw, ph / 2);
                 path.close();
-            } else {
+            }
+            else {
                 path.moveTo(w / 2 - pw / 4, h / 2 - ph / 2);
                 path.lineBy(pw / 4, 0);
                 path.lineBy(0, ph);
@@ -315,7 +315,7 @@ public class PlayBar extends RowView {
             aPntr.fill(c4);
 
             if (_playing) {
-                Path path = new Path();
+                Path2D path = new Path2D();
                 double pw = 40, ph = 40;
                 path.moveTo(w / 2 - pw * 1.5 / 4, h / 2 - ph / 2);
                 path.lineBy(pw / 4, 0);
@@ -329,8 +329,9 @@ public class PlayBar extends RowView {
                 path.close();
                 aPntr.setColor(new Color(1, 1, 1, _mouseOver ? .6 : .3));
                 aPntr.fill(path);
-            } else {
-                Path path = new Path();
+            }
+            else {
+                Path2D path = new Path2D();
                 double pw = 30, ph = 45;
                 path.moveTo(w / 2 - pw * 1 / 3, h / 2 - ph / 2);
                 path.lineBy(pw, ph / 2);
@@ -369,5 +370,4 @@ public class PlayBar extends RowView {
             getAnimCleared(500).setScale(2).setOpacity(0).play();
         }
     }
-
 }
