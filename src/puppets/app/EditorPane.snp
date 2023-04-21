@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RowView GrowWidth="true" FillHeight="true">
+  <ColView PrefWidth="300" Padding="8" Spacing="5" FillWidth="true">
+    <RowView Padding="2,4,2,4" GrowWidth="true" Spacing="4">
+      <BevelBorder />
+      <Label Padding="0" text="Puppets">
+        <font name="Arial" size="14" />
+      </Label>
+      <Button Name="AddPuppetButton" PrefWidth="22" PrefHeight="22" Padding="2" LeanX="RIGHT" text="+" />
+      <MenuButton Name="MoveMenuButton" PrefWidth="22" PrefHeight="22" Padding="2" LeanX="RIGHT">
+        <MenuItem Name="CopyActionMenu" text="Copy" />
+        <MenuItem Name="PasteActionMenu" text="Paste" />
+        <MenuItem Name="DeleteActionMenu" text="Delete" />
+        <MenuItem Name="MoveUpActionMenu" text="Move Up" />
+        <MenuItem Name="MoveDownActionMenu" text="Move Down" />
+      </MenuButton>
+    </RowView>
+    <ListView Name="PuppetList" PrefHeight="140">
+      <LineBorder Color="#c0c0c0" />
+    </ListView>
+    <Label Padding="4" text="Puppet Parts:">
+      <BevelBorder />
+      <font name="Arial" size="14" />
+    </Label>
+    <ListView Name="PartsList" PrefHeight="160">
+      <LineBorder Color="#c0c0c0" />
+    </ListView>
+    <RowView Padding="4" GrowWidth="true" Spacing="4">
+      <Label Margin="5,5,5,0" text="Scale:">
+        <font name="Arial" size="12" />
+      </Label>
+      <Spinner Name="ScaleSpinner" PrefWidth="80" PrefHeight="22" Align="CENTER" Margin="0" />
+    </RowView>
+    <RowView Padding="4" GrowWidth="true" Spacing="4">
+      <Button Name="SaveButton" PrefWidth="80" PrefHeight="22" Padding="2" text="Save Puppet" />
+    </RowView>
+    <Label Name="JointsLabel" Padding="4" LeanY="BOTTOM" text="Puppet Joints:">
+      <BevelBorder />
+      <font name="Arial" size="14" />
+    </Label>
+    <ListView Name="JointsList" PrefHeight="160">
+      <LineBorder Color="#c0c0c0" />
+    </ListView>
+  </ColView>
+  <BoxView Name="PuppetBox" GrowWidth="true">
+    <LineBorder />
+    <color value="#ffffff" />
+    <View PrefWidth="428.864" PrefHeight="600.307">
+      <LineBorder Color="#c0c0c0" />
+    </View>
+  </BoxView>
+</RowView>

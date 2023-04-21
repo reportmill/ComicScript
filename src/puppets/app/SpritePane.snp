@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RowView PrefWidth="540" PrefHeight="600" Align="CENTER" GrowWidth="true" FillHeight="true">
+  <ColView Name="ToolBox" PrefWidth="300" PrefHeight="454" Padding="8" Spacing="5" FillWidth="true">
+    <RowView Padding="2,4,2,4" GrowWidth="true" Spacing="4">
+      <BevelBorder />
+      <Label text="Actions">
+        <font name="Arial" size="14" />
+      </Label>
+    </RowView>
+    <ListView Name="ActionList" PrefHeight="140">
+      <LineBorder Color="#c0c0c0" />
+    </ListView>
+    <RowView Padding="4" GrowWidth="true" Spacing="4">
+      <Button Name="PlayButton" PrefWidth="80" Padding="2" text="Play" />
+      <ToggleButton Name="PlayLoopButton" PrefWidth="80" Padding="2" LeanX="RIGHT" text="Play Loop" />
+    </RowView>
+    <CheckBox Name="FlipXSwitch" text="Flip Horizontal" />
+  </ColView>
+  <BoxView Name="PuppetBox" GrowWidth="true">
+    <LineBorder />
+    <color value="#ffffff" />
+  </BoxView>
+</RowView>

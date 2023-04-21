@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ColView PrefWidth="900" PrefHeight="700" Spacing="4" FillWidth="true">
+  <RowView Padding="4,4,4,6" Spacing="4">
+    <RowView>
+      <ToggleButton Name="PuppetButton" PrefWidth="90" PrefHeight="24" Padding="2" text="Puppet" Position="CENTER_LEFT" Selected="true" Group="bg1" />
+      <ToggleButton Name="ActionButton" PrefWidth="90" PrefHeight="24" Padding="2" text="Animate" Position="CENTER" Group="bg1" />
+      <ToggleButton Name="SpriteButton" PrefWidth="90" PrefHeight="24" Padding="2" text="Sprites" Position="CENTER_RIGHT" Group="bg1" />
+    </RowView>
+  </RowView>
+  <BoxView Name="DocBox" Padding="4" GrowHeight="true" Spacing="4" FillWidth="true" FillHeight="true" />
+</ColView>

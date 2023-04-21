@@ -7,6 +7,11 @@ plugins {
 sourceSets.main.java.srcDirs = ['src']
 sourceSets.main.resources.srcDirs = ['src']
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 repositories {
 
     // Use jcenter for resolving dependencies like jbox2d
@@ -17,8 +22,7 @@ dependencies {
 
     implementation project(':SnapKit')
 
-    implementation project(':Puppets')
-
+    implementation group: 'org.jbox2d', name: 'jbox2d-library', version: '2.2.1.1'
 }
 
-mainClassName = 'comics.app.App'
+mainClassName = 'comics.app.App' // 'puppets.app.App'
