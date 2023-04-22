@@ -249,7 +249,7 @@ public class ScriptLine extends PropObject implements Loadable {
     {
         String prop = aPC.getPropName();
         if (prop == Text_Prop) {
-            setText(SnapUtils.stringValue(newVal));
+            setText(Convert.stringValue(newVal));
             getScript().getPlayer().playLine(getIndex());
         } else super.processPropChange(aPC, oldVal, newVal);
     }

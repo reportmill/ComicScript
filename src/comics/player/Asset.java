@@ -1,7 +1,5 @@
 package comics.player;
-
 import java.util.*;
-
 import puppets.puppet.*;
 import snap.geom.Insets;
 import snap.gfx.*;
@@ -194,8 +192,8 @@ public class Asset implements Loadable {
         {
             super(aMap);
             _urls = ROOT + "actors" + _path;
-            _frameCount = SnapUtils.intValue(aMap.get("FrameCount"));
-            _offsetX = SnapUtils.doubleValue(aMap.get("Offset"));
+            _frameCount = Convert.intValue(aMap.get("FrameCount"));
+            _offsetX = Convert.doubleValue(aMap.get("Offset"));
         }
 
         /**

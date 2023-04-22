@@ -5,6 +5,8 @@ import snap.gfx.*;
 import snap.util.*;
 import snap.web.WebURL;
 
+import java.util.Objects;
+
 /**
  * A class to represent a part of a puppet.
  */
@@ -207,7 +209,7 @@ public class PuppetPart implements Loadable {
         WebURL url = getImageURL();
         byte ibytes[] = img.getBytesPNG();
         byte ibytesOld[] = url.getBytes();
-        if (!SnapUtils.equals(ibytes, ibytesOld))
+        if (!Objects.equals(ibytes, ibytesOld))
             SnapUtils.writeBytes(ibytes, url.getJavaFile());
     }
 

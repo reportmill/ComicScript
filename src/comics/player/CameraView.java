@@ -1,9 +1,8 @@
 package comics.player;
-
 import snap.geom.Insets;
 import snap.gfx.*;
 import snap.util.ArrayUtils;
-import snap.util.SnapUtils;
+import snap.util.Convert;
 import snap.view.*;
 
 /**
@@ -201,9 +200,9 @@ public class CameraView extends ScaleBox implements Star {
      */
     public void setPropValue(String aPropName, Object aValue)
     {
-        if (aPropName.equals("Value")) setZoom(SnapUtils.doubleValue(aValue));
-        else if (aPropName.equals("Blur")) setBlur(SnapUtils.doubleValue(aValue));
-        else if (aPropName.equals("Zoom")) setZoom(SnapUtils.doubleValue(aValue));
+        if (aPropName.equals("Value")) setZoom(Convert.doubleValue(aValue));
+        else if (aPropName.equals("Blur")) setBlur(Convert.doubleValue(aValue));
+        else if (aPropName.equals("Zoom")) setZoom(Convert.doubleValue(aValue));
         else super.setPropValue(aPropName, aValue);
     }
 
