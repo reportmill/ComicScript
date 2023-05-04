@@ -171,7 +171,7 @@ public class PuppetPart implements Loadable {
     protected Image getImageImpl()
     {
         WebURL url = getImageURL();
-        Image img = url != null ? Image.get(url) : null;
+        Image img = url != null ? Image.getImageForSource(url) : null;
         if (img == null) System.out.println("PuppetPart.getImage: Image not found for " + getName() + " at " + url);
         return img;
     }

@@ -172,7 +172,7 @@ public class SpritePane extends ViewOwner {
     public Image getImageFlipped(Image anImage)
     {
         int w = (int) Math.round(anImage.getWidth()), h = (int) Math.round(anImage.getHeight());
-        Image img = Image.get(w, h, anImage.hasAlpha());
+        Image img = Image.getImageForSize(w, h, anImage.hasAlpha());
         Painter pntr = img.getPainter();
         Transform xfm = new Transform(w / 2, h / 2);
         xfm.scale(-1, 1);

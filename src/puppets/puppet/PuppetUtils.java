@@ -56,7 +56,7 @@ public class PuppetUtils {
     public static Image getImageFlipped(Image anImage)
     {
         int w = (int) Math.round(anImage.getWidth()), h = (int) Math.round(anImage.getHeight());
-        Image img = Image.get(w, h, anImage.hasAlpha());
+        Image img = Image.getImageForSize(w, h, anImage.hasAlpha());
         Painter pntr = img.getPainter();
         Transform xfm = new Transform(w / 2, h / 2);
         xfm.scale(-1, 1);
@@ -93,7 +93,7 @@ public class PuppetUtils {
     {
         if (_markerImg != null) return _markerImg;
         double s = 23;
-        Image img = Image.get((int) s, (int) s, true);
+        Image img = Image.getImageForSize(s, s, true);
         Painter pntr = img.getPainter();
         Shape arc = new Arc(0, 0, s, s, 0, 360);
         Color fill = new Color("#E49956D0"); // Yellow: #EFD969E0, Orange: #E49956E0
@@ -116,7 +116,7 @@ public class PuppetUtils {
     {
         if (_anchorImage != null) return _anchorImage;
         double s = 90;
-        Image img = Image.get((int) s, (int) s, true);
+        Image img = Image.getImageForSize((int) s, (int) s, true);
         Painter pntr = img.getPainter();
         pntr.setStroke(Stroke.getStroke(4));
         Color red = new Color("#D54438"), blue = new Color("#4B77B8");

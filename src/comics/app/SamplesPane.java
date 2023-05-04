@@ -189,7 +189,7 @@ public class SamplesPane extends ViewOwner {
         String name = SALL[anIndex].replace(".txt", ".png");
         String urls = "https://reportmill.com/jars/ccsamples/" + name;
         WebURL imgURL = WebURL.getURL(urls);
-        img = DOC_IMAGES[anIndex] = Image.get(imgURL);
+        img = DOC_IMAGES[anIndex] = Image.getImageForSource(imgURL);
         img.getNative();
         return img;
     }

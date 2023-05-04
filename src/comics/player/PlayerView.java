@@ -594,7 +594,7 @@ public class PlayerView extends ScaleBox {
     Image getIntroImage()
     {
         if (_introImg != null) return _introImg;
-        return _introImg = Image.get(getClass(), "pkg.images/Header.png");
+        return _introImg = Image.getImageForClassResource(getClass(), "pkg.images/Header.png");
     }
 //Image getRealImage()  { if(_realImg!=null) return _realImg;
 //    return _realImg = Image.get(getClass(), "pkg.images/RealLogo.png"); }

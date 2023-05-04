@@ -310,7 +310,7 @@ public class EditorPane extends ViewOwner {
         editorBox.addChild(_transPane);
 
         // Add close button
-        Image img = Image.get(getClass(), "Close.png");
+        Image img = Image.getImageForClassResource(getClass(), "Close.png");
         ImageView closeBtn = new ImageView(img);
         closeBtn.setName("CloseButton");
         closeBtn.setLean(Pos.TOP_RIGHT);

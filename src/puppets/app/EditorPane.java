@@ -377,7 +377,7 @@ public class EditorPane extends ViewOwner {
 
         // Get image
         Object imgSrc = aFile.getSourceURL() != null ? aFile.getSourceURL() : aFile.getBytes();
-        Image img = Image.get(imgSrc);
+        Image img = Image.getImageForSource(imgSrc);
         dropImage(anEvent, img);
     }
 

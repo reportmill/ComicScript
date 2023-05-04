@@ -169,8 +169,8 @@ public class StarPicker extends ViewOwner {
         int _selIndex = -1;
 
         // Images for Setting and Camera
-        Image _setImg = Image.get(getClass(), "Setting.png");
-        Image _camImg = Image.get(getClass(), "Camera.png");
+        Image _setImg = Image.getImageForClassResource(getClass(), "Setting.png");
+        Image _camImg = Image.getImageForClassResource(getClass(), "Camera.png");
 
         /**
          * Creates a StarListView.

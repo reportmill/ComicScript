@@ -85,11 +85,11 @@ public class Asset implements Loadable {
     protected Image getImageImpl()
     {
         WebURL url = WebURL.getURL(_urls);
-        Image img = Image.get(url);
+        Image img = Image.getImageForSource(url);
 
         if (!SnapUtils.isTeaVM && isNewGifAvailable(url)) {
             saveSpriteSheet(url);
-            img = Image.get(url);
+            img = Image.getImageForSource(url);
         }
         return img;
     }
@@ -328,7 +328,7 @@ public class Asset implements Loadable {
     {
         // Get URL for GIF file
         WebURL url = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
-        Image img = Image.get(url);
+        Image img = Image.getImageForSource(url);
 
         // Scale image
         if (img.getImageSet() != null) img = img.getImageSet().getImageScaled(.5);

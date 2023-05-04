@@ -125,7 +125,7 @@ public class ORAReader {
         public Image getImage()
         {
             if (_img != null) return _img;
-            return _img = Image.get(src);
+            return _img = Image.getImageForSource(src);
         }
 
         /**
@@ -209,7 +209,7 @@ public class ORAReader {
             }
 
             // Create image and render layer images in it
-            Image img = Image.get(px, py, true);
+            Image img = Image.getImageForSize(px, py, true);
             Painter pntr = img.getPainter();
             for (int i = entries.size() - 1; i >= 0; i--) {
                 Layer entry = entries.get(i);
