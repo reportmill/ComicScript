@@ -365,7 +365,7 @@ public class StarPicker extends ViewOwner {
          */
         public String getParent(String anItem)
         {
-            return anItem.length() > 1 ? FilePathUtils.getParent(anItem) : null;
+            return anItem.length() > 1 ? FilePathUtils.getParentPath(anItem) : null;
         }
 
         // Return whether file is directory
@@ -383,7 +383,7 @@ public class StarPicker extends ViewOwner {
         // Return child file name
         public String getText(String anItem)
         {
-            String name = FilePathUtils.getFileNameSimple(anItem);
+            String name = FilePathUtils.getFilenameSimple(anItem);
             return StringUtils.firstCharUpperCase(name);
         }
 

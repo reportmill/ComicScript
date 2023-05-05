@@ -35,7 +35,7 @@ public class ORAPuppet extends Puppet {
         ORAReader rdr = new ORAReader();
 
         // Get name
-        String name = FilePathUtils.getFileName(aPath);
+        String name = FilePathUtils.getFilename(aPath);
         if (name.startsWith("CT")) name = name.substring(2);
         setName(name);
 

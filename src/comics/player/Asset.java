@@ -313,7 +313,7 @@ public class Asset implements Loadable {
         if (!aURL.getPath().endsWith(".png")) return false;
 
         // Get GIF URL
-        WebURL url2 = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
+        WebURL url2 = WebURL.getURL(FilePathUtils.getPeerPath(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
 
         // If no gif file or it's older than
         long pngMod = aURL.isFound() ? aURL.getHead().getModTime() : 0;
@@ -327,7 +327,7 @@ public class Asset implements Loadable {
     private static void saveSpriteSheet(WebURL aURL)
     {
         // Get URL for GIF file
-        WebURL url = WebURL.getURL(FilePathUtils.getPeer(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
+        WebURL url = WebURL.getURL(FilePathUtils.getPeerPath(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
         Image img = Image.getImageForSource(url);
 
         // Scale image
@@ -347,7 +347,7 @@ public class Asset implements Loadable {
      */
     public static AnimImage getAnimAsset(String aStarName, String anAnimName)
     {
-        String name = FilePathUtils.getFileNameSimple(aStarName);
+        String name = FilePathUtils.getFilenameSimple(aStarName);
         return AssetIndex.get().getAnimAsset(name, anAnimName);
     }
 
