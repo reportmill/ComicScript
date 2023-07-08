@@ -53,7 +53,7 @@ public class SpritePane extends ViewOwner {
         _actionList.setItemTextFunction(action -> {
             return action.getName();
         });
-        _actionList.setItems(PuppetUtils.getActionFile().getActions());
+        _actionList.setItemsList(PuppetUtils.getActionFile().getActions());
         _actionList.setSelIndex(0);
 
         getUI().addPropChangeListener(pc -> runLater(() -> setSpriteImage()), View.Showing_Prop);
