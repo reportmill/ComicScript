@@ -325,7 +325,7 @@ public class ActionPane extends ViewOwner {
         // If Time column, set time
         if (col == 1) {
             move.setTime(Integer.valueOf(text));
-            _moveTable.updateItems(move);
+            _moveTable.updateItem(move);
             _actions.saveActions();
             resetLater();
         }
