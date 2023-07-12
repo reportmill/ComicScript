@@ -232,9 +232,7 @@ public class Actor extends ImageView implements Star {
 
         // Configure anim
         getAnim(time).setValue("Frame", frame);
-        getAnim(0).setOnFinish(a -> {
-            setAssetImage(_asset, offsetX);
-        });
+        getAnim(0).setOnFinish(() -> setAssetImage(_asset, offsetX));
     }
 
     /**

@@ -301,7 +301,7 @@ public class ActorAction extends Action {
             // Add SpeakView with anim to fade in/out
             speakView.setOpacity(0);
             speakView.getAnim(500).setOpacity(1).getAnim(500 + 2000).setOpacity(1).getAnim(500 + 2000 + 500).setOpacity(0);
-            speakView.getAnim(0).setOnFinish(a -> stage.removeChild(speakView));
+            speakView.getAnim(0).setOnFinish(() -> stage.removeChild(speakView));
         }
     }
 

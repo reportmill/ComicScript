@@ -99,7 +99,10 @@ public class Explode extends View {
         ViewUtils.addChild(par, this);
 
         // Start animation with hooks to call animFrame and animFinish
-        getAnim(2000).setOnFrame(a -> animFrame()).setOnFinish(a -> animFinish());//.play();
+        ViewAnim anim0 = getAnim(0);
+        anim0.setOnFrame(() -> animFrame());
+        anim0.setOnFinish(() -> animFinish());
+        getAnim(2000);//.play();
 
         // Hide view
         _view.setOpacity(0);

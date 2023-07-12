@@ -346,9 +346,12 @@ public class EditorPane extends ViewOwner {
 
         // If visible, animate close
         if (visible) {
-            if (_jointsList.isFocused()) _pupView.requestFocus();
-            _jointsList.getAnimCleared(500).setPrefHeight(1);
-            _jointsList.getAnim(500).setOnFinish(a -> _jointsList.setVisible(false)).play();
+            if (_jointsList.isFocused())
+                _pupView.requestFocus();
+            ViewAnim anim = _jointsList.getAnimCleared(500);
+            anim.setPrefHeight(1);
+            anim.setOnFinish(() -> _jointsList.setVisible(false));
+            anim.play();
         }
 
         // If hidden, animate open

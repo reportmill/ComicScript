@@ -257,7 +257,7 @@ public class PlayerView extends ScaleBox {
         }
 
         // Configure PlayerView.Anim to call playerDidAnim() on each frame
-        _camera.getAnim(0).setOnFrame(a -> playerDidFrame());
+        _camera.getAnim(0).setOnFrame(() -> playerDidFrame());
 
         // Update RunLine and call Script.runLine()
         firePropChange(RunLine_Prop, runLine, _runLine = anIndex);
@@ -303,7 +303,7 @@ public class PlayerView extends ScaleBox {
 
         // If time remaining for current line, keep playing and end with playLineDone
         if (camTime < lineRunTime) {
-            _camera.getAnim(lineRunTime).setOnFinish(a -> ViewUtils.runLater(_playLineDoneRun));
+            _camera.getAnim(lineRunTime).setOnFinish(() -> ViewUtils.runLater(_playLineDoneRun));
             _camera.playAnimDeep();
         }
 
@@ -462,7 +462,7 @@ public class PlayerView extends ScaleBox {
         } else {
             getPlayBar().setOpacity(1);
             getPlayBar().getAnimCleared(300).setOpacity(0).play();
-            getPlayBar().getAnim(0).setOnFinish(a -> removeChild(getPlayBar()));
+            getPlayBar().getAnim(0).setOnFinish(() -> removeChild(getPlayBar()));
         }
     }
 
@@ -527,7 +527,7 @@ public class PlayerView extends ScaleBox {
             PlayButtonBig pb = new PlayButtonBig(isPlaying());
             addChild(pb);
             pb.animate();
-            pb.getAnim(0).setOnFinish(a -> removeChild(pb));
+            pb.getAnim(0).setOnFinish(() -> removeChild(pb));
             if (isPlaying()) stop();
             else play();
         } else super.processEvent(anEvent);
@@ -575,8 +575,8 @@ public class PlayerView extends ScaleBox {
         // Configure/start anim
         _introView.setTransY(getHeight() - 30);
         _introView.getAnim(1500).setTransY(0).getAnim(3000).getAnim(3500).setOpacity(0).play();
-        _introView.getAnim(0).setOnFrame(a -> _introView.setScale(getCamera().getScale()));
-        _introView.getAnim(0).setOnFinish(a -> introFinished());
+        _introView.getAnim(0).setOnFrame(() -> _introView.setScale(getCamera().getScale()));
+        _introView.getAnim(0).setOnFinish(() -> introFinished());
     }
 
     /**

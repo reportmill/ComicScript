@@ -116,7 +116,7 @@ public class SpritePane extends ViewOwner {
         int time = action.getMaxTime();
         _imgView.getAnimCleared(time).setValue("Frame", _imgView.getFrameCount()).setLinear().play();
         if (_loopAnim)
-            _imgView.getAnim(0).setOnFinish(a -> animFinished());
+            _imgView.getAnim(0).setOnFinish(() -> animFinished());
     }
 
     /**
