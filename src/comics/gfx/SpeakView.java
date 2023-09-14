@@ -2,6 +2,7 @@ package comics.gfx;
 
 import snap.geom.*;
 import snap.gfx.*;
+import snap.text.TextBox;
 import snap.util.MathUtils;
 import snap.view.*;
 
@@ -157,8 +158,12 @@ public class SpeakView extends ParentView {
         _textArea.setBounds(_bubbleBnds);
 
         // Reset text bounds path and scale text
-        double x = _bubbleBnds.x, y = _bubbleBnds.y, w = _bubbleBnds.width, h = _bubbleBnds.height;
-        _textArea.getTextBox().setBoundsPath(new Ellipse(0, 0, w, h));
+        double x = _bubbleBnds.x;
+        double y = _bubbleBnds.y;
+        double w = _bubbleBnds.width;
+        double h = _bubbleBnds.height;
+        TextBox textBox = (TextBox) _textArea.getTextBlock();
+        textBox.setBoundsPath(new Ellipse(0, 0, w, h));
         _textArea.scaleTextToFit();
 
         // Reset text shape
