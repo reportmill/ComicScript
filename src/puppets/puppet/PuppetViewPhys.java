@@ -146,7 +146,7 @@ public class PuppetViewPhys {
 
         // Set timer to call timerFired 25 times a second
         if (_runner == null)
-            ViewEnv.getEnv().runIntervals(_runner = () -> timerFired(), FRAME_DELAY_MILLIS, true, true);
+            ViewEnv.getEnv().runIntervals(_runner = () -> timerFired(), FRAME_DELAY_MILLIS);
         else {
             ViewEnv.getEnv().stopIntervals(_runner);
             _runner = null;
@@ -491,7 +491,7 @@ public class PuppetViewPhys {
     {
         if (isRunning() || _poseMouseTime == 0) return;
         timerFired();
-        ViewUtils.runDelayed(() -> resolveMouseJointsOverTime(), FRAME_DELAY_MILLIS, true);
+        ViewUtils.runDelayed(() -> resolveMouseJointsOverTime(), FRAME_DELAY_MILLIS);
     }
 
     /**
