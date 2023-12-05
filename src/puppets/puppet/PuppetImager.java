@@ -61,7 +61,7 @@ public class PuppetImager {
         // Create first image (empty)
         double vw = _actView.getWidth();
         double vh = _actView.getHeight();
-        _img = Image.getImageForSizeAndScale(vw, vh, true, 0);
+        _img = Image.getImageForSizeAndDpiScale(vw, vh, true, 0);
         _img.setLoaded(false);
         addImager(this);
     }
@@ -100,7 +100,7 @@ public class PuppetImager {
         double vw = _img.getWidth();
         double vh = _img.getHeight();
         for (int i = 1; i < _frameCount; i++) {
-            Image img = Image.getImageForSizeAndScale(vw, vh, true, 0);
+            Image img = Image.getImageForSizeAndDpiScale(vw, vh, true, 0);
             _images.add(img);
         }
 
@@ -165,7 +165,7 @@ public class PuppetImager {
      */
     private static Image getImage(View aView)
     {
-        Image img = Image.getImageForSizeAndScale(aView.getWidth(), aView.getHeight(), true, 0);
+        Image img = Image.getImageForSizeAndDpiScale(aView.getWidth(), aView.getHeight(), true, 0);
         Painter pntr = img.getPainter();
         ViewUtils.paintAll(aView, pntr);
         return img;
