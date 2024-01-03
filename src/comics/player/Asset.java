@@ -316,8 +316,8 @@ public class Asset implements Loadable {
         WebURL url2 = WebURL.getURL(FilePathUtils.getPeerPath(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
 
         // If no gif file or it's older than
-        long pngMod = aURL.isFound() ? aURL.getHead().getModTime() : 0;
-        long gifMod = url2.isFound() ? url2.getHead().getModTime() : 0;
+        long pngMod = aURL.isFound() ? aURL.getHead().getLastModTime() : 0;
+        long gifMod = url2.isFound() ? url2.getHead().getLastModTime() : 0;
         return gifMod > pngMod;
     }
 
