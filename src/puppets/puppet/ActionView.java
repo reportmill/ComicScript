@@ -205,7 +205,7 @@ public class ActionView extends PuppetView {
         // Create timer and start
         _loops = doLoop;
         _startTime = getActionTime();
-        _timer = new ViewTimer(FRAME_DELAY_MILLIS, t -> timerFired());
+        _timer = new ViewTimer(this::timerFired, FRAME_DELAY_MILLIS);
         _timer.start();
     }
 
