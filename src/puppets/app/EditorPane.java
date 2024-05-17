@@ -373,7 +373,7 @@ public class EditorPane extends ViewOwner {
         }
 
         // Get path and extension (set to empty string if null)
-        String ext = aFile.getExtension();
+        String ext = aFile.getFileType();
         if (ext == null) return;
         ext = ext.toLowerCase();
         if (!Image.canRead(ext)) return;
