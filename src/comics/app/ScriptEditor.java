@@ -280,7 +280,8 @@ public class ScriptEditor extends ViewOwner {
     protected void initUI()
     {
         // List for ScriptLabel MousePress
-        enableEvents("ScriptLabel", MousePress);
+        Label scriptLabel = getView("ScriptLabel", Label.class);
+        scriptLabel.addEventHandler(e -> getPlayer().showIntroAnim(), MousePress);
 
         // Configure ScriptView
         _scriptView.setScript(getScript());
@@ -337,9 +338,6 @@ public class ScriptEditor extends ViewOwner {
      */
     protected void respondUI(ViewEvent anEvent)
     {
-        // Handle ScriptLabel
-        if (anEvent.equals("ScriptLabel")) getPlayer().showIntroAnim();
-
         // Handle CutButton, DeleteButton
         if (anEvent.equals("CutButton")) delete();
         if (anEvent.equals("DeleteButton")) delete();

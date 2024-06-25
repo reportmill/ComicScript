@@ -28,7 +28,7 @@ public class EditorPane extends ViewOwner {
     ListView<String> _jointsList;
 
     // The PuppetView
-    PuppetView _pupView;
+    PuppetView _puppetView;
 
     // The selected part name
     String _selName, _dragName;
@@ -71,7 +71,7 @@ public class EditorPane extends ViewOwner {
 
         if (!isUISet()) return;
 
-        _pupView.setPuppet(aPuppet);
+        _puppetView.setPuppet(aPuppet);
     }
 
     /**
@@ -79,7 +79,7 @@ public class EditorPane extends ViewOwner {
      */
     public PuppetPart getPuppetPartAtPoint(double aX, double aY)
     {
-        View hitView = ViewUtils.getChildAt(_pupView, aX, aY);
+        View hitView = ViewUtils.getChildAt(_puppetView, aX, aY);
         String name = hitView != null ? hitView.getName() : null;
         PuppetPart part = isPartName(name) ? getPuppet().getPart(name) : null;
         return part;
@@ -160,12 +160,12 @@ public class EditorPane extends ViewOwner {
      */
     private View getSelView()
     {
-        return _selName != null ? _pupView.getChildForName(_selName) : null;
+        return _selName != null ? _puppetView.getChildForName(_selName) : null;
     }
 
     private View getDragView()
     {
-        return _dragName != null ? _pupView.getChildForName(_dragName) : null;
+        return _dragName != null ? _puppetView.getChildForName(_dragName) : null;
     }
 
     /**
@@ -200,16 +200,17 @@ public class EditorPane extends ViewOwner {
 
         // Get/configure PupView
         Puppet puppet = getPuppet();
-        _pupView = new PuppetView(puppet);
-        _pupView.setBorder(Color.LIGHTGRAY, 1);
-        _pupView.addEventHandler(e -> puppetViewMousePressed(e), MousePress);
+        _puppetView = new PuppetView(puppet);
+        _puppetView.setBorder(Color.LIGHTGRAY, 1);
+        _puppetView.addEventHandler(this::handlePuppetViewMousePressed, MousePress);
+        _puppetView.addEventHandler(this::handlePuppetViewDragEvent, DragEvents);
 
         // Get PuppetBox and add PupView
         BoxView pupBox = getView("PuppetBox", BoxView.class);
-        pupBox.setContent(_pupView);
+        pupBox.setContent(_puppetView);
 
         // Get/configure PartsList
-        String partNames[] = puppet.getSchema().getPartNamesNaturalOrder();
+        String[] partNames = puppet.getSchema().getPartNamesNaturalOrder();
         _partsList = getView("PartsList", ListView.class);
         _partsList.setItems(partNames);
 
@@ -222,18 +223,15 @@ public class EditorPane extends ViewOwner {
         label.setGraphicAfter(jntsBtn);
 
         // Get/configure JointsList
-        String jointNames[] = puppet.getSchema().getJointNamesNaturalOrder();
+        String[] jointNames = puppet.getSchema().getJointNamesNaturalOrder();
         _jointsList = getView("JointsList", ListView.class);
         _jointsList.setPrefHeight(1);
         _jointsList.setVisible(false);
         _jointsList.setItems(jointNames);
 
         // Configure ScaleSpinner
-        Spinner scaleSpinner = getView("ScaleSpinner", Spinner.class);
+        Spinner<?> scaleSpinner = getView("ScaleSpinner", Spinner.class);
         scaleSpinner.setStep(.1);
-
-        // Enable PupView drag events
-        enableEvents(_pupView, DragEvents);
     }
 
     /**
@@ -267,7 +265,8 @@ public class EditorPane extends ViewOwner {
         // Handle AddPuppetButton
         if (anEvent.equals("AddPuppetButton")) {
             String name = DialogBox.showInputDialog(getUI(), "Add Puppet", "Enter Puppet Name:", "Untitled");
-            if (name == null || name.length() == 0) return;
+            if (name == null || name.isEmpty())
+                return;
             Puppet newPup = new Puppet(getPuppet());
             newPup.setName(name);
             PuppetUtils.getPuppetFile().addPuppet(newPup);
@@ -289,18 +288,37 @@ public class EditorPane extends ViewOwner {
             if (part == null) return;
             PuppetPart part2 = part.cloneForScale(anEvent.getFloatValue());
             getPuppet().setPart(part2);
-            _pupView.rebuildChildren();
+            _puppetView.rebuildChildren();
         }
 
         // Handle SaveButton
         if (anEvent.equals("SaveButton"))
             getPuppet().save();
+    }
 
+    /**
+     * Handles PuppetView MousePressed events.
+     */
+    private void handlePuppetViewMousePressed(ViewEvent anEvent)
+    {
+        Point pnt = anEvent.getPoint();
+        View hitView = ViewUtils.getChildAt(_puppetView, pnt.x, pnt.y);
+        if (hitView != null)
+            setSelName(hitView.getName());
+    }
+
+    /**
+     * Handles PuppetView Drag events.
+     */
+    private void handlePuppetViewDragEvent(ViewEvent anEvent)
+    {
         // Handle drag over
         if (anEvent.isDragOver()) {
             Clipboard cb = anEvent.getClipboard();
-            if (!cb.hasFiles()) return;
-            if (getPuppetPartAtPoint(anEvent.getX(), anEvent.getY()) == null) return;
+            if (!cb.hasFiles())
+                return;
+            if (getPuppetPartAtPoint(anEvent.getX(), anEvent.getY()) == null)
+                return;
             anEvent.acceptDrag();
             PuppetPart part = getPuppetPartAtPoint(anEvent.getX(), anEvent.getY());
             setDragName(part != null ? part.getName() : null);
@@ -309,8 +327,10 @@ public class EditorPane extends ViewOwner {
         // Handle drop
         if (anEvent.isDragDrop()) {
             Clipboard cb = anEvent.getClipboard();
-            if (!cb.hasFiles()) return;
-            if (getPuppetPartAtPoint(anEvent.getX(), anEvent.getY()) == null) return;
+            if (!cb.hasFiles())
+                return;
+            if (getPuppetPartAtPoint(anEvent.getX(), anEvent.getY()) == null)
+                return;
             anEvent.acceptDrag();
             ClipboardData cdata = cb.getFiles().get(0);
             dropFile(anEvent, cdata);
@@ -320,17 +340,6 @@ public class EditorPane extends ViewOwner {
         // Handle drop done
         if (anEvent.isDragExit())
             setDragName(null);
-    }
-
-    /**
-     * Event handling from select tool for super selected shapes.
-     */
-    public void puppetViewMousePressed(ViewEvent anEvent)
-    {
-        Point pnt = anEvent.getPoint();
-        View hitView = ViewUtils.getChildAt(_pupView, pnt.x, pnt.y);
-        if (hitView != null)
-            setSelName(hitView.getName());
     }
 
     /**
@@ -347,7 +356,7 @@ public class EditorPane extends ViewOwner {
         // If visible, animate close
         if (visible) {
             if (_jointsList.isFocused())
-                _pupView.requestFocus();
+                _puppetView.requestFocus();
             ViewAnim anim = _jointsList.getAnimCleared(500);
             anim.setPrefHeight(1);
             anim.setOnFinish(() -> _jointsList.setVisible(false));
@@ -400,7 +409,7 @@ public class EditorPane extends ViewOwner {
         if (part == null) return;
         PuppetPart part2 = part.cloneForImage(anImage);
         getPuppet().setPart(part2);
-        _pupView.rebuildChildren();
+        _puppetView.rebuildChildren();
         runLater(() -> setSelName(part2.getName()));
     }
 

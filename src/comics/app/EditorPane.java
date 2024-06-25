@@ -317,7 +317,7 @@ public class EditorPane extends ViewOwner {
         closeBtn.setPadding(2, 2, 0, 0);
         closeBtn.setManaged(false);
         closeBtn.setSize(20 + 2, 20 + 2);
-        enableEvents(closeBtn, MouseRelease);
+        closeBtn.addEventHandler(e -> _playerPane.setEditing(false), MouseRelease);
         _playerPane.getPlayerBox().addChild(closeBtn);
 
         // Create MainColView to hold Player and Editor
@@ -344,8 +344,10 @@ public class EditorPane extends ViewOwner {
      */
     protected void resetUI()
     {
-        if (_scriptEditor.getUI().isShowing()) _scriptEditor.resetLater();
-        if (_lineEditor.getUI().isShowing()) _lineEditor.resetLater();
+        if (_scriptEditor.getUI().isShowing())
+            _scriptEditor.resetLater();
+        if (_lineEditor.getUI().isShowing())
+            _lineEditor.resetLater();
     }
 
     /**
@@ -353,12 +355,13 @@ public class EditorPane extends ViewOwner {
      */
     protected void respondUI(ViewEvent anEvent)
     {
-        // Handle CloseButton, CloseMenu
-        if (anEvent.equals("CloseButton") || anEvent.equals("CloseMenu"))
+        // Handle CloseMenu
+        if (anEvent.equals("CloseMenu"))
             _playerPane.setEditing(false);
 
         // Handle IntroMenu
-        if (anEvent.equals("IntroMenu")) _player.showIntroAnim();
+        if (anEvent.equals("IntroMenu"))
+            _player.showIntroAnim();
     }
 
     /**
@@ -417,5 +420,4 @@ public class EditorPane extends ViewOwner {
         if (anIndex >= 0) return -anIndex - 1;
         return -(anIndex + 1);
     }
-
 }
