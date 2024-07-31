@@ -74,7 +74,7 @@ public class EditorPane extends ViewOwner {
         // If desktop, set Window.MaximizedBounds to window PrefSize
         if (!SnapUtils.isTeaVM) {
             Size psize = win.isShowing() ? win.getSize() : win.getPrefSize();
-            Rect screenRect = ViewEnv.getEnv().getScreenBoundsInset();
+            Rect screenRect = GFXEnv.getEnv().getScreenBoundsInset();
             Rect maxRect = screenRect.getRectCenteredInside(psize.width, psize.height);
             if (win.isShowing()) {
                 maxRect.x = win.getX();
