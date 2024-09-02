@@ -56,7 +56,7 @@ public class PlayBar extends RowView {
 
         // Create/configure/add TimeLabel
         _timeLabel = new Label();
-        _timeLabel.setTextFill(Color.WHITE);
+        _timeLabel.setTextColor(Color.WHITE);
         _timeLabel.setFont(Font.Arial12);
         addChild(_timeLabel);
 
@@ -65,7 +65,7 @@ public class PlayBar extends RowView {
         _editButton.setPadding(0, 10, 0, 10);
         _editButton.setLeanX(HPos.RIGHT);
         _editButton.setName("EditButton");
-        _editButton.setTextFill(Color.WHITE);
+        _editButton.setTextColor(Color.WHITE);
         _editButton.setFont(Font.Arial14);
         _editButton.setActionable(true);
         _editButton.addEventHandler(e -> ViewUtils.fireActionEvent(_editButton, e), MousePress);

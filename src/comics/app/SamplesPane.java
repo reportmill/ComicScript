@@ -105,7 +105,7 @@ public class SamplesPane extends ViewOwner {
             label.setLeanY(VPos.BOTTOM);
             if (i == 0) {
                 label.setFill(Color.BLUE);
-                label.setTextFill(Color.WHITE);
+                label.setTextColor(Color.WHITE);
             }
 
             // Create/add ItemBox for Sample and add ImageView + Label
@@ -154,11 +154,11 @@ public class SamplesPane extends ViewOwner {
         oldItemBox.getChild(0).setEffect(_shadow);
         Label oldLabel = (Label) oldItemBox.getChild(1);
         oldLabel.setFill(null);
-        oldLabel.setTextFill(null);
+        oldLabel.setTextColor(null);
         anItemBox.getChild(0).setEffect(_selShadow);
         Label newLabel = (Label) anItemBox.getChild(1);
         newLabel.setFill(Color.BLUE);
-        newLabel.setTextFill(Color.WHITE);
+        newLabel.setTextColor(Color.WHITE);
         _selIndex = index;
         if (anEvent.getClickCount() > 1) _dbox.confirm();
     }

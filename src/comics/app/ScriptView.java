@@ -248,8 +248,8 @@ public class ScriptView extends ColView {
             enableEvents(MousePress, MouseMove, MouseExit);
 
             if (aLine != null && !aLine.isLoaded()) {
-                setTextFill(Color.WHITE);
-                aLine.addLoadListener(() -> ViewUtils.runLater(() -> setTextFill(Color.BLACK)));
+                setTextColor(Color.WHITE);
+                aLine.addLoadListener(() -> ViewUtils.runLater(() -> setTextColor(Color.BLACK)));
             }
         }
 
