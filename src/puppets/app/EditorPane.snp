@@ -45,7 +45,7 @@
   <BoxView Name="PuppetBox" GrowWidth="true">
     <LineBorder />
     <color value="#ffffff" />
-    <View PrefWidth="428.864" PrefHeight="600.307">
+    <View PrefWidth="428" PrefHeight="600">
       <LineBorder Color="#c0c0c0" />
     </View>
   </BoxView>
