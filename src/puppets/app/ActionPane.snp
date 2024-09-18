@@ -26,8 +26,8 @@
       </MenuButton>
     </RowView>
     <TableView Name="MoveTable" MinWidth="100" MinHeight="60" PrefHeight="200">
-      <TableCol PrefWidth="120" GrowWidth="true" ItemKey="Name" Header="Name" />
-      <TableCol PrefWidth="60" ItemKey="Time" Header="Time" />
+      <TableCol PrefWidth="120" GrowWidth="true" ItemKey="Name" HeaderText="Name" />
+      <TableCol PrefWidth="60" ItemKey="Time" HeaderText="Time" />
     </TableView>
     <RowView Padding="4" Spacing="4" GrowWidth="true">
       <Button Name="PlayButton" PrefWidth="80" Padding="2" Text="Play" />
