@@ -1,38 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ColView Padding="8,5,5,5" GrowHeight="true" Spacing="4">
-  <RowView Padding="4" GrowWidth="true" Spacing="4">
-    <Label Name="ScriptLabel" text="Script:">
-      <font name="Arial Bold" size="16" />
-    </Label>
-    <Button Name="CutButton" PrefWidth="22" PrefHeight="22" LeanX="RIGHT" ToolTip="Cut" image="Edit_Cut.png" ShowBorder="false" />
-    <Button Name="CopyButton" PrefWidth="22" PrefHeight="22" ToolTip="Copy" image="Edit_Copy.png" ShowBorder="false" />
-    <Button Name="PasteButton" PrefWidth="22" PrefHeight="22" ToolTip="Paste" image="Edit_Paste.png" ShowBorder="false" />
-    <Button Name="DeleteButton" PrefWidth="22" PrefHeight="22" ToolTip="Delete" image="Edit_Delete.png" ShowBorder="false" />
+<ColView Padding="8,5,5,5" Spacing="4" GrowHeight="true">
+  <RowView Padding="4" Spacing="4" GrowWidth="true">
+    <Label Name="ScriptLabel" Font="Arial Bold 16" Text="Script:" />
+    <Button Name="CutButton" PrefWidth="22" PrefHeight="22" LeanX="RIGHT" ToolTip="Cut" ImageName="Edit_Cut.png" ShowArea="false" />
+    <Button Name="CopyButton" PrefWidth="22" PrefHeight="22" ToolTip="Copy" ImageName="Edit_Copy.png" ShowArea="false" />
+    <Button Name="PasteButton" PrefWidth="22" PrefHeight="22" ToolTip="Paste" ImageName="Edit_Paste.png" ShowArea="false" />
+    <Button Name="DeleteButton" PrefWidth="22" PrefHeight="22" ToolTip="Delete" ImageName="Edit_Delete.png" ShowArea="false" />
     <Separator PrefWidth="8" PrefHeight="18" Vertical="true" />
-    <Button Name="UndoButton" PrefWidth="22" PrefHeight="22" ToolTip="Undo" image="Edit_Undo.png" ShowBorder="false" />
-    <Button Name="RedoButton" PrefWidth="22" PrefHeight="22" ToolTip="Redo" image="Edit_Redo.png" ShowBorder="false" />
+    <Button Name="UndoButton" PrefWidth="22" PrefHeight="22" ToolTip="Undo" ImageName="Edit_Undo.png" ShowArea="false" />
+    <Button Name="RedoButton" PrefWidth="22" PrefHeight="22" ToolTip="Redo" ImageName="Edit_Redo.png" ShowArea="false" />
     <Label PrefWidth="20" PrefHeight="18" />
-    <Button Name="ClearButton" PrefWidth="85" PrefHeight="26" Padding="2" LeanX="RIGHT" text="Clear All" />
-    <Button Name="SamplesButton" PrefWidth="85" PrefHeight="26" Padding="2" LeanX="RIGHT" text="Samples" />
+    <Button Name="ClearButton" PrefWidth="85" PrefHeight="26" Padding="2" LeanX="RIGHT" Text="Clear All" />
+    <Button Name="SamplesButton" PrefWidth="85" PrefHeight="26" Padding="2" LeanX="RIGHT" Text="Samples" />
   </RowView>
-  <RowView Name="MainRowView" MinWidth="400" GrowHeight="true" Spacing="5">
-    <ColView PrefWidth="180" Spacing="2" FillWidth="true">
-      <font name="Arial" size="13" />
-      <Label Name="HelpLabel" Padding="3,3,3,5" text="Vocabulary">
-        <BevelBorder />
-        <font name="Arial Bold" size="13" />
-      </Label>
-      <ListView Name="HelpList" MinHeight="60" GrowHeight="true">
-        <LineBorder Color="#c0c0c0" />
-      </ListView>
+  <RowView Name="MainRowView" MinWidth="400" Spacing="5" GrowHeight="true">
+    <ColView PrefWidth="180" Spacing="2" Font="Arial 13" FillWidth="true">
+      <Label Name="HelpLabel" Padding="3,3,3,5" Border="bevel" Font="Arial Bold 13" Text="Vocabulary" />
+      <ListView Name="HelpList" MinHeight="60" GrowHeight="true" />
     </ColView>
   </RowView>
-  <RowView Name="InputRow" Padding="4" GrowWidth="true" Spacing="8">
-    <TextField Name="InputText" GrowWidth="true" Class="comics.app.ScriptEditor$ComicTextField">
-      <LineBorder Color="#c0c0c0" />
-      <font name="Arial" size="16" />
-    </TextField>
-    <Button Name="InputButton" PrefWidth="80" Padding="2" text="Button" />
-    <Button Name="EditLineButton" PrefWidth="85" PrefHeight="26" Padding="2" text="Edit Line" />
+  <RowView Name="InputRow" Padding="4" Spacing="8" GrowWidth="true">
+    <TextField Name="InputText" Font="Arial 16" GrowWidth="true" Class="comics.app.ScriptEditor$ComicTextField" />
+    <Button Name="InputButton" PrefWidth="80" Padding="2" Text="Button" />
+    <Button Name="EditLineButton" PrefWidth="85" PrefHeight="26" Padding="2" Text="Edit Line" />
   </RowView>
 </ColView>

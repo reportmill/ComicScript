@@ -1,57 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RowView PrefWidth="540" PrefHeight="600" Align="CENTER" GrowWidth="true" FillHeight="true">
   <ColView Name="ToolBox" PrefWidth="300" PrefHeight="454" Padding="8" Spacing="5" FillWidth="true">
-    <RowView Padding="2,4,2,4" GrowWidth="true" Spacing="4">
-      <BevelBorder />
-      <Label text="Actions">
-        <font name="Arial" size="14" />
-      </Label>
-      <Button Name="AddActionButton" PrefWidth="22" PrefHeight="22" Padding="2" LeanX="RIGHT" text="+" />
+    <RowView Padding="2,4,2,4" Spacing="4" Border="bevel" GrowWidth="true">
+      <Label Font="Arial 14" Text="Actions" />
+      <Button Name="AddActionButton" PrefWidth="22" PrefHeight="22" Padding="2" LeanX="RIGHT" Text="+" />
       <MenuButton Name="MoveMenuButton" PrefWidth="22" PrefHeight="22" Padding="2" LeanX="RIGHT">
-        <MenuItem Name="CopyActionMenu" text="Copy" />
-        <MenuItem Name="PasteActionMenu" text="Paste" />
-        <MenuItem Name="DeleteActionMenu" text="Delete" />
-        <MenuItem Name="MoveUpActionMenu" text="Move Up" />
-        <MenuItem Name="MoveDownActionMenu" text="Move Down" />
+        <MenuItem Name="CopyActionMenu" Text="Copy" />
+        <MenuItem Name="PasteActionMenu" Text="Paste" />
+        <MenuItem Name="DeleteActionMenu" Text="Delete" />
+        <MenuItem Name="MoveUpActionMenu" Text="Move Up" />
+        <MenuItem Name="MoveDownActionMenu" Text="Move Down" />
       </MenuButton>
     </RowView>
-    <ListView Name="ActionList" PrefHeight="140">
-      <LineBorder Color="#c0c0c0" />
-    </ListView>
-    <RowView Padding="2,4,2,4" GrowWidth="true" Spacing="4">
-      <BevelBorder />
-      <Label text="Moves">
-        <font name="Arial" size="14" />
-      </Label>
-      <Button Name="AddMoveButton" PrefWidth="22" PrefHeight="22" Padding="2" LeanX="RIGHT" text="+" />
+    <ListView Name="ActionList" PrefHeight="140" />
+    <RowView Padding="2,4,2,4" Spacing="4" Border="bevel" GrowWidth="true">
+      <Label Font="Arial 14" Text="Moves" />
+      <Button Name="AddMoveButton" PrefWidth="22" PrefHeight="22" Padding="2" LeanX="RIGHT" Text="+" />
       <MenuButton Name="MoveMenuButton" PrefWidth="22" PrefHeight="22" Padding="2" LeanX="RIGHT">
-        <MenuItem Name="CopyMoveMenu" text="Copy" />
-        <MenuItem Name="PasteMoveMenu" text="Paste" />
-        <MenuItem Name="PastePoseMenu" text="Paste Pose" />
-        <MenuItem Name="DeleteMoveMenu" text="Delete" />
-        <MenuItem Name="MoveUpMoveMenu" text="Move Up" />
-        <MenuItem Name="MoveDownMoveMenu" text="Move Down" />
+        <MenuItem Name="CopyMoveMenu" Text="Copy" />
+        <MenuItem Name="PasteMoveMenu" Text="Paste" />
+        <MenuItem Name="PastePoseMenu" Text="Paste Pose" />
+        <MenuItem Name="DeleteMoveMenu" Text="Delete" />
+        <MenuItem Name="MoveUpMoveMenu" Text="Move Up" />
+        <MenuItem Name="MoveDownMoveMenu" Text="Move Down" />
       </MenuButton>
     </RowView>
-    <TableView Name="MoveTable" MinWidth="100" MinHeight="60" PrefHeight="200" ShowHeader="false">
-      <LineBorder Color="#c0c0c0" />
+    <TableView Name="MoveTable" MinWidth="100" MinHeight="60" PrefHeight="200">
       <TableCol PrefWidth="120" GrowWidth="true" ItemKey="Name" Header="Name" />
       <TableCol PrefWidth="60" ItemKey="Time" Header="Time" />
     </TableView>
-    <RowView Padding="4" GrowWidth="true" Spacing="4">
-      <Button Name="PlayButton" PrefWidth="80" Padding="2" text="Play" />
-      <ToggleButton Name="PlayLoopButton" PrefWidth="80" Padding="2" LeanX="RIGHT" text="Play Loop" />
+    <RowView Padding="4" Spacing="4" GrowWidth="true">
+      <Button Name="PlayButton" PrefWidth="80" Padding="2" Text="Play" />
+      <ToggleButton Name="PlayLoopButton" PrefWidth="80" Padding="2" LeanX="RIGHT" Text="Play Loop" />
     </RowView>
-    <RowView Margin="10,0,0,0" Padding="6" GrowWidth="true" Spacing="6">
-      <BevelBorder />
-      <Label text="Time:" />
+    <RowView Margin="10,0,0,0" Padding="6" Spacing="6" Border="bevel" GrowWidth="true">
+      <Label Text="Time:" />
       <Slider Name="TimeSlider" GrowWidth="true" Max="1" Value="0" />
     </RowView>
-    <CheckBox Name="ShowMarkersCheckBox" text="Show Markers" />
-    <CheckBox Name="FreezeOuterJointsCheckBox" text="Freeze Outer Joints" />
+    <CheckBox Name="ShowMarkersCheckBox" Text="Show Markers" />
+    <CheckBox Name="FreezeOuterJointsCheckBox" Text="Freeze Outer Joints" />
   </ColView>
-  <BoxView Name="PuppetBox" GrowWidth="true">
-    <LineBorder />
-    <color value="#ffffff" />
-  </BoxView>
+  <BoxView Name="PuppetBox" Fill="#FF" Border="#00 1" GrowWidth="true" />
 </RowView>

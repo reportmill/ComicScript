@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ColView PrefWidth="400" PrefHeight="250" Padding="4" Spacing="2">
-  <RowView Padding="4,4,2,4" GrowWidth="true" Spacing="4">
-    <Label PrefHeight="13" text="Script Stars:" />
+  <RowView Padding="4,4,2,4" Spacing="4" GrowWidth="true">
+    <Label PrefHeight="13" Text="Script Stars:" />
   </RowView>
-  <RowView Padding="0,4,0,4" GrowWidth="true" Spacing="4">
-    <Label text="All Stars:" />
+  <RowView Padding="0,4,0,4" Spacing="4" GrowWidth="true">
+    <Label Text="All Stars:" />
   </RowView>
-  <RowView Padding="0" GrowWidth="true" GrowHeight="true" Spacing="4">
+  <RowView Spacing="4" GrowWidth="true" GrowHeight="true">
     <BrowserView Name="StarsBrowser" MinWidth="120" MinHeight="60" GrowWidth="true" GrowHeight="true" />
   </RowView>
 </ColView>

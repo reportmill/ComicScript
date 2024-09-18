@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ColView PrefWidth="800" Spacing="5" FillWidth="true">
-  <font name="Arial" size="15" />
+<ColView PrefWidth="800" Spacing="5" Font="Arial 15" FillWidth="true">
   <ColView FillWidth="true">
-    <RowView Align="CENTER" Padding="4" GrowWidth="true" Spacing="4">
-      <BevelBorder />
-      <color value="#3dcece" />
-      <Label image="Header.png" />
+    <RowView Align="CENTER" Padding="4" Spacing="4" Fill="#3DCECE" Border="bevel" GrowWidth="true">
+      <Label ImageName="Header.png" />
     </RowView>
   </ColView>
-  <ColView Padding="8,4,4,4" PrefHeight="400" GrowHeight="true" FillWidth="true">
-    <font name="Arial" size="14" />
-  </ColView>
+  <ColView PrefHeight="400" Padding="8,4,4,4" Font="Arial 14" GrowHeight="true" FillWidth="true" />
 </ColView>
