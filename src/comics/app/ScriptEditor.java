@@ -1,7 +1,5 @@
 package comics.app;
-
 import comics.player.*;
-import snap.geom.Rect;
 import snap.gfx.*;
 import snap.util.Range;
 import snap.util.StringUtils;
@@ -299,9 +297,7 @@ public class ScriptEditor extends ViewOwner {
         _inputText = getView("InputText", TextField.class);
         _inputText.setBorderRadius(10);
         _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
-        _inputText.addPropChangeListener(pc -> inputTextSelChanged(), TextField.Sel_Prop);
-        if (_inputText.getWidth() < 0)
-            ((ComicTextField) _inputText).paintSel(null); // Forces TeaVM to compile ComicTextField
+        _inputText.addPropChangeListener(pc -> inputTextSelChanged(), TextField.Selection_Prop);
 
         // Get/Configure InputButton
         Button inputButton = getView("InputButton", Button.class);
@@ -403,24 +399,4 @@ public class ScriptEditor extends ViewOwner {
         if (anEvent.equals("EditLineButton"))
             _editorPane.showLineEditor();
     }
-
-    /**
-     * A TextField subclass to paint selection even when not focused.
-     */
-    public static class ComicTextField extends TextField {
-
-        /**
-         * Override to paint sel even when not focused.
-         */
-        protected void paintSel(Painter aPntr)
-        {
-            super.paintSel(aPntr);
-            if (!isFocused() && !isSelEmpty()) {
-                Rect sbnds = getSelBounds();
-                aPntr.setPaint(INPUTTEXT_SEL_COLOR);
-                aPntr.fill(sbnds);
-            }
-        }
-    }
-
 }

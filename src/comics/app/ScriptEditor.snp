@@ -20,7 +20,7 @@
     </ColView>
   </RowView>
   <RowView Name="InputRow" Padding="4" Spacing="8" GrowWidth="true">
-    <TextField Name="InputText" Font="Arial 16" GrowWidth="true" Class="comics.app.ScriptEditor$ComicTextField" />
+    <TextField Name="InputText" Font="Arial 16" GrowWidth="true" />
     <Button Name="InputButton" PrefWidth="80" Padding="2" Text="Button" />
     <Button Name="EditLineButton" PrefWidth="85" PrefHeight="26" Padding="2" Text="Edit Line" />
   </RowView>
