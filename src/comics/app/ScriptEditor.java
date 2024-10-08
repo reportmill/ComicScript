@@ -291,7 +291,6 @@ public class ScriptEditor extends ViewOwner {
         _helpList = getView("HelpList", ListView.class);
         _helpList.setFont(Font.Arial16);
         _helpList.setFocusWhenPressed(false);
-        _helpList.getListArea().setFocusWhenPressed(false);
 
         // Get/Configure InputText
         _inputText = getView("InputText", TextField.class);
