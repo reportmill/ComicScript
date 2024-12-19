@@ -375,9 +375,9 @@ public class StarPicker extends ViewOwner {
         }
 
         // Return child files
-        public String[] getChildren(String aPar)
+        public List<String> getChildren(String aPar)
         {
-            return AssetIndex.get().getDirPaths(aPar);
+            return Arrays.asList(AssetIndex.get().getDirPaths(aPar));
         }
 
         // Return child file name
