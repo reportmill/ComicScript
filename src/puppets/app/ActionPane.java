@@ -61,14 +61,14 @@ public class ActionPane extends ViewOwner {
     {
         // Set ActView Action
         _actView.setAction(anAction);
-        _actionList.setItemsList(_actions.getActions());
+        _actionList.setItems(_actions.getActions());
         _actionList.setSelItem(anAction);
 
         // Set MoveTable items
         List<PuppetMove> moves = anAction != null ? anAction.getMoves() : null;
         int ind = moves != null ? moves.indexOf(aMove) : -1;
         if (aMove == null && anAction.getMoveCount() > 0) ind = 0;
-        _moveTable.setItemsList(moves);
+        _moveTable.setItems(moves);
         _moveTable.setSelIndex(ind);
 
         // Set time
@@ -94,7 +94,7 @@ public class ActionPane extends ViewOwner {
         _actionList.setItemTextFunction(action -> {
             return action.getName();
         });
-        _actionList.setItemsList(_actions.getActions());
+        _actionList.setItems(_actions.getActions());
 
         // Set MoveTable
         _moveTable = getView("MoveTable", TableView.class);
