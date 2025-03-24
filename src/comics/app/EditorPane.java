@@ -6,7 +6,7 @@ import snap.geom.Rect;
 import snap.geom.Size;
 import snap.gfx.*;
 import snap.props.PropChangeListener;
-import snap.util.SnapUtils;
+import snap.util.SnapEnv;
 import snap.view.*;
 import snap.viewx.TransitionPane;
 
@@ -72,7 +72,7 @@ public class EditorPane extends ViewOwner {
         _player.addPropChangeListener(_playerLsnr, PlayerView.Script_Prop);
 
         // If desktop, set Window.MaximizedBounds to window PrefSize
-        if (!SnapUtils.isTeaVM) {
+        if (!SnapEnv.isTeaVM) {
             Size psize = win.isShowing() ? win.getSize() : win.getPrefSize();
             Rect screenRect = GFXEnv.getEnv().getScreenBoundsInset();
             Rect maxRect = screenRect.getRectCenteredInside(psize.width, psize.height);

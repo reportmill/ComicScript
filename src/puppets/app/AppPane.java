@@ -1,7 +1,7 @@
 package puppets.app;
 
 import puppets.puppet.*;
-import snap.util.SnapUtils;
+import snap.util.SnapEnv;
 import snap.view.*;
 
 /**
@@ -22,19 +22,20 @@ public class AppPane extends ViewOwner {
     SpritePane _spritePane;
 
     /**
-     * Creates AppPane.
+     * Constructor.
      */
     public static void showAppPane()
     {
-        AppPane apane = new AppPane();
-        if (SnapUtils.isTeaVM) apane.getWindow().setMaximized(true);
-        apane.setWindowVisible(true);
+        AppPane appPane = new AppPane();
+        if (SnapEnv.isTeaVM)
+            appPane.getWindow().setMaximized(true);
+        appPane.setWindowVisible(true);
 
         // Initialize EditorPane
         //apane._editorPane.open("Man");
         Puppet puppet = PuppetUtils.getPuppetFile().getPuppet(0);
-        apane._editorPane.setPuppet(puppet);
-        apane.showEditorPane();
+        appPane._editorPane.setPuppet(puppet);
+        appPane.showEditorPane();
     }
 
     /**

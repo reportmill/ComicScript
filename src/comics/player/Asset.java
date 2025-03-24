@@ -87,7 +87,7 @@ public class Asset implements Loadable {
         WebURL url = WebURL.getURL(_urls);
         Image img = Image.getImageForSource(url);
 
-        if (!SnapUtils.isTeaVM && isNewGifAvailable(url)) {
+        if (!SnapEnv.isTeaVM && isNewGifAvailable(url)) {
             saveSpriteSheet(url);
             img = Image.getImageForSource(url);
         }

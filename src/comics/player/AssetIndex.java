@@ -17,10 +17,10 @@ public class AssetIndex {
     List<Asset> _assets;
 
     // The actors
-    List<ActorImage> _actors, _actorsPup = new ArrayList();
+    List<ActorImage> _actors, _actorsPup = new ArrayList<>();
 
     // The anims
-    List<AnimImage> _anims, _animsPup = new ArrayList();
+    List<AnimImage> _anims, _animsPup = new ArrayList<>();
 
     // The settings
     List<SetImage> _sets;
@@ -36,7 +36,7 @@ public class AssetIndex {
      */
     public AssetIndex()
     {
-        if (SnapUtils.isTeaVM)
+        if (SnapEnv.isTeaVM)
             ROOT = "https://reportmill.com/ComicLib/";
 
         WebURL url = WebURL.getURL(ROOT + "index.json");
@@ -46,8 +46,8 @@ public class AssetIndex {
         JSArray settings = (JSArray) root.getValue("Settings");
 
         // Get Actors
-        _assets = new ArrayList();
-        _actors = new ArrayList();
+        _assets = new ArrayList<>();
+        _actors = new ArrayList<>();
         for (int i = 0; i < actors.getValueCount(); i++) {
             JSObject actor = (JSObject) actors.getValue(i);
             Map map = actor.getAsMap();
@@ -55,7 +55,7 @@ public class AssetIndex {
         }
 
         // Get Anims
-        _anims = new ArrayList();
+        _anims = new ArrayList<>();
         for (int i = 0; i < anims.getValueCount(); i++) {
             JSObject anim = (JSObject) anims.getValue(i);
             Map map = anim.getAsMap();
@@ -63,7 +63,7 @@ public class AssetIndex {
         }
 
         // Get Settings
-        _sets = new ArrayList();
+        _sets = new ArrayList<>();
         for (int i = 0; i < settings.getValueCount(); i++) {
             JSObject setting = (JSObject) settings.getValue(i);
             Map map = setting.getAsMap();

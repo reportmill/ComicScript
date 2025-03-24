@@ -1,7 +1,5 @@
 package puppets.puppet;
-
 import java.util.*;
-
 import snap.geom.Arc;
 import snap.geom.Shape;
 import snap.geom.Transform;
@@ -30,7 +28,7 @@ public class PuppetUtils {
      * Initialization.
      */
     static {
-        if (SnapUtils.isTeaVM) ROOT = "https://reportmill.com/ComicLib/";
+        if (SnapEnv.isTeaVM) ROOT = "https://reportmill.com/ComicLib/";
         System.out.println("Root: " + ROOT);
     }
 
@@ -252,7 +250,7 @@ public class PuppetUtils {
          */
         public void savePuppets()
         {
-            if (SnapUtils.isTeaVM) return;
+            if (SnapEnv.isTeaVM) return;
 
             // Create element for puppets and iterate over puppets and add each
             XMLElement puppetsXML = new XMLElement("Puppets");
@@ -262,7 +260,7 @@ public class PuppetUtils {
             }
 
             // Get as bytes and write to file
-            byte bytes[] = puppetsXML.getBytes();
+            byte[] bytes = puppetsXML.getBytes();
             SnapUtils.writeBytes(bytes, _path);
         }
     }
@@ -428,11 +426,11 @@ public class PuppetUtils {
             // Get file string as XMLElement
             WebURL url = WebURL.getURL(_path);
             String fileStr = url.getText();
-            if (fileStr == null) return new ArrayList();
+            if (fileStr == null) return new ArrayList<>();
             XMLElement actionsXML = XMLElement.readFromXMLSource(url);
 
             // Iterate over actions
-            List<PuppetAction> actions = new ArrayList();
+            List<PuppetAction> actions = new ArrayList<>();
             for (XMLElement actionXML : actionsXML.getElements()) {
                 PuppetAction action = new PuppetAction().fromXML(null, actionXML);
                 actions.add(action);
@@ -447,7 +445,7 @@ public class PuppetUtils {
          */
         public void saveActions()
         {
-            if (SnapUtils.isTeaVM) return;
+            if (SnapEnv.isTeaVM) return;
 
             // Create element for actions and iterate over actions and add each
             XMLElement actionsXML = new XMLElement("Actions");
@@ -457,9 +455,8 @@ public class PuppetUtils {
             }
 
             // Get as bytes and write to file
-            byte bytes[] = actionsXML.getBytes();
+            byte[] bytes = actionsXML.getBytes();
             SnapUtils.writeBytes(bytes, _path);
         }
     }
-
 }

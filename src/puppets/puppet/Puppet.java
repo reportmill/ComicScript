@@ -468,7 +468,7 @@ public class Puppet {
      */
     public void save()
     {
-        if (SnapUtils.isTeaVM) return;
+        if (SnapEnv.isTeaVM) return;
 
         // Create dir
         WebURL url = getSourceURL();
@@ -485,11 +485,11 @@ public class Puppet {
 
         // Create element for puppet, get as bytes and write to file
         XMLElement puppetXML = toXML(null);
-        byte bytes[] = puppetXML.getBytes();
+        byte[] bytes = puppetXML.getBytes();
         SnapUtils.writeBytes(bytes, url.getJavaFile());
 
         // Write images
-        PuppetPart motherParts[] = getMotherParts();
+        PuppetPart[] motherParts = getMotherParts();
         for (PuppetPart part : motherParts) {
             if (part.getPuppet() != this) continue;
             part.saveImage();
