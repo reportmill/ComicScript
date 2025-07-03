@@ -196,7 +196,7 @@ public class PuppetPart implements Loadable {
         if (pup == null) return null;
         WebURL dirURL = pup.getSourceDirURL();
         String iname = getName() + ".png";
-        WebURL url = dirURL.getChild(iname);
+        WebURL url = dirURL.getChildUrlForPath(iname);
         return url;
     }
 

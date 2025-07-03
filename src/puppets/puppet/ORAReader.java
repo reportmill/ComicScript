@@ -23,7 +23,7 @@ public class ORAReader {
     {
         _srcPath = aPath; //"/tmp/CTLady";
 
-        WebURL url = WebURL.getURL(_srcPath + "/stack.xml");
+        WebURL url = WebURL.getUrl(_srcPath + "/stack.xml");
 
         XMLElement imgXML = XMLElement.readFromXMLSource(url);
         XMLElement stackXML = imgXML.getElement(0);

@@ -170,7 +170,7 @@ public class SamplesPane extends ViewOwner {
     {
         String name = SALL[anIndex];
         String urls = "https://reportmill.com/jars/ccsamples/" + name;
-        WebURL url = WebURL.getURL(urls);
+        WebURL url = WebURL.getUrl(urls);
         String str = url.getText();
         if (str == null) System.err.println("SamplesPane.getDoc: Couldn't load " + url);
         return str;
@@ -188,7 +188,7 @@ public class SamplesPane extends ViewOwner {
         // Get image name, URL string, URL and Image. Then make sure image is loaded by requesting Image.Native.
         String name = SALL[anIndex].replace(".txt", ".png");
         String urls = "https://reportmill.com/jars/ccsamples/" + name;
-        WebURL imgURL = WebURL.getURL(urls);
+        WebURL imgURL = WebURL.getUrl(urls);
         img = DOC_IMAGES[anIndex] = Image.getImageForSource(imgURL);
         img.getNative();
         return img;

@@ -39,7 +39,7 @@ public class AssetIndex {
         if (SnapEnv.isTeaVM)
             ROOT = "https://reportmill.com/ComicLib/";
 
-        WebURL url = WebURL.getURL(ROOT + "index.json");
+        WebURL url = WebURL.getUrl(ROOT + "index.json");
         JSObject root = (JSObject) JSValue.readSource(url);
         JSArray actors = (JSArray) root.getValue("Actors");
         JSArray anims = (JSArray) root.getValue("Anims");

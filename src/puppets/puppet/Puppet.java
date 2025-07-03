@@ -108,7 +108,7 @@ public class Puppet {
             src = PuppetUtils.ROOT + "chars/" + getName() + '/' + getName() + ".pup";
 
         // Create SourceURL from source and return
-        _srcURL = WebURL.getURL(src);
+        _srcURL = WebURL.getUrl(src);
         return _srcURL;
     }
 

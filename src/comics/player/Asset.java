@@ -84,7 +84,7 @@ public class Asset implements Loadable {
      */
     protected Image getImageImpl()
     {
-        WebURL url = WebURL.getURL(_urls);
+        WebURL url = WebURL.getUrl(_urls);
         Image img = Image.getImageForSource(url);
 
         if (!SnapEnv.isTeaVM && isNewGifAvailable(url)) {
@@ -313,7 +313,7 @@ public class Asset implements Loadable {
         if (!aURL.getPath().endsWith(".png")) return false;
 
         // Get GIF URL
-        WebURL url2 = WebURL.getURL(FilePathUtils.getPeerPath(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
+        WebURL url2 = WebURL.getUrl(FilePathUtils.getPeerPath(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
 
         // If no gif file or it's older than
         long pngMod = aURL.isFound() ? aURL.getHead().getLastModTime() : 0;
@@ -327,7 +327,7 @@ public class Asset implements Loadable {
     private static void saveSpriteSheet(WebURL aURL)
     {
         // Get URL for GIF file
-        WebURL url = WebURL.getURL(FilePathUtils.getPeerPath(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
+        WebURL url = WebURL.getUrl(FilePathUtils.getPeerPath(aURL.getString(), aURL.getFilenameSimple() + ".gif"));
         Image img = Image.getImageForSource(url);
 
         // Scale image

@@ -229,7 +229,7 @@ public class PuppetUtils {
         protected List<PuppetEntry> readPuppets()
         {
             // Get file string as XMLElement
-            WebURL url = WebURL.getURL(_path);
+            WebURL url = WebURL.getUrl(_path);
             String fileStr = url.getText();
             if (fileStr == null) return new ArrayList();
             XMLElement puppetsXML = XMLElement.readFromXMLSource(url);
@@ -424,7 +424,7 @@ public class PuppetUtils {
         protected List<PuppetAction> loadActions()
         {
             // Get file string as XMLElement
-            WebURL url = WebURL.getURL(_path);
+            WebURL url = WebURL.getUrl(_path);
             String fileStr = url.getText();
             if (fileStr == null) return new ArrayList<>();
             XMLElement actionsXML = XMLElement.readFromXMLSource(url);
