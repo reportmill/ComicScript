@@ -6,6 +6,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.joints.*;
 import snap.geom.*;
+import snap.util.ListUtils;
 import snap.view.*;
 import snap.view.EventListener;
 
@@ -42,7 +43,7 @@ public class PuppetViewPhys {
     MouseJoint _dragJoint;
 
     // List of MouseJoints used to move joints into poses
-    List<MouseJoint> _poseMouseJoints = new ArrayList();
+    List<MouseJoint> _poseMouseJoints = new ArrayList<>();
 
     //
     long _poseMouseTime;
@@ -67,16 +68,17 @@ public class PuppetViewPhys {
         PuppetSchema pschema = puppet.getSchema();
 
         // Add bodies for view children
-        List<View> joints = new ArrayList(), markers = new ArrayList();
+        List<View> joints = new ArrayList<>();
+        List<View> markers = new ArrayList<>();
         for (View child : _pupView.getChildren()) {
-            ViewPhysics phys = child.getPhysics(true);
+            ViewPhysics<?> phys = child.getPhysics(true);
             if (phys.isJoint())
                 joints.add(child);
             else if (pschema.isMarkerName(child.getName()))
                 markers.add(child);
             else if (child.isVisible()) {
                 phys.setDynamic(true);
-                createBody(child);
+                createJboxBodyForView(child);
                 addDragger(child);
             }
         }
@@ -88,10 +90,11 @@ public class PuppetViewPhys {
             createMarker(v);
 
         // Add sidewalls
-        double vw = _pupView.getWidth(), vh = _pupView.getHeight();
+        double vw = _pupView.getWidth();
+        double vh = _pupView.getHeight();
         RectView r0 = new RectView(-1, -900, 1, vh + 900);
         r0.getPhysics(true);  // Left
-        _groundBody = createBody(r0); //createBody(r1); createBody(r2);
+        _groundBody = createJboxBodyForView(r0); //createBody(r1); createBody(r2);
     }
 
     /**
@@ -228,25 +231,20 @@ public class PuppetViewPhys {
      */
     public boolean isAwake(View aView)
     {
-        // Get ViewPhysics and body
+        // Get ViewPhysics (just return if null or not dynamic)
         ViewPhysics<Body> phys = aView.getPhysics();
-        if (phys == null) return false;
-        Object ntv = phys.getNative();
+        if (phys == null || !phys.isDynamic())
+            return false;
 
-        // Handle Body
-        if (ntv instanceof Body) {
-            Body body = (Body) ntv;
-            if (!phys.isDynamic()) return false;
-            return body.isAwake();
-        }
-
-        return false;
+        // Get body and return whether awake
+        Body nativeBody = phys.getNative();
+        return nativeBody != null && nativeBody.isAwake();
     }
 
     /**
      * Returns a body for a view.
      */
-    public Body createBody(View aView)
+    public Body createJboxBodyForView(View aView)
     {
         // Create BodyDef
         ViewPhysics<Body> phys = aView.getPhysics();
@@ -262,7 +260,7 @@ public class PuppetViewPhys {
 
         // Create PolygonShape
         Shape vshape = aView.getBoundsShape();
-        org.jbox2d.collision.shapes.Shape pshapes[] = createShape(vshape);
+        List<org.jbox2d.collision.shapes.Shape> pshapes = createJboxShapeForShape(vshape);
 
         // Create FixtureDef
         for (org.jbox2d.collision.shapes.Shape pshp : pshapes) {
@@ -282,41 +280,38 @@ public class PuppetViewPhys {
     /**
      * Creates a Box2D shape for given snap shape.
      */
-    public org.jbox2d.collision.shapes.Shape[] createShape(Shape aShape)
+    public List<org.jbox2d.collision.shapes.Shape> createJboxShapeForShape(Shape aShape)
     {
         // Handle Rect (simple case)
-        if (aShape instanceof Rect) {
-            Rect rect = (Rect) aShape;
+        if (aShape instanceof Rect rect) {
             PolygonShape pshape = new PolygonShape();
             float pw = viewToWorld(rect.width / 2);
             float ph = viewToWorld(rect.height / 2);
             pshape.setAsBox(pw, ph);
-            return new org.jbox2d.collision.shapes.Shape[]{pshape};
+            return List.of(pshape);
         }
 
         // Handle Ellipse
-        if (aShape instanceof Ellipse && aShape.getWidth() == aShape.getHeight()) {
-            Ellipse elp = (Ellipse) aShape;
+        if (aShape instanceof Ellipse elp && aShape.getWidth() == aShape.getHeight()) {
             CircleShape cshape = new CircleShape();
             cshape.setRadius(viewToWorld(elp.getWidth() / 2));
-            return new org.jbox2d.collision.shapes.Shape[]{cshape};
+            return List.of(cshape);
         }
 
         // Handle Arc
-        if (aShape instanceof Arc && aShape.getWidth() == aShape.getHeight()) {
-            Arc arc = (Arc) aShape;
+        if (aShape instanceof Arc arc && aShape.getWidth() == aShape.getHeight()) {
             if (arc.getSweepAngle() == 360) {
                 CircleShape cshape = new CircleShape();
                 cshape.setRadius(viewToWorld(arc.getWidth() / 2));
-                return new org.jbox2d.collision.shapes.Shape[]{cshape};
+                return List.of(cshape);
             }
         }
 
         // Handle Polygon if Simple, Convex and less than 8 points
-        if (aShape instanceof Polygon) {
-            Polygon poly = (Polygon) aShape;
-            org.jbox2d.collision.shapes.Shape pshape = createShape(poly);
-            if (pshape != null) return new org.jbox2d.collision.shapes.Shape[]{pshape};
+        if (aShape instanceof Polygon poly) {
+            org.jbox2d.collision.shapes.Shape pshape = createJboxShapeForPolygon(poly);
+            if (pshape != null)
+                return List.of(pshape);
         }
 
         // Get shape centered around shape midpoint
@@ -324,33 +319,24 @@ public class PuppetViewPhys {
         Shape shape = aShape.copyFor(new Transform(-bnds.width / 2, -bnds.height / 2));
 
         // Get convex Polygons for shape
-        Polygon convexPolys[] = Polygon.getConvexPolygonsWithMaxSideCount(shape, 8);
-        List<org.jbox2d.collision.shapes.Shape> pshapes = new ArrayList();
-
-        // Iterate over polygons
-        for (Polygon cpoly : convexPolys) {
-
-            // Try simple case
-            org.jbox2d.collision.shapes.Shape pshp = createShape(cpoly);
-            if (pshp != null) pshapes.add(pshp);
-            else System.err.println("PhysicsRunner:.createShape: failure");
-        }
-
-        // Return Box2D shapes array
-        return pshapes.toArray(new org.jbox2d.collision.shapes.Shape[0]);
+        List<Polygon> convexPolys = Polygon.getConvexPolygonsWithMaxSideCount(shape, 8);
+        return ListUtils.mapNonNull(convexPolys, poly -> createJboxShapeForPolygon(poly));
     }
 
     /**
      * Creates a Box2D shape for given snap shape.
      */
-    public org.jbox2d.collision.shapes.Shape createShape(Polygon aPoly)
+    public org.jbox2d.collision.shapes.Shape createJboxShapeForPolygon(Polygon aPoly)
     {
         // If invalid, just return null
-        if (aPoly.isSelfIntersecting() || !aPoly.isConvex() || aPoly.getPointCount() > 8) return null;
+        if (aPoly.isSelfIntersecting() || !aPoly.isConvex() || aPoly.getPointCount() > 8) {
+            System.err.println("PhysicsRunner:.createJboxShapeForPolygon: failure");
+            return null;
+        }
 
         // Create Box2D PolygonShape and return
         int pc = aPoly.getPointCount();
-        Vec2 vecs[] = new Vec2[pc];
+        Vec2[] vecs = new Vec2[pc];
         for (int i = 0; i < pc; i++) vecs[i] = viewToWorld(aPoly.getPointX(i), aPoly.getPointY(i));
         PolygonShape pshape = new PolygonShape();
         pshape.set(vecs, vecs.length);
@@ -364,7 +350,8 @@ public class PuppetViewPhys {
     {
         // Get shapes interesting joint view
         PuppetSchema pschema = getPuppet().getSchema();
-        String name = aView.getName(), linkNames[] = pschema.getLinkNamesForJoint(name);
+        String name = aView.getName();
+        String[] linkNames = pschema.getLinkNamesForJoint(name);
         if (linkNames.length < 2) {
             System.out.println("PhysicsRunner.createJoint: 2 Bodies not found for joint: " + name);
             return;
@@ -407,7 +394,7 @@ public class PuppetViewPhys {
             return;
 
         aView.getPhysics(true).setDynamic(true);
-        createBody(aView);
+        createJboxBodyForView(aView);
 
         // Get linked views
         View viewA = getView(linkNames[0]);
