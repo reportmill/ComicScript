@@ -14,7 +14,7 @@ import snap.gfx.*;
 public class SpritePane extends ViewOwner {
 
     // The AppPane
-    AppPane _appPane;
+    PuppetsPane _puppetsPane;
 
     // The image view
     ImageView _imgView;
@@ -31,9 +31,9 @@ public class SpritePane extends ViewOwner {
     /**
      * Creates SpritePane.
      */
-    public SpritePane(AppPane aAP)
+    public SpritePane(PuppetsPane aAP)
     {
-        _appPane = aAP;
+        _puppetsPane = aAP;
     }
 
     /**
@@ -91,7 +91,7 @@ public class SpritePane extends ViewOwner {
      */
     protected void setSpriteImage()
     {
-        Puppet puppet = _appPane.getPuppet();
+        Puppet puppet = _puppetsPane.getPuppet();
         PuppetAction action = _actionList.getSelItem();
         Image img = getImage(puppet, action);
         if (_flipImage)

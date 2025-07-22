@@ -13,7 +13,7 @@ import puppets.puppet.*;
 public class ActionPane extends ViewOwner {
 
     // The AppPane
-    AppPane _appPane;
+    PuppetsPane _puppetsPane;
 
     // The puppet action view
     ActionView _actView;
@@ -33,9 +33,9 @@ public class ActionPane extends ViewOwner {
     /**
      * Creates ActionPane.
      */
-    public ActionPane(AppPane aAP)
+    public ActionPane(PuppetsPane aAP)
     {
-        _appPane = aAP;
+        _puppetsPane = aAP;
     }
 
     /**
@@ -81,7 +81,7 @@ public class ActionPane extends ViewOwner {
     protected void initUI()
     {
         // Create ActionView
-        _actView = new ActionView(_appPane.getPuppet());
+        _actView = new ActionView(_puppetsPane.getPuppet());
         _actView.addEventFilter(e -> _actView.setTimeless(true), MouseRelease);
         _actView.addPropChangeListener(pc -> resetLater(), ActionView.MoveIndex_Prop);
 
@@ -163,7 +163,7 @@ public class ActionPane extends ViewOwner {
 
         // Handle AddActionButton
         if (anEvent.equals("AddActionButton")) {
-            String name = DialogBox.showInputDialog(_appPane.getUI(), "Add Action", "Enter Action Name:", "Untitled");
+            String name = DialogBox.showInputDialog(_puppetsPane.getUI(), "Add Action", "Enter Action Name:", "Untitled");
             if (name == null || name.length() == 0) return;
             PuppetAction action = new PuppetAction(name);
             _actions.addAction(action);
@@ -207,7 +207,7 @@ public class ActionPane extends ViewOwner {
         if (anEvent.equals("AddMoveButton")) {
             PuppetAction action = _actionList.getSelItem();
             if (action == null) return;
-            String name = DialogBox.showInputDialog(_appPane.getUI(), "Add Move", "Enter Pose Name:", "Untitled");
+            String name = DialogBox.showInputDialog(_puppetsPane.getUI(), "Add Move", "Enter Pose Name:", "Untitled");
             if (name == null || name.length() == 0) return;
             PuppetPose pose = action.getPoseForName(name);
             if (pose == null) {

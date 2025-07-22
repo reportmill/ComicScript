@@ -13,7 +13,7 @@ import snap.viewx.DialogBox;
 public class EditorPane extends ViewOwner {
 
     // The AppPane
-    AppPane _appPane;
+    PuppetsPane _puppetsPane;
 
     // The Puppet
     Puppet _puppet;
@@ -40,9 +40,9 @@ public class EditorPane extends ViewOwner {
     /**
      * Creates a EditorPane.
      */
-    public EditorPane(AppPane aAP)
+    public EditorPane(PuppetsPane aAP)
     {
-        _appPane = aAP;
+        _puppetsPane = aAP;
     }
 
     /**

@@ -1,5 +1,4 @@
 package puppets.app;
-
 import puppets.puppet.*;
 import snap.util.SnapEnv;
 import snap.view.*;
@@ -7,7 +6,7 @@ import snap.view.*;
 /**
  * The top level document UI management class for displaying and editing puppets and actions.
  */
-public class AppPane extends ViewOwner {
+public class PuppetsPane extends ViewOwner {
 
     // The view that holds the document
     BoxView _docBox;
@@ -26,16 +25,16 @@ public class AppPane extends ViewOwner {
      */
     public static void showAppPane()
     {
-        AppPane appPane = new AppPane();
+        PuppetsPane puppetsPane = new PuppetsPane();
         if (SnapEnv.isTeaVM)
-            appPane.getWindow().setMaximized(true);
-        appPane.setWindowVisible(true);
+            puppetsPane.getWindow().setMaximized(true);
+        puppetsPane.setWindowVisible(true);
 
         // Initialize EditorPane
         //apane._editorPane.open("Man");
         Puppet puppet = PuppetUtils.getPuppetFile().getPuppet(0);
-        appPane._editorPane.setPuppet(puppet);
-        appPane.showEditorPane();
+        puppetsPane._editorPane.setPuppet(puppet);
+        puppetsPane.showEditorPane();
     }
 
     /**
@@ -99,4 +98,8 @@ public class AppPane extends ViewOwner {
         if (anEvent.equals("SpriteButton")) showSpritePane();
     }
 
+    /**
+     * Standard main method.
+     */
+    public static void main(String[] args)  { ViewUtils.runLater(PuppetsPane::showAppPane);}
 }
