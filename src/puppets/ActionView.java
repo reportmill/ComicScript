@@ -1,5 +1,4 @@
 package puppets;
-
 import snap.gfx.*;
 import snap.view.*;
 
@@ -9,25 +8,25 @@ import snap.view.*;
 public class ActionView extends PuppetView {
 
     // The PuppetAction currently playing
-    PuppetAction _action;
+    private PuppetAction _action;
 
     // The currently configured move index
-    int _moveIndex = -1;
+    private int _moveIndex = -1;
 
     // The current action time
-    int _actTime;
+    private int _actTime;
 
     // Whether timer loops
-    boolean _loops;
+    private boolean _loops;
 
     // Whether ActionView is showing pose not assoicated with action/move
-    boolean _timeless;
+    private boolean _timeless;
 
     // The ViewTimer
-    ViewTimer _timer;
+    private ViewTimer _timer;
 
     // The action time when play last started
-    int _startTime;
+    private int _startTime;
 
     // Constants for properties
     public static final String Action_Prop = "Action";
@@ -35,11 +34,10 @@ public class ActionView extends PuppetView {
     public static final String MoveIndex_Prop = "MoveIndex";
 
     // Constants
-    static int FRAME_DELAY_MILLIS = 20;
-    static float FRAME_DELAY_SECS = 20 / 1000f;
+    private static int FRAME_DELAY_MILLIS = 20;
 
     /**
-     * Creates an ActionView.
+     * Constructor.
      */
     public ActionView(Puppet aPuppet)
     {
@@ -90,10 +88,7 @@ public class ActionView extends PuppetView {
     /**
      * Returns the move index.
      */
-    public int getMoveIndex()
-    {
-        return _moveIndex;
-    }
+    public int getMoveIndex()  { return _moveIndex; }
 
     /**
      * Sets the move index.
@@ -172,10 +167,7 @@ public class ActionView extends PuppetView {
     /**
      * Returns whether ActionView is showing pose not associated with current Action/Move.
      */
-    public boolean isTimeless()
-    {
-        return _timeless;
-    }
+    public boolean isTimeless()  { return _timeless; }
 
     /**
      * Sets whether ActionView is showing pose not associated with current Action/Move.
@@ -189,10 +181,7 @@ public class ActionView extends PuppetView {
     /**
      * Returns whether action is playing.
      */
-    public boolean isPlaying()
-    {
-        return _timer != null;
-    }
+    public boolean isPlaying()  { return _timer != null; }
 
     /**
      * Starts playing the ActionView action with option to loop.
@@ -205,7 +194,7 @@ public class ActionView extends PuppetView {
         // Create timer and start
         _loops = doLoop;
         _startTime = getActionTime();
-        _timer = new ViewTimer(this::timerFired, FRAME_DELAY_MILLIS);
+        _timer = new ViewTimer(this::handleTimerFired, FRAME_DELAY_MILLIS);
         _timer.start();
     }
 
@@ -225,11 +214,12 @@ public class ActionView extends PuppetView {
     /**
      * Called when timer fires.
      */
-    void timerFired()
+    private void handleTimerFired()
     {
         // Get timer time (adjust if looping) and set
         int time = _timer.getTime();
-        if (_loops) time = time % _action.getMaxTime();
+        if (_loops)
+            time = time % _action.getMaxTime();
 
         // Set time
         boolean isSmooth = isPoseSmoothly();
@@ -237,10 +227,9 @@ public class ActionView extends PuppetView {
         setActionTime(time);
         setPoseSmoothly(isSmooth);
 
-
         // If beyond Action.MaxTime, stop anim
         if (!_loops && time > _action.getMaxTime())
-            getEnv().runLater(() -> stopAction());
+            getEnv().runLater(this::stopAction);
     }
 
     /**
@@ -250,5 +239,4 @@ public class ActionView extends PuppetView {
     {
         _phys.resolveMouseJoints();
     }
-
 }

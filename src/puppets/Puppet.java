@@ -1,7 +1,5 @@
 package puppets;
-
 import java.util.*;
-
 import snap.geom.Point;
 import snap.geom.Rect;
 import snap.util.*;
@@ -13,37 +11,38 @@ import snap.web.WebURL;
 public class Puppet {
 
     // The puppet name
-    String _name;
+    private String _name;
 
     // The source of puppet
-    Object _src;
+    private Object _source;
 
     // The source as URL
-    WebURL _srcURL;
+    private WebURL _sourceUrl;
 
     // The description of puppet parts and joints
-    PuppetSchema _schema = new PuppetSchema();
+    private PuppetSchema _schema = new PuppetSchema();
 
     // Cached parts
-    Map<String, PuppetPart> _parts = new HashMap();
+    private Map<String, PuppetPart> _parts = new HashMap<>();
 
     // Cached joints
-    Map<String, PuppetJoint> _joints = new HashMap();
+    private Map<String, PuppetJoint> _joints = new HashMap<>();
 
     // The puppet that this puppet is based on
-    Puppet _parent;
+    private Puppet _parent;
 
     // The bounds of parts
-    Rect _bounds;
+    private Rect _bounds;
 
     // The bounds of joints
-    Rect _jntBnds;
+    private Rect _jntBnds;
 
     /**
-     * Creates a Puppet.
+     * Constructor.
      */
     public Puppet()
     {
+        super();
     }
 
     /**
@@ -83,7 +82,7 @@ public class Puppet {
      */
     public Object getSource()
     {
-        return _src;
+        return _source;
     }
 
     /**
@@ -91,7 +90,7 @@ public class Puppet {
      */
     public void setSource(Object aSource)
     {
-        _src = aSource;
+        _source = aSource;
     }
 
     /**
@@ -100,7 +99,7 @@ public class Puppet {
     public WebURL getSourceURL()
     {
         // If already set, just return
-        if (_srcURL != null) return _srcURL;
+        if (_sourceUrl != null) return _sourceUrl;
 
         // Get source - if null and name exists, create default
         Object src = getSource();
@@ -108,8 +107,8 @@ public class Puppet {
             src = PuppetUtils.ROOT + "chars/" + getName() + '/' + getName() + ".pup";
 
         // Create SourceURL from source and return
-        _srcURL = WebURL.getUrl(src);
-        return _srcURL;
+        _sourceUrl = WebURL.getUrl(src);
+        return _sourceUrl;
     }
 
     /**
@@ -159,34 +158,29 @@ public class Puppet {
     /**
      * Returns the schema.
      */
-    public PuppetSchema getSchema()
-    {
-        return _schema;
-    }
+    public PuppetSchema getSchema()  { return _schema; }
 
     /**
      * Returns the parent.
      */
-    public Puppet getParent()
-    {
-        return _parent;
-    }
+    public Puppet getParent()  { return _parent; }
 
     /**
      * Returns the part for given name.
      */
-    public PuppetPart getPart(String aName)
+    public PuppetPart getPartForName(String aName)
     {
         // Get cached part (just return if found)
         PuppetPart part = _parts.get(aName);
-        if (part != null) return part;
+        if (part != null)
+            return part;
 
         // Try to create part
         part = createPart(aName);
         if (part == null)
             part = createDerivedPart(aName);
         if (part == null && _parent != null)
-            part = _parent.getPart(aName);
+            part = _parent.getPartForName(aName);
         if (part == null) {
             System.out.println("Puppet.getPart: part not found " + getName() + ' ' + aName);
             return null;
@@ -225,7 +219,7 @@ public class Puppet {
     /**
      * Returns the joint for given name.
      */
-    public PuppetJoint getJoint(String aName)
+    public PuppetJoint getJointForName(String aName)
     {
         // Get cached joint (just return if found)
         PuppetJoint joint = _joints.get(aName);
@@ -234,7 +228,7 @@ public class Puppet {
         // Try to create joint
         joint = createJoint(aName);
         if (joint == null && _parent != null)
-            joint = _parent.getJoint(aName);
+            joint = _parent.getJointForName(aName);
         if (joint == null) {
             System.out.println("Puppet.getJoint: part not found " + aName);
             return null;
@@ -281,11 +275,9 @@ public class Puppet {
     /**
      * Returns the parts for given names.
      */
-    public PuppetPart[] getPartsForNames(String theNames[])
+    public PuppetPart[] getPartsForNames(String[] theNames)
     {
-        PuppetPart parts[] = new PuppetPart[theNames.length];
-        for (int i = 0; i < theNames.length; i++) parts[i] = getPart(theNames[i]);
-        return parts;
+        return ArrayUtils.map(theNames, this::getPartForName, PuppetPart.class);
     }
 
     /**
@@ -307,11 +299,9 @@ public class Puppet {
     /**
      * Returns the joints for given names.
      */
-    public PuppetJoint[] getJointsForNames(String theNames[])
+    public PuppetJoint[] getJointsForNames(String[] theNames)
     {
-        PuppetJoint joints[] = new PuppetJoint[theNames.length];
-        for (int i = 0; i < theNames.length; i++) joints[i] = getJoint(theNames[i]);
-        return joints;
+        return ArrayUtils.map(theNames, this::getJointForName, PuppetJoint.class);
     }
 
     /**
@@ -320,16 +310,17 @@ public class Puppet {
     public PuppetPart[] getMotherParts()
     {
         // Iterate over parts and replace parts with their mother (if found)
-        PuppetPart parts[] = getParts();
-        List<PuppetPart> motherParts = new ArrayList(parts.length);
+        PuppetPart[] parts = getParts();
+        List<PuppetPart> motherParts = new ArrayList<>(parts.length);
         for (PuppetPart part : parts) {
-            if (part.getMotherPart() != null) part = part.getMotherPart();
+            if (part.getMotherPart() != null)
+                part = part.getMotherPart();
             if (!motherParts.contains(part))
                 motherParts.add(part);
         }
 
         // Return MotherParts as array
-        return motherParts.toArray(new PuppetPart[motherParts.size()]);
+        return motherParts.toArray(new PuppetPart[0]);
     }
 
     /**
@@ -342,7 +333,7 @@ public class Puppet {
 
         // If not loaded, just return bounds for current loaded parts
         if (!isLoaded()) {
-            PuppetPart parts[] = _parts.values().toArray(new PuppetPart[0]);
+            PuppetPart[] parts = _parts.values().toArray(new PuppetPart[0]);
             Rect bnds = getBoundsForParts(parts);
             if (getParent() != null) {
                 Rect pbnds = getParent().getBounds();
@@ -352,17 +343,19 @@ public class Puppet {
         }
 
         // Return rect
-        PuppetPart parts[] = getParts();
+        PuppetPart[] parts = getParts();
         return _bounds = getBoundsForParts(parts);
     }
 
     /**
      * Returns the bounds for given parts.
      */
-    protected Rect getBoundsForParts(PuppetPart theParts[])
+    protected Rect getBoundsForParts(PuppetPart[] theParts)
     {
         // Iterate over parts and expand bounds
-        double x = Float.MAX_VALUE, y = x, mx = -Float.MAX_VALUE, my = mx;
+        double x = Float.MAX_VALUE;
+        double y = Float.MAX_VALUE;
+        double mx = -Float.MAX_VALUE, my = mx;
         for (PuppetPart part : theParts) {
             x = Math.min(x, part.getX());
             y = Math.min(y, part.getY());
@@ -383,7 +376,9 @@ public class Puppet {
         if (_jntBnds != null) return _jntBnds;
 
         // Iterate over parts and expand bounds
-        double x = Float.MAX_VALUE, y = x, mx = -Float.MAX_VALUE, my = mx;
+        double x = Float.MAX_VALUE;
+        double y = Float.MAX_VALUE;
+        double mx = -Float.MAX_VALUE, my = mx;
         for (PuppetJoint jnt : getJoints()) {
             double jx = jnt.getX(), jy = jnt.getY();
             x = Math.min(x, jx);
@@ -402,9 +397,9 @@ public class Puppet {
     public PuppetPose getPose(double aScale)
     {
         // Iterate over pose keys and add pose marker and x/y location to map
-        Map<String, Point> map = new LinkedHashMap();
+        Map<String, Point> map = new LinkedHashMap<>();
         for (String pkey : getSchema().getPoseKeys()) {
-            PuppetJoint pjnt = getJoint(pkey);
+            PuppetJoint pjnt = getJointForName(pkey);
             Point pnt = new Point(pjnt.getX() * aScale, pjnt.getY() * aScale);
             map.put(pkey, pnt);
         }
@@ -435,9 +430,9 @@ public class Puppet {
      */
     protected Loadable getLoadable()
     {
-        String names[] = {PuppetSchema.RArm, PuppetSchema.RHand, PuppetSchema.RLeg, PuppetSchema.RFoot, PuppetSchema.Torso,
+        String[] names = {PuppetSchema.RArm, PuppetSchema.RHand, PuppetSchema.RLeg, PuppetSchema.RFoot, PuppetSchema.Torso,
                 PuppetSchema.Head, PuppetSchema.LLeg, PuppetSchema.LFoot, PuppetSchema.LArm, PuppetSchema.LHand};
-        PuppetPart parts[] = getPartsForNames(names);
+        PuppetPart[] parts = getPartsForNames(names);
         return Loadable.getAsLoadable(parts);
     }
 
@@ -514,7 +509,7 @@ public class Puppet {
         // Create element for parts and iterate over poses and add each
         XMLElement partsXML = new XMLElement("Parts");
         e.add(partsXML);
-        PuppetPart motherParts[] = getMotherParts();
+        PuppetPart[] motherParts = getMotherParts();
         for (PuppetPart part : motherParts) {
             if (part.getPuppet() != this) continue;
             XMLElement partXML = part.toXML(anArchiver);
@@ -604,17 +599,16 @@ public class Puppet {
     public static Puppet getPuppetForSource(Object aSource)
     {
         // Handle String
-        if (aSource instanceof String) {
-            String src = (String) aSource;
+        if (aSource instanceof String sourceStr) {
 
             // Handle old ORA puppets
-            if (src.equals("Man") || src.equals("Lady")) {
-                src = PuppetUtils.ROOT + "chars/CT" + src;
-                return new ORAPuppet(src);
+            if (sourceStr.equals("Man") || sourceStr.equals("Lady")) {
+                sourceStr = PuppetUtils.ROOT + "chars/CT" + sourceStr;
+                return new ORAPuppet(sourceStr);
             }
 
             Puppet puppet = new Puppet();
-            puppet.setSource(src);
+            puppet.setSource(sourceStr);
             puppet.readSource();
             return puppet;
         }
@@ -623,5 +617,4 @@ public class Puppet {
         System.err.println("Puppet.getPuppetForSource: Unknown source " + aSource);
         return null;
     }
-
 }

@@ -1,5 +1,4 @@
 package puppets;
-
 import java.util.*;
 
 import snap.geom.Transform;
@@ -12,26 +11,26 @@ import snap.gfx.*;
 public class SpritePane extends ViewOwner {
 
     // The AppPane
-    PuppetsPane _puppetsPane;
+    private PuppetsPane _puppetsPane;
 
     // The image view
-    ImageView _imgView;
+    private ImageView _imgView;
 
     // A ListView to show actions
-    ListView<PuppetAction> _actionList;
+    private ListView<PuppetAction> _actionList;
 
     // Whether to flip image
-    boolean _flipImage;
+    private boolean _flipImage;
 
     // Whether to loop anim
-    boolean _loopAnim;
+    private boolean _loopAnim;
 
     /**
-     * Creates SpritePane.
+     * Constructor.
      */
-    public SpritePane(PuppetsPane aAP)
+    public SpritePane(PuppetsPane puppetsPane)
     {
-        _puppetsPane = aAP;
+        _puppetsPane = puppetsPane;
     }
 
     /**
@@ -48,9 +47,7 @@ public class SpritePane extends ViewOwner {
 
         // Set ActionList
         _actionList = getView("ActionList", ListView.class);
-        _actionList.setItemTextFunction(action -> {
-            return action.getName();
-        });
+        _actionList.setItemTextFunction(PuppetAction::getName);
         _actionList.setItems(PuppetUtils.getActionFile().getActions());
         _actionList.setSelIndex(0);
 
@@ -62,25 +59,26 @@ public class SpritePane extends ViewOwner {
      */
     protected void respondUI(ViewEvent anEvent)
     {
-        // Handle ActionList
-        if (anEvent.equals("ActionList"))
-            runLater(() -> runLater(() -> setSpriteImage()));
+        switch (anEvent.getName()) {
 
-        // Handle PlayButton
-        if (anEvent.equals("PlayButton"))
-            playAnim();
+            // Handle ActionList
+            case "ActionList" -> runLater(() -> runLater(() -> setSpriteImage()));
 
-        // Handle PlayButton
-        if (anEvent.equals("PlayLoopButton")) {
-            _loopAnim = anEvent.getBoolValue();
-            if (_loopAnim) playAnim();
-            else stopAnim();
-        }
+            // Handle PlayButton
+            case "PlayButton" -> playAnim();
 
-        // Handle FlipXSwitch
-        if (anEvent.equals("FlipXSwitch")) {
-            _flipImage = anEvent.getBoolValue();
-            runLater(() -> runLater(() -> setSpriteImage()));
+            // Handle PlayButton
+            case "PlayLoopButton" -> {
+                _loopAnim = anEvent.getBoolValue();
+                if (_loopAnim) playAnim();
+                else stopAnim();
+            }
+
+            // Handle FlipXSwitch
+            case "FlipXSwitch" -> {
+                _flipImage = anEvent.getBoolValue();
+                runLater(() -> runLater(() -> setSpriteImage()));
+            }
         }
     }
 
@@ -108,19 +106,19 @@ public class SpritePane extends ViewOwner {
     /**
      * Play anim.
      */
-    void playAnim()
+    private void playAnim()
     {
         PuppetAction action = _actionList.getSelItem();
         int time = action.getMaxTime();
         _imgView.getAnimCleared(time).setValue("Frame", _imgView.getFrameCount()).setLinear().play();
         if (_loopAnim)
-            _imgView.getAnim(0).setOnFinish(() -> animFinished());
+            _imgView.getAnim(0).setOnFinish(this::handleAnimFinished);
     }
 
     /**
      * Stop Anim.
      */
-    void stopAnim()
+    private void stopAnim()
     {
         _imgView.getAnimCleared(0).stop();
         _imgView.setFrame(0);
@@ -129,7 +127,7 @@ public class SpritePane extends ViewOwner {
     /**
      * Called when anim is done.
      */
-    void animFinished()
+    private void handleAnimFinished()
     {
         if (_loopAnim) {
             playAnim();
@@ -150,8 +148,8 @@ public class SpritePane extends ViewOwner {
         actView.setFill(null);
         actView.setBorder(null);
 
-        int FRAME_DELAY_MILLIS = 25, frameCount = anAction.getMaxTime() / 25 + 1;
-        List<Image> images = new ArrayList();
+        int frameCount = anAction.getMaxTime() / 25 + 1;
+        List<Image> images = new ArrayList<>();
         for (int i = 0; i < frameCount; i++) {
             actView.setActionTime(i * 25);
             actView.finishPose();
@@ -160,8 +158,7 @@ public class SpritePane extends ViewOwner {
         }
 
         ImageSet imgSet = new ImageSet(images);
-        Image img = imgSet.getImage(0);
-        return img;
+        return imgSet.getImage(0);
     }
 
     /**
@@ -169,15 +166,16 @@ public class SpritePane extends ViewOwner {
      */
     public Image getImageFlipped(Image anImage)
     {
-        int w = (int) Math.round(anImage.getWidth()), h = (int) Math.round(anImage.getHeight());
-        Image img = Image.getImageForSize(w, h, anImage.hasAlpha());
-        Painter pntr = img.getPainter();
-        Transform xfm = new Transform(w / 2, h / 2);
+        int imageW = (int) Math.round(anImage.getWidth());
+        int imageH = (int) Math.round(anImage.getHeight());
+        Image flippedImage = Image.getImageForSize(imageW, imageH, anImage.hasAlpha());
+        Painter pntr = flippedImage.getPainter();
+        Transform xfm = new Transform(imageW / 2, imageH / 2);
         xfm.scale(-1, 1);
-        xfm.translate(-w / 2, -h / 2);
+        xfm.translate(-imageW / 2, -imageH / 2);
         pntr.transform(xfm);
         pntr.drawImage(anImage, 0, 0);
-        return img;
+        return flippedImage;
     }
 
     /**
@@ -185,15 +183,14 @@ public class SpritePane extends ViewOwner {
      */
     public Image getImagesFlipped(Image anImage)
     {
-        ImageSet iset = anImage.getImageSet();
-        int count = iset.getCount();
-        List<Image> imgs2 = new ArrayList(count);
+        ImageSet imageSet = anImage.getImageSet();
+        int count = imageSet.getCount();
+        List<Image> imgs2 = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
-            Image img = iset.getImage(i);
+            Image img = imageSet.getImage(i);
             imgs2.add(getImageFlipped(img));
         }
         ImageSet iset2 = new ImageSet(imgs2);
         return iset2.getImage(0);
     }
-
 }

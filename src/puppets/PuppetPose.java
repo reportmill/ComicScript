@@ -289,7 +289,7 @@ public class PuppetPose implements Cloneable {
      */
     private static double getJointDistance(Puppet aPuppet, double aScale, String aJName)
     {
-        PuppetJoint jnt0 = aPuppet.getJoint(aJName);
+        PuppetJoint jnt0 = aPuppet.getJointForName(aJName);
         PuppetJoint jnt1 = jnt0.getNext();
         return Point.getDistance(jnt0.getX(), jnt0.getY(), jnt1.getX(), jnt1.getY()) * aScale;
     }

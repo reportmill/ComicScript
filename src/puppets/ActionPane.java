@@ -1,7 +1,5 @@
 package puppets;
-
 import java.util.List;
-
 import snap.props.PropChange;
 import snap.view.*;
 import snap.viewx.DialogBox;
@@ -12,51 +10,47 @@ import snap.viewx.DialogBox;
 public class ActionPane extends ViewOwner {
 
     // The AppPane
-    PuppetsPane _puppetsPane;
+    private PuppetsPane _puppetsPane;
 
     // The puppet action view
-    ActionView _actView;
+    private ActionView _actView;
 
     // A List of Puppet Actions
-    PuppetUtils.ActionFile _actions = PuppetUtils.getActionFile();
+    private PuppetUtils.ActionFile _actions;
 
     // A ListView to show actions
-    ListView<PuppetAction> _actionList;
+    private ListView<PuppetAction> _actionList;
 
     // A TableView to show moves
-    TableView<PuppetMove> _moveTable;
+    private TableView<PuppetMove> _moveTable;
 
     // The last copied move
-    PuppetMove _copyMove;
+    private PuppetMove _copyMove;
 
     /**
-     * Creates ActionPane.
+     * Constructor.
      */
-    public ActionPane(PuppetsPane aAP)
+    public ActionPane(PuppetsPane puppetsPane)
     {
-        _puppetsPane = aAP;
+        super();
+        _puppetsPane = puppetsPane;
+        _actions = PuppetUtils.getActionFile();
     }
 
     /**
      * Returns the puppet.
      */
-    public Puppet getPuppet()
-    {
-        return _actView.getPuppet();
-    }
+    public Puppet getPuppet()  { return _actView.getPuppet(); }
 
     /**
      * Returns the action.
      */
-    public PuppetAction getAction()
-    {
-        return _actView.getAction();
-    }
+    public PuppetAction getAction()  { return _actView.getAction(); }
 
     /**
      * Selects action and move.
      */
-    void setActionAndMove(PuppetAction anAction, PuppetMove aMove)
+    private void setActionAndMove(PuppetAction anAction, PuppetMove aMove)
     {
         // Set ActView Action
         _actView.setAction(anAction);
@@ -65,10 +59,11 @@ public class ActionPane extends ViewOwner {
 
         // Set MoveTable items
         List<PuppetMove> moves = anAction != null ? anAction.getMoves() : null;
-        int ind = moves != null ? moves.indexOf(aMove) : -1;
-        if (aMove == null && anAction.getMoveCount() > 0) ind = 0;
+        int moveIndex = moves != null ? moves.indexOf(aMove) : -1;
+        if (aMove == null && anAction != null && anAction.getMoveCount() > 0)
+            moveIndex = 0;
         _moveTable.setItems(moves);
-        _moveTable.setSelIndex(ind);
+        _moveTable.setSelIndex(moveIndex);
 
         // Set time
         _actView.setActionTimeForMove(aMove);
@@ -90,21 +85,15 @@ public class ActionPane extends ViewOwner {
 
         // Set ActionList
         _actionList = getView("ActionList", ListView.class);
-        _actionList.setItemTextFunction(action -> {
-            return action.getName();
-        });
+        _actionList.setItemTextFunction(PuppetAction::getName);
         _actionList.setItems(_actions.getActions());
 
         // Set MoveTable
         _moveTable = getView("MoveTable", TableView.class);
-        _moveTable.getCol(0).setItemTextFunction(move -> {
-            return move.getPoseName();
-        });
-        _moveTable.getCol(1).setItemTextFunction(move -> {
-            return String.valueOf(move.getTime());
-        });
+        _moveTable.getCol(0).setItemTextFunction(PuppetMove::getPoseName);
+        _moveTable.getCol(1).setItemTextFunction(move -> String.valueOf(move.getTime()));
         _moveTable.setEditable(true);
-        _moveTable.addPropChangeListener(pc -> moveTableEditingCellChanged(pc), TableView.EditingCell_Prop);
+        _moveTable.addPropChangeListener(this::handleMoveTableEditingCellChange, TableView.EditingCell_Prop);
 
         // Make PuppetView interactive
         _actView.setPosable(true);
@@ -112,9 +101,6 @@ public class ActionPane extends ViewOwner {
         // Configure
         PuppetAction action = _actions.getActionCount() > 0 ? _actions.getAction(0) : null;
         setActionAndMove(action, null);
-
-        // Kick off first action
-        getUI().addPropChangeListener(pc -> runLater(() -> _actView.playAction(false)), View.Showing_Prop);
     }
 
     /**
@@ -163,7 +149,8 @@ public class ActionPane extends ViewOwner {
         // Handle AddActionButton
         if (anEvent.equals("AddActionButton")) {
             String name = DialogBox.showInputDialog(_puppetsPane.getUI(), "Add Action", "Enter Action Name:", "Untitled");
-            if (name == null || name.length() == 0) return;
+            if (name == null || name.isEmpty())
+                return;
             PuppetAction action = new PuppetAction(name);
             _actions.addAction(action);
             setActionAndMove(action, null);
@@ -171,29 +158,36 @@ public class ActionPane extends ViewOwner {
 
         // Handle DeleteActionMenu
         if (anEvent.equals("DeleteActionMenu")) {
-            int ind = _actionList.getSelIndex();
-            if (ind < 0) {
-                beep();
-                return;
-            }
-            _actions.removeAction(ind);
-            int ind2 = ind < _actions.getActionCount() ? ind : _actions.getActionCount() - 1;
-            PuppetAction action = ind2 >= 0 ? _actions.getAction(ind2) : null;
-            setActionAndMove(action, null);
+
+            // Get selected action index and remove
+            int selActionIndex = _actionList.getSelIndex();
+            if (selActionIndex < 0) {
+                beep(); return; }
+            _actions.removeAction(selActionIndex);
+
+            // Select next action
+            int newSelIndex = selActionIndex < _actions.getActionCount() ? selActionIndex : _actions.getActionCount() - 1;
+            PuppetAction newSelAction = newSelIndex >= 0 ? _actions.getAction(newSelIndex) : null;
+            setActionAndMove(newSelAction, null);
+
+            // Save actions
             _actions.saveActions();
         }
 
         // Handle MoveUpActionMenu, MoveDownActionMenu
         if (anEvent.equals("MoveUpActionMenu") || anEvent.equals("MoveDownActionMenu")) {
-            int ind = _actionList.getSelIndex();
-            if (ind < 0) {
-                beep();
-                return;
-            }
-            int ind2 = anEvent.equals("MoveUpActionMenu") ? (ind - 1) : (ind + 1);
-            PuppetAction action = _actions.removeAction(ind);
+
+            // Get selected action index
+            int selActionIndex = _actionList.getSelIndex();
+            if (selActionIndex < 0) {
+                beep(); return; }
+
+            int ind2 = anEvent.equals("MoveUpActionMenu") ? (selActionIndex - 1) : (selActionIndex + 1);
+            PuppetAction action = _actions.removeAction(selActionIndex);
             _actions.addAction(action, ind2);
             setActionAndMove(action, _moveTable.getSelItem());
+
+            // Save actions
             _actions.saveActions();
         }
 
@@ -205,9 +199,11 @@ public class ActionPane extends ViewOwner {
         // Handle AddMoveButton
         if (anEvent.equals("AddMoveButton")) {
             PuppetAction action = _actionList.getSelItem();
-            if (action == null) return;
+            if (action == null)
+                return;
             String name = DialogBox.showInputDialog(_puppetsPane.getUI(), "Add Move", "Enter Pose Name:", "Untitled");
-            if (name == null || name.length() == 0) return;
+            if (name == null || name.isEmpty())
+                return;
             PuppetPose pose = action.getPoseForName(name);
             if (pose == null) {
                 pose = _actView.getPose();
@@ -249,14 +245,10 @@ public class ActionPane extends ViewOwner {
             if (action == null) return;
             PuppetMove srcMove = _copyMove != null ? _copyMove.clone() : null;
             if (srcMove == null) {
-                beep();
-                return;
-            }
+                beep(); return; }
             PuppetMove dstMove = _moveTable.getSelItem();
             if (dstMove == null) {
-                beep();
-                return;
-            }
+                beep(); return; }
             action.replacePose(dstMove.getPoseName(), srcMove.getPose());
             _actions.saveActions();
             _actView.setPose(dstMove.getPose());
@@ -311,7 +303,7 @@ public class ActionPane extends ViewOwner {
     /**
      * Called when cell editing changes.
      */
-    private void moveTableEditingCellChanged(PropChange aPC)
+    private void handleMoveTableEditingCellChange(PropChange aPC)
     {
         // Get cell that finished editing (just return if none)
         ListCell<PuppetMove> cell = (ListCell<PuppetMove>) aPC.getOldValue();
@@ -323,7 +315,7 @@ public class ActionPane extends ViewOwner {
 
         // If Time column, set time
         if (col == 1) {
-            move.setTime(Integer.valueOf(text));
+            move.setTime(Integer.parseInt(text));
             _moveTable.updateItem(move);
             _actions.saveActions();
             resetLater();

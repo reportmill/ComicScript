@@ -1,5 +1,4 @@
 package puppets;
-
 import snap.geom.HPos;
 import snap.geom.Point;
 import snap.gfx.*;
@@ -11,37 +10,34 @@ import snap.viewx.DialogBox;
  */
 public class EditorPane extends ViewOwner {
 
-    // The AppPane
-    PuppetsPane _puppetsPane;
-
     // The Puppet
-    Puppet _puppet;
+    private Puppet _puppet;
 
     // The ListView for Puppets
-    ListView<String> _pupList;
+    private ListView<String> _pupList;
 
     // The ListView for parts/joints
-    ListView<String> _partsList;
+    private ListView<String> _partsList;
 
     // The ListView for joints
-    ListView<String> _jointsList;
+    private ListView<String> _jointsList;
 
     // The PuppetView
-    PuppetView _puppetView;
+    private PuppetView _puppetView;
 
     // The selected part name
-    String _selName, _dragName;
+    private String _selName, _dragName;
 
     // Constants
-    static Color SELECT_COLOR = Color.get("#039ed3");
-    static Effect SELECT_EFFECT = new ShadowEffect(8, SELECT_COLOR, 0, 0);
+    private static Color SELECT_COLOR = Color.get("#039ed3");
+    private static Effect SELECT_EFFECT = new ShadowEffect(8, SELECT_COLOR, 0, 0);
 
     /**
-     * Creates a EditorPane.
+     * Constructor.
      */
-    public EditorPane(PuppetsPane aAP)
+    public EditorPane()
     {
-        _puppetsPane = aAP;
+        super();
     }
 
     /**
@@ -80,7 +76,7 @@ public class EditorPane extends ViewOwner {
     {
         View hitView = ViewUtils.getChildAt(_puppetView, aX, aY);
         String name = hitView != null ? hitView.getName() : null;
-        PuppetPart part = isPartName(name) ? getPuppet().getPart(name) : null;
+        PuppetPart part = isPartName(name) ? getPuppet().getPartForName(name) : null;
         return part;
     }
 
@@ -121,7 +117,7 @@ public class EditorPane extends ViewOwner {
     public PuppetPart getSelPart()
     {
         String name = getSelPartName();
-        return name != null ? getPuppet().getPart(name) : null;
+        return name != null ? getPuppet().getPartForName(name) : null;
     }
 
     /**
@@ -138,7 +134,7 @@ public class EditorPane extends ViewOwner {
     public PuppetJoint getSelJoint()
     {
         String name = getSelJointName();
-        return name != null ? getPuppet().getJoint(name) : null;
+        return name != null ? getPuppet().getJointForName(name) : null;
     }
 
     /**

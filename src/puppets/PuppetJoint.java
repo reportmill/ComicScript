@@ -129,7 +129,7 @@ public class PuppetJoint {
     public PuppetJoint getNext()
     {
         String nextName = getPuppet().getSchema().getNextJointNameForName(getName());
-        PuppetJoint next = nextName != null ? getPuppet().getJoint(nextName) : null;
+        PuppetJoint next = nextName != null ? getPuppet().getJointForName(nextName) : null;
         return next;
     }
 

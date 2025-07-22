@@ -304,14 +304,14 @@ public class PuppetPart implements Loadable {
     {
         // Get part to split
         boolean isTop = aName2.contains("Top");
-        PuppetPart part = aPuppet.getPart(aPartName);
+        PuppetPart part = aPuppet.getPartForName(aPartName);
         if (part == null) {
             System.err.println("PuppetPart.splitPart: Part not found " + aPartName);
             return null;
         }
 
         // Get joint to split around
-        PuppetJoint joint = aPuppet.getJoint(aJointName);
+        PuppetJoint joint = aPuppet.getJointForName(aJointName);
         if (joint == null) {
             System.err.println("PuppetPart.splitView: Joint not found " + aJointName);
             return null;
