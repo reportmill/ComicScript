@@ -1,6 +1,5 @@
-package puppets.app;
+package puppets;
 
-import puppets.puppet.*;
 import snap.geom.HPos;
 import snap.geom.Point;
 import snap.gfx.*;

@@ -1,6 +1,10 @@
 package comics.player;
 import java.util.*;
-import puppets.puppet.*;
+
+import puppets.Puppet;
+import puppets.PuppetAction;
+import puppets.PuppetImager;
+import puppets.PuppetUtils;
 import snap.geom.Insets;
 import snap.gfx.*;
 import snap.util.*;

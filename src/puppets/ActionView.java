@@ -1,4 +1,4 @@
-package puppets.puppet;
+package puppets;
 
 import snap.gfx.*;
 import snap.view.*;

@@ -1,11 +1,10 @@
-package puppets.app;
+package puppets;
 
 import java.util.List;
 
 import snap.props.PropChange;
 import snap.view.*;
 import snap.viewx.DialogBox;
-import puppets.puppet.*;
 
 /**
  * A class to manage UI to create and edit puppet animations.

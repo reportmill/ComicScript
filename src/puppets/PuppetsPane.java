@@ -1,5 +1,4 @@
-package puppets.app;
-import puppets.puppet.*;
+package puppets;
 import snap.util.SnapEnv;
 import snap.view.*;
 

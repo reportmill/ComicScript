@@ -1,4 +1,4 @@
-package puppets.puppet;
+package puppets;
 import java.util.*;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;

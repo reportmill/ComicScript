@@ -1,4 +1,4 @@
-package puppets.puppet;
+package puppets;
 
 import snap.geom.Rect;
 import snap.gfx.*;

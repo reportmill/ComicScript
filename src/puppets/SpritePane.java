@@ -1,6 +1,4 @@
-package puppets.app;
-
-import puppets.puppet.*;
+package puppets;
 
 import java.util.*;
 

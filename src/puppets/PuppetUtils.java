@@ -1,4 +1,4 @@
-package puppets.puppet;
+package puppets;
 import java.util.*;
 import snap.geom.Arc;
 import snap.geom.Shape;

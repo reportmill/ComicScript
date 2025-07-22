@@ -1,7 +1,7 @@
-package puppets.puppet;
+package puppets;
 
-import puppets.puppet.ORAReader.Layer;
-import puppets.puppet.ORAReader.Stack;
+import puppets.ORAReader.Layer;
+import puppets.ORAReader.Stack;
 import snap.util.*;
 
 /**
