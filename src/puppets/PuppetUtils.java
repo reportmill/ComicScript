@@ -1,4 +1,6 @@
 package puppets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import snap.geom.Arc;
 import snap.geom.Shape;
@@ -13,7 +15,7 @@ import snap.web.WebURL;
 public class PuppetUtils {
 
     // Constants
-    public static String ROOT = "/Users/jeff/Dev/ComicLib/";
+    public static String ROOT = "https://reportmill.com/ComicLib/";
 
     // The PuppetFile
     private static PuppetFile _puppetFile;
@@ -28,7 +30,9 @@ public class PuppetUtils {
      * Initialization.
      */
     static {
-        if (!SnapEnv.isDesktop) ROOT = "https://reportmill.com/ComicLib/";
+        String localRoot = "/Users/jeff/Dev/ComicLib/";
+        if (Files.exists(Path.of(localRoot)))
+            ROOT = localRoot;
         System.out.println("Root: " + ROOT);
     }
 
