@@ -28,7 +28,7 @@ public class PuppetUtils {
      * Initialization.
      */
     static {
-        if (SnapEnv.isTeaVM) ROOT = "https://reportmill.com/ComicLib/";
+        if (!SnapEnv.isDesktop) ROOT = "https://reportmill.com/ComicLib/";
         System.out.println("Root: " + ROOT);
     }
 
