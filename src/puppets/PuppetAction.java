@@ -13,20 +13,20 @@ public class PuppetAction {
     String _name;
 
     // A list of poses used by this action
-    List<PuppetPose> _poses = new ArrayList();
+    List<PuppetPose> _poses = new ArrayList<>();
 
     // A list of moves
-    List<PuppetMove> _moves = new ArrayList();
+    List<PuppetMove> _moves = new ArrayList<>();
 
     /**
-     * Creates a PuppetAction.
+     * Constructor.
      */
     public PuppetAction()
     {
     }
 
     /**
-     * Creates a PuppetAction.
+     * Constructor for given name.
      */
     public PuppetAction(String aName)
     {
@@ -36,10 +36,7 @@ public class PuppetAction {
     /**
      * Returns the name.
      */
-    public String getName()
-    {
-        return _name;
-    }
+    public String getName()  { return _name; }
 
     /**
      * Sets the name.
@@ -52,34 +49,12 @@ public class PuppetAction {
     /**
      * Returns the list of poses defined for this action.
      */
-    public List<PuppetPose> getPoses()
-    {
-        return _poses;
-    }
-
-    /**
-     * Returns the number of poses.
-     */
-    public int getPoseCount()
-    {
-        return getPoses().size();
-    }
-
-    /**
-     * Returns the individual pose at given index.
-     */
-    public PuppetPose getPose(int anIndex)
-    {
-        return getPoses().get(anIndex);
-    }
+    public List<PuppetPose> getPoses()  { return _poses; }
 
     /**
      * Adds a pose.
      */
-    public void addPose(PuppetPose aPose)
-    {
-        addPose(aPose, getPoseCount());
-    }
+    public void addPose(PuppetPose aPose)  { addPose(aPose, _poses.size()); }
 
     /**
      * Adds a pose.
@@ -92,10 +67,9 @@ public class PuppetAction {
     /**
      * Removes a pose.
      */
-    public PuppetPose removePose(int anIndex)
+    public void removePose(int anIndex)
     {
-        PuppetPose pose = getPoses().remove(anIndex);
-        return pose;
+        _poses.remove(anIndex);
     }
 
     /**
@@ -103,35 +77,23 @@ public class PuppetAction {
      */
     public PuppetPose getPoseForName(String aName)
     {
-        for (PuppetPose pose : getPoses())
-            if (pose.getName().equals(aName))
-                return pose;
-        return null;
+        return ListUtils.findMatch(_poses, pose -> pose.getName().equals(aName));
     }
 
     /**
      * Returns the list of moves defined for this action.
      */
-    public List<PuppetMove> getMoves()
-    {
-        return _moves;
-    }
+    public List<PuppetMove> getMoves()  { return _moves; }
 
     /**
      * Returns the number of moves.
      */
-    public int getMoveCount()
-    {
-        return getMoves().size();
-    }
+    public int getMoveCount()  { return _moves.size(); }
 
     /**
      * Returns the individual move at given index.
      */
-    public PuppetMove getMove(int anIndex)
-    {
-        return getMoves().get(anIndex);
-    }
+    public PuppetMove getMove(int anIndex)  { return _moves.get(anIndex); }
 
     /**
      * Returns the individual move pose at given index.
@@ -154,10 +116,7 @@ public class PuppetAction {
     /**
      * Adds a move.
      */
-    public void addMove(PuppetMove aMove)
-    {
-        addMove(aMove, getMoveCount());
-    }
+    public void addMove(PuppetMove aMove)  { addMove(aMove, getMoveCount()); }
 
     /**
      * Adds a move at given index.

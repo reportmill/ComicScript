@@ -1,7 +1,5 @@
 package puppets;
-
 import java.util.*;
-
 import snap.geom.Insets;
 import snap.geom.Transform;
 import snap.gfx.*;
@@ -16,7 +14,7 @@ public class PuppetImager {
     int _frameCount;
 
     // The first image
-    Image _img;
+    Image _image;
 
     // The images
     List<Image> _images;
@@ -31,13 +29,13 @@ public class PuppetImager {
     ActionView _actView;
 
     // A list of PuppetImagers
-    private static List<PuppetImager> _imagers = new ArrayList();
+    private static List<PuppetImager> _imagers = new ArrayList<>();
 
     // The thread to process imagers
     private static Thread _imagerThread;
 
     /**
-     * Creates PuppetImager
+     * Constructor.
      */
     public PuppetImager(Puppet aPuppet, PuppetAction anAction, double aScale, Insets theIns)
     {
@@ -61,26 +59,20 @@ public class PuppetImager {
         // Create first image (empty)
         double vw = _actView.getWidth();
         double vh = _actView.getHeight();
-        _img = Image.getImageForSizeAndDpiScale(vw, vh, true, 0);
-        _img.setLoaded(false);
+        _image = Image.getImageForSizeAndDpiScale(vw, vh, true, 0);
+        _image.setLoaded(false);
         addImager(this);
     }
 
     /**
      * Returns the image.
      */
-    public Image getImage()
-    {
-        return _img;
-    }
+    public Image getImage()  { return _image; }
 
     /**
      * Returns the frame count.
      */
-    public int getFrameCount()
-    {
-        return _frameCount;
-    }
+    public int getFrameCount()  { return _frameCount; }
 
     /**
      * Loads the images.
@@ -95,12 +87,12 @@ public class PuppetImager {
         System.out.println("PuppetImager: Loading images for " + puppet.getName() + " " + _action.getName());
 
         // Create list of images and fill with empty images
-        _images = new ArrayList(_frameCount);
-        _images.add(_img);
-        double vw = _img.getWidth();
-        double vh = _img.getHeight();
+        _images = new ArrayList<>(_frameCount);
+        _images.add(_image);
+        double imageW = _image.getWidth();
+        double imageH = _image.getHeight();
         for (int i = 1; i < _frameCount; i++) {
-            Image img = Image.getImageForSizeAndDpiScale(vw, vh, true, 0);
+            Image img = Image.getImageForSizeAndDpiScale(imageW, imageH, true, 0);
             _images.add(img);
         }
 
@@ -110,8 +102,6 @@ public class PuppetImager {
 
         // Iterate over frames, set action pose and paint view into frame image
         for (int i = 0; i < _frameCount; i++) {
-            //if(i==0 || i==(_frameCount-1) || i%5==0)
-            //    System.out.println("PuppetImager: Loading image " + i + " of " + _frameCount);
             Image img = _images.get(i);
             _actView.setActionTime(i * 25);
             _actView.finishPose();
@@ -121,7 +111,7 @@ public class PuppetImager {
 
         // Create ImageSet and set image loaded
         ImageSet imgSet = new ImageSet(_images);
-        _img.setLoaded(true);
+        _image.setLoaded(true);
     }
 
     /**
@@ -129,12 +119,13 @@ public class PuppetImager {
      */
     public static Image getImageFlipped(Image anImage)
     {
-        int w = (int) Math.round(anImage.getWidth()), h = (int) Math.round(anImage.getHeight());
-        Image img = Image.getImageForSize(w, h, anImage.hasAlpha());
+        int imageW = (int) Math.round(anImage.getWidth());
+        int imageH = (int) Math.round(anImage.getHeight());
+        Image img = Image.getImageForSize(imageW, imageH, anImage.hasAlpha());
         Painter pntr = img.getPainter();
-        Transform xfm = new Transform(w / 2, h / 2);
+        Transform xfm = new Transform(imageW / 2, imageH / 2);
         xfm.scale(-1, 1);
-        xfm.translate(-w / 2, -h / 2);
+        xfm.translate(-imageW / 2, -imageH / 2);
         pntr.transform(xfm);
         pntr.drawImage(anImage, 0, 0);
         return img;
@@ -146,14 +137,14 @@ public class PuppetImager {
     public static Image getImagesFlipped(Image anImage)
     {
         // Get image set (if null, just return flipped image)
-        ImageSet iset = anImage.getImageSet();
-        if (iset == null)
+        ImageSet imageSet = anImage.getImageSet();
+        if (imageSet == null)
             return getImageFlipped(anImage);
 
-        int count = iset.getCount();
-        List<Image> imgs2 = new ArrayList(count);
+        int count = imageSet.getCount();
+        List<Image> imgs2 = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
-            Image img = iset.getImage(i);
+            Image img = imageSet.getImage(i);
             imgs2.add(getImageFlipped(img));
         }
         ImageSet iset2 = new ImageSet(imgs2);
@@ -167,7 +158,7 @@ public class PuppetImager {
     {
         Image img = Image.getImageForSizeAndDpiScale(aView.getWidth(), aView.getHeight(), true, 0);
         Painter pntr = img.getPainter();
-        ViewUtils.paintAll(aView, pntr);
+        ViewUtils.paintView(aView, pntr);
         return img;
     }
 
@@ -177,7 +168,7 @@ public class PuppetImager {
     private static void paintViewInImage(View aView, Image anImage)
     {
         Painter pntr = anImage.getPainter();
-        ViewUtils.paintAll(aView, pntr);
+        ViewUtils.paintView(aView, pntr);
     }
 
     /**
@@ -196,7 +187,7 @@ public class PuppetImager {
      */
     private static synchronized PuppetImager getImager()
     {
-        if (_imagers.size() == 0) return null;
+        if (_imagers.isEmpty()) return null;
         PuppetImager pi = _imagers.get(0);
         return pi;
     }
@@ -206,7 +197,7 @@ public class PuppetImager {
      */
     private static synchronized PuppetImager removeImager()
     {
-        if (_imagers.size() == 0) return null;
+        if (_imagers.isEmpty()) return null;
         PuppetImager pi = _imagers.remove(0);
         return pi;
     }
@@ -223,7 +214,7 @@ public class PuppetImager {
 
     private static void processImagers()
     {
-        while (_imagers.size() > 0) {
+        while (!_imagers.isEmpty()) {
             PuppetImager pi = getImager();
             if (pi == null) break;
             if (!pi._puppet.isLoaded()) {
@@ -235,5 +226,4 @@ public class PuppetImager {
         }
         _imagerThread = null;
     }
-
 }

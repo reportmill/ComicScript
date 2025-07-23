@@ -1,7 +1,5 @@
 package puppets;
-
 import java.util.*;
-
 import snap.geom.*;
 import snap.gfx.*;
 import snap.view.*;
@@ -12,25 +10,25 @@ import snap.view.*;
 public class PuppetView extends ParentView {
 
     // The puppet
-    Puppet _puppet;
+    private Puppet _puppet;
 
     // The scale
-    double _scale = .87;
+    private double _scale = .87;
 
     // The puppet height in points
-    double _pupHeight = 500;
+    //double _pupHeight = 500;
 
     // Whether poses should set over time (instead of instantly)
-    boolean _poseSmoothly = true;
+    private boolean _poseSmoothly = true;
 
     // The Physics runner
-    PuppetViewPhys _phys;
+    protected PuppetViewPhys _phys;
 
     // Whether to show markers
-    boolean _showMarkers = true;
+    private boolean _showMarkers = true;
 
     /**
-     * Creates a PuppetView.
+     * Constructor.
      */
     public PuppetView()
     {
@@ -39,7 +37,7 @@ public class PuppetView extends ParentView {
     }
 
     /**
-     * Creates a PuppetView.
+     * Constructor for given source.
      */
     public PuppetView(String aSource)
     {
@@ -49,7 +47,7 @@ public class PuppetView extends ParentView {
     }
 
     /**
-     * Creates a PuppetView.
+     * Constructor for given puppet.
      */
     public PuppetView(Puppet aPuppet)
     {
@@ -60,10 +58,7 @@ public class PuppetView extends ParentView {
     /**
      * Returns the puppet.
      */
-    public Puppet getPuppet()
-    {
-        return _puppet;
-    }
+    public Puppet getPuppet()  { return _puppet; }
 
     /**
      * Sets the puppet.
@@ -81,10 +76,7 @@ public class PuppetView extends ParentView {
     /**
      * Returns the puppet schema.
      */
-    public PuppetSchema getSchema()
-    {
-        return _puppet.getSchema();
-    }
+    public PuppetSchema getSchema()  { return _puppet.getSchema(); }
 
     /**
      * Sets the puppet height.
@@ -101,8 +93,7 @@ public class PuppetView extends ParentView {
     public Point puppetToLocalForXY(double aX, double aY)
     {
         Transform xfm = getPuppetToLocal();
-        Point pnt = xfm.transformXY(aX, aY);
-        return pnt;
+        return xfm.transformXY(aX, aY);
     }
 
     /**
@@ -111,8 +102,7 @@ public class PuppetView extends ParentView {
     public Point localToPuppetForXY(double aX, double aY)
     {
         Transform xfm = getLocalToPuppet();
-        Point pnt = xfm.transformXY(aX, aY);
-        return pnt;
+        return xfm.transformXY(aX, aY);
     }
 
     /**
@@ -121,8 +111,7 @@ public class PuppetView extends ParentView {
     public Shape puppetToLocalForShape(Shape aShape)
     {
         Transform xfm = getPuppetToLocal();
-        Shape shp = aShape.copyFor(xfm);
-        return shp;
+        return aShape.copyFor(xfm);
     }
 
     /**
@@ -234,7 +223,7 @@ public class PuppetView extends ParentView {
         Point anchor = anchorView.localToParent(anchorView.getWidth() / 2, anchorView.getHeight() / 2);
 
         // Iterate over pose keys and add pose marker and x/y location to poseKeyPoints map
-        Map<String, Point> poseKeyPoints = new LinkedHashMap();
+        Map<String, Point> poseKeyPoints = new LinkedHashMap<>();
         for (String pkey : getSchema().getPoseKeys()) {
             View pview = getChildForName(pkey);
             Point pnt = pview.localToParent(pview.getWidth() / 2, pview.getHeight() / 2);
@@ -263,11 +252,12 @@ public class PuppetView extends ParentView {
         PuppetPose pose = aPose.cloneForPuppetAtScale(getPuppet(), _scale);
 
         // Iterate over pose keys and add pose marker and x/y location to map
-        for (String pkey : getSchema().getPoseKeys()) {
-            View pview = getChildForName(pkey);
-            Point pnt = pose.getMarkerPoint(pkey);
-            double px = pnt.x + anchor.x, py = anchor.y - pnt.y;
-            _phys.setJointOrMarkerToViewXY(pkey, px, py);
+        for (String poseKey : getSchema().getPoseKeys()) {
+            //View pview = getChildForName(poseKey);
+            Point pnt = pose.getMarkerPoint(poseKey);
+            double px = pnt.x + anchor.x;
+            double py = anchor.y - pnt.y;
+            _phys.setJointOrMarkerToViewXY(poseKey, px, py);
         }
 
         if (isPoseSmoothly())
@@ -278,10 +268,7 @@ public class PuppetView extends ParentView {
     /**
      * Returns whether poses are set over time (animated) as opposed to instantly.
      */
-    public boolean isPoseSmoothly()
-    {
-        return _poseSmoothly;
-    }
+    public boolean isPoseSmoothly()  { return _poseSmoothly; }
 
     /**
      * Sets whether poses are set over time (animated) as opposed to instantly.
@@ -294,10 +281,7 @@ public class PuppetView extends ParentView {
     /**
      * Returns whether to show markers.
      */
-    public boolean isShowMarkers()
-    {
-        return _showMarkers;
-    }
+    public boolean isShowMarkers()  { return _showMarkers; }
 
     /**
      * Sets whether to show markers.
@@ -318,10 +302,7 @@ public class PuppetView extends ParentView {
     /**
      * Returns whether puppet is posable via user interaction.
      */
-    public boolean isPosable()
-    {
-        return _phys != null;
-    }
+    public boolean isPosable()  { return _phys != null; }
 
     /**
      * Sets whether puppet is posable via user interaction.
@@ -341,10 +322,7 @@ public class PuppetView extends ParentView {
     /**
      * Returns whether to Freeze outer joints on drag.
      */
-    public boolean isFreezeOuterJoints()
-    {
-        return _phys != null && _phys._freezeOuterJoints;
-    }
+    public boolean isFreezeOuterJoints()  { return _phys != null && _phys._freezeOuterJoints; }
 
     /**
      * Sets whether to Freeze outer joints on drag.
@@ -395,5 +373,4 @@ public class PuppetView extends ParentView {
             else getPhysics(true).setJoint(true);
         }
     }
-
 }

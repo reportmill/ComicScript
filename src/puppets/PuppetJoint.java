@@ -1,5 +1,4 @@
 package puppets;
-
 import snap.geom.Rect;
 import snap.gfx.*;
 import snap.util.*;
@@ -10,26 +9,26 @@ import snap.util.*;
 public class PuppetJoint {
 
     // The name of the part
-    String _name;
+    private String _name;
 
     // The location of the part
-    double _x, _y;
+    protected double _x, _y;
 
     // The image
-    Image _img;
+    private Image _image;
 
     // The Puppet that owns this joint
-    Puppet _puppet;
+    protected Puppet _puppet;
 
     /**
-     * Creates a PuppetJoint.
+     * Constructor.
      */
     public PuppetJoint()
     {
     }
 
     /**
-     * Creates a PuppetJoint.
+     * Constructor.
      */
     public PuppetJoint(String aName, double aX, double aY)
     {
@@ -41,10 +40,7 @@ public class PuppetJoint {
     /**
      * Returns the name.
      */
-    public String getName()
-    {
-        return _name;
-    }
+    public String getName()  { return _name; }
 
     /**
      * Sets the name.
@@ -57,25 +53,20 @@ public class PuppetJoint {
     /**
      * Returns the puppet X.
      */
-    public double getX()
-    {
-        return _x;
-    }
+    public double getX()  { return _x; }
 
     /**
      * Returns the puppet Y.
      */
-    public double getY()
-    {
-        return _y;
-    }
+    public double getY()  { return _y; }
 
     /**
      * Returns the image.
      */
     public Image getImage()
     {
-        return _img != null ? _img : (_img = getImageImpl());
+        if (_image != null) return _image;
+        return _image = getImageImpl();
     }
 
     /**
@@ -83,7 +74,7 @@ public class PuppetJoint {
      */
     public void setImage(Image anImage)
     {
-        _img = anImage;
+        _image = anImage;
     }
 
     /**
@@ -91,7 +82,8 @@ public class PuppetJoint {
      */
     protected Image getImageImpl()
     {
-        if (_name == PuppetSchema.Anchor_Joint) return PuppetUtils.getAnchorImage();
+        if (_name == PuppetSchema.Anchor_Joint)
+            return PuppetUtils.getAnchorImage();
         return PuppetUtils.getMarkerImage();
     }
 
@@ -164,8 +156,8 @@ public class PuppetJoint {
         _y = anElement.getAttributeDoubleValue("Y");
 
         // Unarchive Image
-        _img = PuppetUtils.getMarkerImage();
-        if (name.equals(PuppetSchema.Anchor_Joint)) _img = PuppetUtils.getAnchorImage();
+        _image = PuppetUtils.getMarkerImage();
+        if (name.equals(PuppetSchema.Anchor_Joint)) _image = PuppetUtils.getAnchorImage();
 
         // Return this
         return this;
@@ -178,5 +170,4 @@ public class PuppetJoint {
     {
         return "Joint: name=" + _name + ", x=" + _x + ", y=" + _y;
     }
-
 }

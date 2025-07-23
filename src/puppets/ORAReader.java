@@ -97,7 +97,7 @@ public class ORAReader {
 
         public Stack stack;
 
-        Image _img;
+        Image _image;
 
         /**
          * Creates an ORA Layer.
@@ -124,17 +124,14 @@ public class ORAReader {
          */
         public Image getImage()
         {
-            if (_img != null) return _img;
-            return _img = Image.getImageForSource(src);
+            if (_image != null) return _image;
+            return _image = Image.getImageForSource(src);
         }
 
         /**
          * Returns the image(s) that need to be loaded for this layer.
          */
-        public Loadable getLoadable()
-        {
-            return getImage();
-        }
+        public Loadable getLoadable()  { return getImage(); }
 
         /**
          * Standard toString implementation.
@@ -144,7 +141,7 @@ public class ORAReader {
             return "Layer: name=" + name + ", src=" + src + ", x=" + x + ", y=" + y;
         }
 
-        String strip(String str)
+        private static String strip(String str)
         {
             if (str == null) return "";
             return str.replace("+", "").replace(" #1", "").replace(" #2", "");
@@ -157,7 +154,7 @@ public class ORAReader {
     public static class Stack extends Layer {
 
         // The list of layers (or nested stacks) in this stack
-        public List<Layer> entries = new ArrayList();
+        public List<Layer> entries = new ArrayList<>();
 
         /**
          * Creates an ORA Stack.
@@ -185,8 +182,10 @@ public class ORAReader {
         public Image getImage()
         {
             // If already set, just return
-            if (_img != null) return _img;
-            if (entries.size() == 0) return null;
+            if (_image != null)
+                return _image;
+            if (entries.isEmpty())
+                return null;
 
             // Iterate over entries and find x, y, maxX, maxY
             double mx = 0, my = 0;
@@ -220,7 +219,7 @@ public class ORAReader {
             }
 
             // Return image
-            return _img = img;
+            return _image = img;
         }
 
         /**
@@ -232,8 +231,7 @@ public class ORAReader {
             for (Layer entry : entries) {
                 if (entry.name.equals(aName))
                     return entry;
-                if (entry instanceof Stack) {
-                    Stack stack = (Stack) entry;
+                if (entry instanceof Stack stack) {
                     Layer match = stack.getLayer(aName);
                     if (match != null)
                         return match;
@@ -247,11 +245,7 @@ public class ORAReader {
          */
         public Loadable getLoadable()
         {
-            List<Loadable> list = new ArrayList();
-            for (Layer entry : entries) {
-                if (!entry.visible) continue;
-                list.add(entry.getLoadable());
-            }
+            List<Loadable> list = ListUtils.mapNonNull(entries, entry -> entry.visible ? entry.getLoadable() : null);
             return Loadable.getAsLoadable(list);
         }
 

@@ -1,5 +1,4 @@
 package puppets;
-
 import puppets.ORAReader.Layer;
 import puppets.ORAReader.Stack;
 import snap.util.*;
@@ -10,16 +9,16 @@ import snap.util.*;
 public class ORAPuppet extends Puppet {
 
     // The stack of layers
-    Stack _stack;
+    private Stack _stack;
 
     // The stack of body part layers
-    Stack _bodyStack;
+    private Stack _bodyStack;
 
     // The stack of layers
-    Stack _jointStack;
+    private Stack _jointStack;
 
     /**
-     * Creates a PuppetView.
+     * Constructor.
      */
     public ORAPuppet(String aSource)
     {
@@ -41,8 +40,8 @@ public class ORAPuppet extends Puppet {
 
         // Get stack, body stack and joint stack
         _stack = rdr.readFile(aPath);
-        _bodyStack = (Stack) getLayer("RL_Image");
-        _jointStack = (Stack) getLayer("RL_Bone_Human");
+        _bodyStack = (Stack) getLayerForName("RL_Image");
+        _jointStack = (Stack) getLayerForName("RL_Bone_Human");
     }
 
     /**
@@ -52,7 +51,8 @@ public class ORAPuppet extends Puppet {
     {
         String lname = getLayerNameForPuppetName(aName);
         Layer layer = getLayerForPartName(lname);
-        if (layer == null) return null;
+        if (layer == null)
+            return null;
         return new ORAPart(aName, layer);
     }
 
@@ -63,7 +63,8 @@ public class ORAPuppet extends Puppet {
     {
         String lname = getLayerNameForPuppetName(aName);
         Layer layer = getLayerForJointName(lname);
-        if (layer == null) return null;
+        if (layer == null)
+            return null;
         return new PuppetJoint(aName, layer.x, layer.y);
     }
 
@@ -72,110 +73,70 @@ public class ORAPuppet extends Puppet {
      */
     String getLayerNameForPuppetName(String aName)
     {
-        switch (aName) {
+        return switch (aName) {
 
             // Parts
-            case PuppetSchema.Torso:
-                return "Hip";
-            case PuppetSchema.Head:
-                return "RL_TalkingHead";
-            case PuppetSchema.RArm:
-                return "RArm";
-            case PuppetSchema.RArmTop:
-                return "RArmTop";
-            case PuppetSchema.RArmBtm:
-                return "RArmBtm";
-            case PuppetSchema.RHand:
-                return "RHand";
-            case PuppetSchema.RLeg:
-                return "RThigh";
-            case PuppetSchema.RLegTop:
-                return "RLegTop";
-            case PuppetSchema.RLegBtm:
-                return "RLegBtm";
-            case PuppetSchema.RFoot:
-                return "RFoot";
-            case PuppetSchema.LArm:
-                return "LArm";
-            case PuppetSchema.LArmTop:
-                return "LArmTop";
-            case PuppetSchema.LArmBtm:
-                return "LArmBtm";
-            case PuppetSchema.LHand:
-                return "LHand";
-            case PuppetSchema.LLeg:
-                return "LThigh";
-            case PuppetSchema.LLegTop:
-                return "LLegTop";
-            case PuppetSchema.LLegBtm:
-                return "LLegBtm";
-            case PuppetSchema.LFoot:
-                return "LFoot";
+            case PuppetSchema.Torso -> "Hip";
+            case PuppetSchema.Head -> "RL_TalkingHead";
+            case PuppetSchema.RArm -> "RArm";
+            case PuppetSchema.RArmTop -> "RArmTop";
+            case PuppetSchema.RArmBtm -> "RArmBtm";
+            case PuppetSchema.RHand -> "RHand";
+            case PuppetSchema.RLeg -> "RThigh";
+            case PuppetSchema.RLegTop -> "RLegTop";
+            case PuppetSchema.RLegBtm -> "RLegBtm";
+            case PuppetSchema.RFoot -> "RFoot";
+            case PuppetSchema.LArm -> "LArm";
+            case PuppetSchema.LArmTop -> "LArmTop";
+            case PuppetSchema.LArmBtm -> "LArmBtm";
+            case PuppetSchema.LHand -> "LHand";
+            case PuppetSchema.LLeg -> "LThigh";
+            case PuppetSchema.LLegTop -> "LLegTop";
+            case PuppetSchema.LLegBtm -> "LLegBtm";
+            case PuppetSchema.LFoot -> "LFoot";
 
             // Joints
-            case PuppetSchema.Anchor_Joint:
-                return "ObjectPivot";
-            case PuppetSchema.Head_Joint:
-                return "Head";
-            case PuppetSchema.HeadTop_Joint:
-                return "Head_Nub";
-            case PuppetSchema.RArm_Joint:
-                return "RArm";
-            case PuppetSchema.RArmMid_Joint:
-                return "RForearm";
-            case PuppetSchema.RHand_Joint:
-                return "RHand";
-            case PuppetSchema.RHandEnd_Joint:
-                return "RHand_Nub";
-            case PuppetSchema.RLeg_Joint:
-                return "RThigh";
-            case PuppetSchema.RLegMid_Joint:
-                return "RShank";
-            case PuppetSchema.RFoot_Joint:
-                return "RFoot";
-            case PuppetSchema.RFootEnd_Joint:
-                return "RToe";
-            case PuppetSchema.LArm_Joint:
-                return "LArm";
-            case PuppetSchema.LArmMid_Joint:
-                return "LForearm";
-            case PuppetSchema.LHand_Joint:
-                return "LHand";
-            case PuppetSchema.LHandEnd_Joint:
-                return "LHand_Nub";
-            case PuppetSchema.LLeg_Joint:
-                return "LThigh";
-            case PuppetSchema.LLegMid_Joint:
-                return "LShank";
-            case PuppetSchema.LFoot_Joint:
-                return "LFoot";
-            case PuppetSchema.LFootEnd_Joint:
-                return "LToe";
+            case PuppetSchema.Anchor_Joint -> "ObjectPivot";
+            case PuppetSchema.Head_Joint -> "Head";
+            case PuppetSchema.HeadTop_Joint -> "Head_Nub";
+            case PuppetSchema.RArm_Joint -> "RArm";
+            case PuppetSchema.RArmMid_Joint -> "RForearm";
+            case PuppetSchema.RHand_Joint -> "RHand";
+            case PuppetSchema.RHandEnd_Joint -> "RHand_Nub";
+            case PuppetSchema.RLeg_Joint -> "RThigh";
+            case PuppetSchema.RLegMid_Joint -> "RShank";
+            case PuppetSchema.RFoot_Joint -> "RFoot";
+            case PuppetSchema.RFootEnd_Joint -> "RToe";
+            case PuppetSchema.LArm_Joint -> "LArm";
+            case PuppetSchema.LArmMid_Joint -> "LForearm";
+            case PuppetSchema.LHand_Joint -> "LHand";
+            case PuppetSchema.LHandEnd_Joint -> "LHand_Nub";
+            case PuppetSchema.LLeg_Joint -> "LThigh";
+            case PuppetSchema.LLegMid_Joint -> "LShank";
+            case PuppetSchema.LFoot_Joint -> "LFoot";
+            case PuppetSchema.LFootEnd_Joint -> "LToe";
 
             // Failure
-            default:
+            default -> {
                 System.err.println("ORAPuppet.getLayerNameForPuppetName: failed for " + aName);
-                return null;
-        }
+                yield null;
+            }
+        };
     }
 
     /**
      * Returns the layer for given name.
      */
-    public Layer getLayer(String aName)
-    {
-        return getLayer(_stack, aName);
-    }
+    public Layer getLayerForName(String aName)  { return getLayer(_stack, aName); }
 
     /**
      * Returns the layer for given name.
      */
-    Layer getLayer(Layer aLayer, String aName)
+    private Layer getLayer(Layer aLayer, String aName)
     {
         if (aLayer.name != null && aLayer.name.equals(aName))
             return aLayer;
-        if (aLayer instanceof Stack) {
-            Stack stack = (Stack) aLayer;
+        if (aLayer instanceof Stack stack) {
             for (Layer l : stack.entries)
                 if (getLayer(l, aName) != null)
                     return getLayer(l, aName);
@@ -196,17 +157,14 @@ public class ORAPuppet extends Puppet {
     /**
      * Returns the layer for given joint name.
      */
-    public Layer getLayerForJointName(String aName)
-    {
-        return _jointStack.getLayer(aName);
-    }
+    public Layer getLayerForJointName(String aName)  { return _jointStack.getLayer(aName); }
 
     /**
      * A PuppetPart subclass for ORAPuppet.
      */
-    private class ORAPart extends PuppetPart {
+    private static class ORAPart extends PuppetPart {
 
-        Layer _lyr;
+        private Layer _lyr;
 
         /**
          * Creates an ORAPart for given layer.
@@ -222,18 +180,11 @@ public class ORAPuppet extends Puppet {
         /**
          * Returns the image.
          */
-        protected snap.gfx.Image getImageImpl()
-        {
-            return _lyr.getImage();
-        }
+        protected snap.gfx.Image getImageImpl()  { return _lyr.getImage(); }
 
         /**
          * Returns the images that need to be loaded for this part.
          */
-        protected Loadable getLoadable()
-        {
-            return _lyr.getLoadable();
-        }
+        protected Loadable getLoadable()  { return _lyr.getLoadable(); }
     }
-
 }
