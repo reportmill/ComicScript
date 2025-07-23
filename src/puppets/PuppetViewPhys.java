@@ -16,7 +16,7 @@ import snap.view.EventListener;
 public class PuppetViewPhys {
 
     // The Snap View
-    private PuppetView _pupView;
+    private PuppetView _puppetView;
 
     // The Box2D World
     private World _world;
@@ -46,8 +46,8 @@ public class PuppetViewPhys {
     private long _poseMouseTime;
 
     // Constants
-    static int FRAME_DELAY_MILLIS = 20;
-    static float FRAME_DELAY_SECS = 20 / 1000f;
+    private static int FRAME_DELAY_MILLIS = 20;
+    private static float FRAME_DELAY_SECS = 20 / 1000f;
 
     /**
      * Create new PhysicsRunner.
@@ -55,19 +55,19 @@ public class PuppetViewPhys {
     public PuppetViewPhys(PuppetView aView)
     {
         // Set View
-        _pupView = aView;
+        _puppetView = aView;
 
         // Create world
-        _world = new World(new Vec2(0, 0));//-9.8f));
+        _world = new World(new Vec2(0, 0));
 
         // Get PuppetView, Puppet
-        Puppet puppet = _pupView.getPuppet();
+        Puppet puppet = _puppetView.getPuppet();
         PuppetSchema pschema = puppet.getSchema();
 
         // Add bodies for view children
         List<View> joints = new ArrayList<>();
         List<View> markers = new ArrayList<>();
-        for (View child : _pupView.getChildren()) {
+        for (View child : _puppetView.getChildren()) {
             ViewPhysics<?> phys = child.getPhysics(true);
             if (phys.isJoint())
                 joints.add(child);
@@ -76,40 +76,26 @@ public class PuppetViewPhys {
             else if (child.isVisible()) {
                 phys.setDynamic(true);
                 createJboxBodyForView(child);
-                addDragger(child);
+                enableDraggingForView(child);
             }
         }
 
         // Add joints
         for (View v : joints)
-            createJoint(v);
+            createJboxJointForView(v);
         for (View v : markers)
             createMarker(v);
     }
 
     /**
-     * Returns a view for given name.
-     */
-    public View getView(String aName)
-    {
-        return _pupView.getChildForName(aName);
-    }
-
-    /**
      * Returns the puppet.
      */
-    public Puppet getPuppet()
-    {
-        return _pupView.getPuppet();
-    }
+    public Puppet getPuppet()  { return _puppetView.getPuppet(); }
 
     /**
      * Returns whether physics is running.
      */
-    public boolean isRunning()
-    {
-        return _runner != null;
-    }
+    public boolean isRunning()  { return _runner != null; }
 
     /**
      * Sets whether physics is running.
@@ -137,7 +123,7 @@ public class PuppetViewPhys {
         _world.step(FRAME_DELAY_SECS, 20, 20);
 
         // Update world view children from jbox natives
-        _pupView.getChildren().forEach(this::updateViewFromJboxNative);
+        _puppetView.getChildren().forEach(this::updateViewFromJboxNative);
 
         // Clear PoseMouseJoints
         if (_poseMouseTime > 0 && System.currentTimeMillis() > _poseMouseTime + 800)
@@ -181,18 +167,13 @@ public class PuppetViewPhys {
      */
     public boolean isAwake()
     {
-        for (int i = 0, iMax = _pupView.getChildCount(); i < iMax; i++) {
-            View view = _pupView.getChild(i);
-            if (isAwake(view))
-                return true;
-        }
-        return false;
+        return ListUtils.hasMatch(_puppetView.getChildren(), this::isAwake);
     }
 
     /**
      * Returns whether given body is awake.
      */
-    public boolean isAwake(View aView)
+    private boolean isAwake(View aView)
     {
         // Get ViewPhysics (just return if null or not dynamic)
         ViewPhysics<Body> phys = aView.getPhysics();
@@ -309,7 +290,7 @@ public class PuppetViewPhys {
     /**
      * Creates a Joint.
      */
-    public void createJoint(View aView)
+    public void createJboxJointForView(View aView)
     {
         // Get shapes interesting joint view
         PuppetSchema pschema = getPuppet().getSchema();
@@ -321,8 +302,8 @@ public class PuppetViewPhys {
         }
 
         // Get linked views
-        View viewA = getView(linkNames[0]);
-        View viewB = getView(linkNames[1]);
+        View viewA = getViewForName(linkNames[0]);
+        View viewB = getViewForName(linkNames[1]);
 
         // Create joint def and set body A/B
         RevoluteJointDef jointDef = new RevoluteJointDef();
@@ -361,7 +342,7 @@ public class PuppetViewPhys {
         createJboxBodyForView(aView);
 
         // Get linked views
-        View viewA = getView(linkNames[0]);
+        View viewA = getViewForName(linkNames[0]);
         View viewB = aView;
 
         // Create joint def and set body A/B
@@ -393,13 +374,13 @@ public class PuppetViewPhys {
         if (linkNames.length < 1) return;
 
         // Get Joint view
-        View jview = getView(aName);
+        View jview = getViewForName(aName);
         Point jpnt = jview.localToParent(jview.getWidth() / 2, jview.getHeight() / 2);
         if (equals(jpnt.x, jpnt.y, aX, aY)) return;
         Vec2 jointVec = viewToWorld(jpnt.x, jpnt.y);
 
         // Get linked view, body and X/Y in body coords
-        View view = getView(linkNames[0]);
+        View view = getViewForName(linkNames[0]);
         Body body = (Body) view.getPhysics().getNative();
 
         // Create MouseJoint and target X/Y
@@ -438,7 +419,7 @@ public class PuppetViewPhys {
     /**
      * Resolve mouse joints.
      */
-    void resolveMouseJointsOverTime()
+    protected void resolveMouseJointsOverTime()
     {
         if (isRunning() || _poseMouseTime == 0) return;
         stepWorld();
@@ -448,7 +429,7 @@ public class PuppetViewPhys {
     /**
      * Clear mouse joints.
      */
-    void clearMouseJoints()
+    private void clearMouseJoints()
     {
         for (MouseJoint mj : _poseMouseJoints) _world.destroyJoint(mj);
         _poseMouseJoints.clear();
@@ -456,9 +437,9 @@ public class PuppetViewPhys {
     }
 
     /**
-     * Adds DragFilter to view.
+     * Enables user mouse dragging of given view.
      */
-    void addDragger(View aView)
+    private void enableDraggingForView(View aView)
     {
         if (_viewDraggingEventLsnr == null) _viewDraggingEventLsnr = this::handleViewMouseEventForDragging;
         aView.addEventFilter(_viewDraggingEventLsnr, View.MousePress, View.MouseDrag, View.MouseRelease);
@@ -510,7 +491,7 @@ public class PuppetViewPhys {
     /**
      * Freezes outer joints for a body name.
      */
-    void setOuterJointLimitsEnabledForBodyName(String aName, boolean isEnabled)
+    private void setOuterJointLimitsEnabledForBodyName(String aName, boolean isEnabled)
     {
         // Get outer joint names
         PuppetSchema schema = getPuppet().getSchema();
@@ -519,7 +500,7 @@ public class PuppetViewPhys {
 
         // Iterate over joint names and set limit enabled/disabled
         while (jnameNext != null) {
-            View view = getView(jname);
+            View view = getViewForName(jname);
             ViewPhysics<Joint> phys = view.getPhysics();
             RevoluteJoint joint = (RevoluteJoint) phys.getNative();
             joint.enableLimit(isEnabled);
@@ -531,12 +512,14 @@ public class PuppetViewPhys {
     }
 
     /**
+     * Returns a view for given name.
+     */
+    private View getViewForName(String aName)  { return _puppetView.getChildForName(aName); }
+
+    /**
      * Convert View coord to Box2D world.
      */
-    private float viewToWorld(double aValue)
-    {
-        return (float) (aValue / _pixelsToMeters);
-    }
+    private float viewToWorld(double aValue)  { return (float) (aValue / _pixelsToMeters); }
 
     /**
      * Convert View coord to Box2D world.
@@ -553,9 +536,9 @@ public class PuppetViewPhys {
      */
     private Vec2 viewToBoxLocal(double aX, double aY, View aView)
     {
-        float x = viewToWorld(aX - aView.getWidth() / 2);
-        float y = viewToWorld(aView.getHeight() / 2 - aY);
-        return new Vec2(x, y);
+        float jboxX = viewToWorld(aX - aView.getWidth() / 2);
+        float jboxY = viewToWorld(aView.getHeight() / 2 - aY);
+        return new Vec2(jboxX, jboxY);
     }
 
     /**
@@ -576,18 +559,8 @@ public class PuppetViewPhys {
     }
 
     /**
-     * Returns whether given points are equal
+     * Returns whether given coords or points are equal
      */
-    public static boolean equals(double x0, double y0, double x1, double y1)
-    {
-        return equals(x0, x1) && equals(y0, y1);
-    }
-
-    /**
-     * Returns whether given coords are equal
-     */
-    public static boolean equals(double a, double b)
-    {
-        return Math.abs(a - b) < 0.5;
-    }
+    private static boolean equals(double a, double b)  { return Math.abs(a - b) < 0.5; }
+    private static boolean equals(double x0, double y0, double x1, double y1)  { return equals(x0, x1) && equals(y0, y1); }
 }
