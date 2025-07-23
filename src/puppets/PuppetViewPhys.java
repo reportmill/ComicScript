@@ -16,37 +16,34 @@ import snap.view.EventListener;
 public class PuppetViewPhys {
 
     // The Snap View
-    PuppetView _pupView;
+    private PuppetView _pupView;
 
     // The Box2D World
-    World _world;
+    private World _world;
 
     // The ratio of screen points to Box2D world meters.
-    double _scale = 720 / 10d;
+    private double _pixelsToMeters = 720 / 10d;
 
     // Whether to freeze outer joints when moving a part
-    boolean _freezeOuterJoints = true;
+    protected boolean _freezeOuterJoints = true;
 
     // The Runner
-    Runnable _runner;
-
-    // Transforms
-    Transform _localToBox;
+    private Runnable _runner;
 
     // Listener to handle drags
-    EventListener _dragFilter = e -> handleDrag(e);
-
-    // Ground Body
-    Body _groundBody;
+    private EventListener _viewDraggingEventLsnr;
 
     // MouseJoint used for dragging
-    MouseJoint _dragJoint;
+    private MouseJoint _dragJoint;
+
+    // Static dummy body used by mouse joint for dragging
+    private Body _dragGroundBody;
 
     // List of MouseJoints used to move joints into poses
-    List<MouseJoint> _poseMouseJoints = new ArrayList<>();
+    private List<MouseJoint> _poseMouseJoints = new ArrayList<>();
 
     //
-    long _poseMouseTime;
+    private long _poseMouseTime;
 
     // Constants
     static int FRAME_DELAY_MILLIS = 20;
@@ -88,31 +85,6 @@ public class PuppetViewPhys {
             createJoint(v);
         for (View v : markers)
             createMarker(v);
-
-        // Add sidewalls
-        double vw = _pupView.getWidth();
-        double vh = _pupView.getHeight();
-        RectView r0 = new RectView(-1, -900, 1, vh + 900);
-        r0.getPhysics(true);  // Left
-        _groundBody = createJboxBodyForView(r0); //createBody(r1); createBody(r2);
-    }
-
-    /**
-     * Returns the scale of the world in screen points to Box2D world meters.
-     */
-    public double getScreenPointsToWorldMeters(double aScale)
-    {
-        return _scale;
-    }
-
-    /**
-     * Sets the scale of the world in screen points to Box2D world meters.
-     * <p>
-     * So if you want your 720 point tall window to be 10m, set scale to be 720/10d (the default).
-     */
-    public void setScreenPointsToWorldMeters(double aScale)
-    {
-        _scale = aScale;
     }
 
     /**
@@ -149,7 +121,7 @@ public class PuppetViewPhys {
 
         // Set timer to call timerFired 25 times a second
         if (_runner == null)
-            ViewEnv.getEnv().runIntervals(_runner = () -> timerFired(), FRAME_DELAY_MILLIS);
+            ViewEnv.getEnv().runIntervals(_runner = this::stepWorld, FRAME_DELAY_MILLIS);
         else {
             ViewEnv.getEnv().stopIntervals(_runner);
             _runner = null;
@@ -157,16 +129,15 @@ public class PuppetViewPhys {
     }
 
     /**
-     * Called when world timer fires.
+     * Called to process next world frame (usually by timer).
      */
-    void timerFired()
+    private void stepWorld()
     {
         // Update world
         _world.step(FRAME_DELAY_SECS, 20, 20);
 
-        // Update Dynamics
-        for (int i = 0, iMax = _pupView.getChildCount(); i < iMax; i++)
-            updateView(_pupView.getChild(i));
+        // Update world view children from jbox natives
+        _pupView.getChildren().forEach(this::updateViewFromJboxNative);
 
         // Clear PoseMouseJoints
         if (_poseMouseTime > 0 && System.currentTimeMillis() > _poseMouseTime + 800)
@@ -176,16 +147,14 @@ public class PuppetViewPhys {
     /**
      * Updates a view from a body.
      */
-    public void updateView(View aView)
+    private void updateViewFromJboxNative(View aView)
     {
         // Get ViewPhysics and body
-        ViewPhysics<Body> phys = aView.getPhysics();
-        if (phys == null) return;
-        Object ntv = phys.getNative();
+        ViewPhysics<?> phys = aView.getPhysics(); if (phys == null) return;
+        Object jboxNative = phys.getNative();
 
         // Handle Body
-        if (ntv instanceof Body) {
-            Body body = (Body) ntv;
+        if (jboxNative instanceof Body body) {
             if (!phys.isDynamic()) return;
 
             // Get/set position
@@ -198,18 +167,12 @@ public class PuppetViewPhys {
             aView.setRotate(-Math.toDegrees(angle));
         }
 
-        // Handle Joint
-        else if (ntv instanceof RevoluteJoint) {
-            RevoluteJoint joint = (RevoluteJoint) ntv;
-
-            // Get/set position
+        // Handle Joint: Get position from joint and set in view
+        else if (jboxNative instanceof RevoluteJoint joint) {
             Vec2 pos = new Vec2(0, 0);
             joint.getAnchorA(pos);
             Point posV = worldToView(pos.x, pos.y);
             aView.setXY(posV.x - aView.getWidth() / 2, posV.y - aView.getHeight() / 2);
-
-            // Get set rotation
-            //float angle = joint.getAngle(); aView.setRotate(-Math.toDegrees(angle));
         }
     }
 
@@ -389,7 +352,8 @@ public class PuppetViewPhys {
     {
         // Get shapes interesting joint view
         PuppetSchema pschema = getPuppet().getSchema();
-        String name = aView.getName(), linkNames[] = pschema.getLinkNamesForJoint(name);
+        String name = aView.getName();
+        String[] linkNames = pschema.getLinkNamesForJoint(name);
         if (linkNames.length < 1)
             return;
 
@@ -425,7 +389,7 @@ public class PuppetViewPhys {
     {
         // Get joint or marker link name(s)
         PuppetSchema pschema = getPuppet().getSchema();
-        String linkNames[] = pschema.getLinkNamesForJoint(aName);
+        String[] linkNames = pschema.getLinkNamesForJoint(aName);
         if (linkNames.length < 1) return;
 
         // Get Joint view
@@ -440,7 +404,7 @@ public class PuppetViewPhys {
 
         // Create MouseJoint and target X/Y
         MouseJointDef jdef = new MouseJointDef();
-        jdef.bodyA = _groundBody;
+        jdef.bodyA = getDragGroundBody();
         jdef.bodyB = body;
         jdef.collideConnected = true;
         jdef.maxForce = 1000f * body.getMass();
@@ -462,7 +426,7 @@ public class PuppetViewPhys {
 
         // Iterate over 40 frames to resolve pose
         for (int i = 0; i < 40 && _poseMouseTime != 0; i++) {
-            timerFired();
+            stepWorld();
             if (i > 20 && !isAwake())
                 break; //System.out.println("PupViewPhys: Not awake at frame " + i);
         }
@@ -477,7 +441,7 @@ public class PuppetViewPhys {
     void resolveMouseJointsOverTime()
     {
         if (isRunning() || _poseMouseTime == 0) return;
-        timerFired();
+        stepWorld();
         ViewUtils.runDelayed(() -> resolveMouseJointsOverTime(), FRAME_DELAY_MILLIS);
     }
 
@@ -496,13 +460,14 @@ public class PuppetViewPhys {
      */
     void addDragger(View aView)
     {
-        aView.addEventFilter(_dragFilter, View.MousePress, View.MouseDrag, View.MouseRelease);
+        if (_viewDraggingEventLsnr == null) _viewDraggingEventLsnr = this::handleViewMouseEventForDragging;
+        aView.addEventFilter(_viewDraggingEventLsnr, View.MousePress, View.MouseDrag, View.MouseRelease);
     }
 
     /**
      * Called when View gets drag event.
      */
-    void handleDrag(ViewEvent anEvent)
+    private void handleViewMouseEventForDragging(ViewEvent anEvent)
     {
         // Get View, ViewPhysics, Body and Event point in page view
         View view = anEvent.getView();
@@ -515,7 +480,7 @@ public class PuppetViewPhys {
         if (anEvent.isMousePress()) {
             setRunning(true);
             MouseJointDef jdef = new MouseJointDef();
-            jdef.bodyA = _groundBody;
+            jdef.bodyA = getDragGroundBody();
             jdef.bodyB = body;
             jdef.collideConnected = true;
             jdef.maxForce = 1000f * body.getMass();
@@ -566,33 +531,27 @@ public class PuppetViewPhys {
     }
 
     /**
-     * Return Vec2 for snap Point.
+     * Convert View coord to Box2D world.
      */
-    Vec2 getVec(Point aPnt)
+    private float viewToWorld(double aValue)
     {
-        return new Vec2((float) aPnt.x, (float) aPnt.y);
+        return (float) (aValue / _pixelsToMeters);
     }
 
     /**
      * Convert View coord to Box2D world.
      */
-    float viewToWorld(double aValue)
+    private Vec2 viewToWorld(double aX, double aY)
     {
-        return (float) (aValue / _scale);
-    }
-
-    /**
-     * Convert View coord to Box2D world.
-     */
-    Vec2 viewToWorld(double aX, double aY)
-    {
-        return getVec(getViewToWorld().transformXY(aX, aY));
+        double jboxX = aX / _pixelsToMeters;
+        double jboxY = -aY / _pixelsToMeters;
+        return new Vec2((float) jboxX, (float) jboxY);
     }
 
     /**
      * Returns a Vec2 in world coords for a point in View coords.
      */
-    Vec2 viewToBoxLocal(double aX, double aY, View aView)
+    private Vec2 viewToBoxLocal(double aX, double aY, View aView)
     {
         float x = viewToWorld(aX - aView.getWidth() / 2);
         float y = viewToWorld(aView.getHeight() / 2 - aY);
@@ -602,43 +561,18 @@ public class PuppetViewPhys {
     /**
      * Convert Box2D world coord to View.
      */
-    double worldToView(double aValue)
+    private Point worldToView(double aX, double aY)
     {
-        return aValue * _scale;
+        double viewX = aX * _pixelsToMeters;
+        double viewY = -aY * _pixelsToMeters;
+        return new Point(viewX, viewY);
     }
 
-    /**
-     * Convert Box2D world coord to View.
-     */
-    Point worldToView(double aX, double aY)
+    /** Returns the static dummy body used by mouse joint for dragging. */
+    private Body getDragGroundBody()
     {
-        return getWorldToView().transformXY(aX, aY);
-    }
-
-    /**
-     * Returns transform from View coords to Box coords.
-     */
-    public Transform getViewToWorld()
-    {
-        // If already set, just return
-        if (_localToBox != null) return _localToBox;
-
-        // Create transform from WorldView bounds to World bounds
-        Rect r0 = _pupView.getBoundsLocal();
-        Rect r1 = new Rect(0, 0, r0.width / _scale, -r0.height / _scale);
-        double bw = r0.width, bh = r0.height;
-        double sx = bw != 0 ? r1.width / bw : 0, sy = bh != 0 ? r1.height / bh : 0;
-        Transform trans = Transform.getScale(sx, sy);
-        trans.translate(r1.x - r0.x, r1.y - r0.y);
-        return trans;
-    }
-
-    /**
-     * Returns transform from Box coords to View coords.
-     */
-    public Transform getWorldToView()
-    {
-        return getViewToWorld().getInverse();
+        if (_dragGroundBody != null) return _dragGroundBody;
+        return _dragGroundBody = _world.createBody(new BodyDef());
     }
 
     /**
@@ -656,5 +590,4 @@ public class PuppetViewPhys {
     {
         return Math.abs(a - b) < 0.5;
     }
-
 }
