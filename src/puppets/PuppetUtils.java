@@ -234,12 +234,10 @@ public class PuppetUtils {
         {
             // Get file string as XMLElement
             WebURL url = WebURL.getUrl(_path);
-            String fileStr = url.getText();
-            if (fileStr == null) return new ArrayList();
-            XMLElement puppetsXML = XMLElement.readFromXMLSource(url);
+            XMLElement puppetsXML = XMLElement.readXmlFromUrl(url);
 
             // Iterate over actions
-            List<PuppetEntry> puppets = new ArrayList();
+            List<PuppetEntry> puppets = new ArrayList<>();
             for (XMLElement pupXML : puppetsXML.getElements()) {
                 PuppetEntry pe = new PuppetEntry().fromXML(null, pupXML);
                 puppets.add(pe);
@@ -429,9 +427,7 @@ public class PuppetUtils {
         {
             // Get file string as XMLElement
             WebURL url = WebURL.getUrl(_path);
-            String fileStr = url.getText();
-            if (fileStr == null) return new ArrayList<>();
-            XMLElement actionsXML = XMLElement.readFromXMLSource(url);
+            XMLElement actionsXML = XMLElement.readXmlFromUrl(url);
 
             // Iterate over actions
             List<PuppetAction> actions = new ArrayList<>();

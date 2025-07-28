@@ -25,7 +25,7 @@ public class ORAReader {
 
         WebURL url = WebURL.getUrl(_srcPath + "/stack.xml");
 
-        XMLElement imgXML = XMLElement.readFromXMLSource(url);
+        XMLElement imgXML = XMLElement.readXmlFromUrl(url);
         XMLElement stackXML = imgXML.getElement(0);
 
         Stack stack = readStack(stackXML);

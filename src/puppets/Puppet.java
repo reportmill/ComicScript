@@ -444,15 +444,8 @@ public class Puppet {
         // Get file string as XMLElement
         WebURL url = getSourceURL();
         if (url == null) {
-            System.err.println("Puppet.readSource: No source");
-            return;
-        }
-        String text = url.getText();
-        if (text == null) {
-            System.err.println("Puppet.readSource: No text at " + url);
-            return;
-        }
-        XMLElement puppetXML = XMLElement.readFromXMLSource(url);
+            System.err.println("Puppet.readSource: No source"); return; }
+        XMLElement puppetXML = XMLElement.readXmlFromUrl(url);
 
         // Read puppet
         fromXML(puppetXML);
