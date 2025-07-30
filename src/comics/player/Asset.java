@@ -336,7 +336,7 @@ public class Asset implements Loadable {
 
         // Scale image
         if (img.getImageSet() != null) img = img.getImageSet().getImageScaled(.5);
-        else img = img.cloneForScale(.5);
+        else img = img.copyForScale(.5);
 
         // Create sprite sheet image, get PNG bytes, set in file and save
         Image sheet = img.getImageSet() != null ? img.getImageSet().getSpriteSheetImage() : img;

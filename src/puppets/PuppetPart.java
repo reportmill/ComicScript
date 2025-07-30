@@ -332,7 +332,7 @@ public class PuppetPart implements Loadable {
         double piy = ih - (pbnds.getMaxY() - part.getY()) * isy;
         double piw = pbnds.width * isx;
         double pih = pbnds.height * isy;
-        Image img1 = img.cloneForCropRect(pix, piy, piw, pih);
+        Image img1 = img.copyForCropRect(pix, piy, piw, pih);
 
         // Create/add new parts
         PuppetPart np = new PuppetPart(aName2, img1, pbnds.x, pbnds.y, pbnds.width, pbnds.height);
