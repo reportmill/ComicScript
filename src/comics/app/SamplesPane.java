@@ -8,6 +8,7 @@ import snap.view.*;
 import snap.viewx.DialogBox;
 import snap.viewx.DialogSheet;
 import snap.web.WebURL;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * A class to show samples.
@@ -15,21 +16,25 @@ import snap.web.WebURL;
 public class SamplesPane extends ViewOwner {
 
     //
-    EditorPane _epane;
-    DialogSheet _dbox;
+    private EditorPane _epane;
+    private DialogSheet _dbox;
 
     // The selected index
-    int _selIndex;
+    private int _selIndex;
 
     // The effects
-    ShadowEffect _shadow, _selShadow;
+    private ShadowEffect _shadow, _selShadow;
+
+    // Constant for samples
+    private static final String SAMPLES_ROOT = "https://reportmill.com/jars/ccsamples/";
+    private static final Size SAMPLES_DOC_SIZE = new Size(144, 81);
 
     // Samples
-    static final String S1 = "Blank.txt";
-    static final String S2 = "Welcome.txt";
-    static final String S3 = "AllActions.txt";
-    static final String SALL[] = {S1, S2, S3};
-    static final Image DOC_IMAGES[] = new Image[SALL.length];
+    private static final String S1 = "Blank.txt";
+    private static final String S2 = "Welcome.txt";
+    private static final String S3 = "AllActions.txt";
+    private static final String[] SALL = {S1, S2, S3};
+    private static final Image[] DOC_IMAGES = new Image[SALL.length];
 
     /**
      * Shows the samples pane.
@@ -93,9 +98,9 @@ public class SamplesPane extends ViewOwner {
 
             // Create ImageViewX for sample
             ImageView iview = new ImageView();
-            iview.setPrefSize(getDocSize(i));
+            iview.setPrefSize(SAMPLES_DOC_SIZE);
             iview.setFill(Color.WHITE);
-            iview.setName("ImageView" + String.valueOf(i));
+            iview.setName("ImageView" + i);
             iview.setEffect(i == 0 ? _selShadow : _shadow);
 
             // Create label for sample
@@ -114,7 +119,7 @@ public class SamplesPane extends ViewOwner {
             ibox.setAlign(Pos.TOP_CENTER);
             ibox.setChildren(iview, label);
             ibox.setPadding(0, 0, 8, 0);
-            ibox.setName("ItemBox" + String.valueOf(i));
+            ibox.setName("ItemBox" + i);
             ibox.addEventHandler(e -> itemBoxWasPressed(ibox, e), MousePress);
             rowView.addChild(ibox);
         }
@@ -140,7 +145,7 @@ public class SamplesPane extends ViewOwner {
      */
     protected void initUI()
     {
-        loadImagesInBackground();
+        CompletableFuture.runAsync(this::loadImages);
     }
 
     /**
@@ -169,8 +174,7 @@ public class SamplesPane extends ViewOwner {
     static String getDoc(int anIndex)
     {
         String name = SALL[anIndex];
-        String urls = "https://reportmill.com/jars/ccsamples/" + name;
-        WebURL url = WebURL.getUrl(urls);
+        WebURL url = WebURL.createUrl(SAMPLES_ROOT + name);
         String str = url.getText();
         if (str == null) System.err.println("SamplesPane.getDoc: Couldn't load " + url);
         return str;
@@ -187,27 +191,10 @@ public class SamplesPane extends ViewOwner {
 
         // Get image name, URL string, URL and Image. Then make sure image is loaded by requesting Image.Native.
         String name = SALL[anIndex].replace(".txt", ".png");
-        String urls = "https://reportmill.com/jars/ccsamples/" + name;
-        WebURL imgURL = WebURL.getUrl(urls);
+        WebURL imgURL = WebURL.getUrl(SAMPLES_ROOT + name);
         img = DOC_IMAGES[anIndex] = Image.getImageForSource(imgURL);
         img.getNative();
         return img;
-    }
-
-    /**
-     * Returns size of doc at given index.
-     */
-    static Size getDocSize(int anIndex)
-    {
-        return new Size(144, 81);
-    }
-
-    /**
-     * Loads the thumbnail image for each sample in background thread.
-     */
-    void loadImagesInBackground()
-    {
-        new Thread(() -> loadImages()).start();
     }
 
     /**
@@ -228,7 +215,7 @@ public class SamplesPane extends ViewOwner {
      */
     void setImage(Image anImg, int anIndex)
     {
-        ImageView iview = getView("ImageView" + String.valueOf(anIndex), ImageView.class);
+        ImageView iview = getView("ImageView" + anIndex, ImageView.class);
         iview.setImage(anImg);
     }
 }
