@@ -61,7 +61,7 @@ public class PuppetPose implements Cloneable {
     public Point getMarkerPoint(String aName)
     {
         Point pnt = _markers.get(aName);
-        if (pnt == null && aName.equals(PuppetSchema.Anchor_Joint)) pnt = new Point();
+        if (pnt == null && aName.equals(PuppetSchema.Anchor_Joint)) pnt = Point.ZERO;
         return pnt;
     }
 
@@ -93,7 +93,7 @@ public class PuppetPose implements Cloneable {
         double dist = p0.getDistance(p1);
         double x2 = p0.x + Math.cos(anAng) * dist;
         double y2 = p0.y + Math.sin(anAng) * dist;
-        p1.setXY(x2, y2);
+        setMarkerPoint(aJName1, new Point(x2, y2));
     }
 
     /**
@@ -116,7 +116,7 @@ public class PuppetPose implements Cloneable {
         double ang = getAngle(p0, p1);
         double x2 = p0.x + Math.cos(ang) * aDist;
         double y2 = p0.y + Math.sin(ang) * aDist;
-        p1.setXY(x2, y2);
+        setMarkerPoint(aJName1, new Point(x2, y2));
     }
 
     /**
@@ -125,10 +125,9 @@ public class PuppetPose implements Cloneable {
     public void setAngleAndDistance(String aJName0, String aJName1, double anAng, double aDist)
     {
         Point p0 = getMarkerPoint(aJName0);
-        Point p1 = getMarkerPoint(aJName1);
         double x2 = p0.x + Math.cos(anAng) * aDist;
         double y2 = p0.y + Math.sin(anAng) * aDist;
-        p1.setXY(x2, y2);
+        setMarkerPoint(aJName1, new Point(x2, y2));
     }
 
     /**
@@ -169,7 +168,7 @@ public class PuppetPose implements Cloneable {
         Point p1 = aPose2.getMarkerPoint(aJointName);
         double x = p0.x + (p1.x - p0.x) * aRatio;
         double y = p0.y + (p1.y - p0.y) * aRatio;
-        p0.setXY(x, y);
+        setMarkerPoint(aJointName, new Point(x,y));
     }
 
     /**
@@ -198,8 +197,7 @@ public class PuppetPose implements Cloneable {
         Point p0b = getMarkerPoint(aJointName1);
         double x2 = p0b.x + Math.cos(ang2) * dist;
         double y2 = p0b.y + Math.sin(ang2) * dist;
-        Point p1b = getMarkerPoint(aJointName2);
-        p1b.setXY(x2, y2);
+        setMarkerPoint(aJointName2, new Point(x2, y2));
     }
 
     /**

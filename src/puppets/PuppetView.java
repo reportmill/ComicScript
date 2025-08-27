@@ -224,12 +224,11 @@ public class PuppetView extends ParentView {
 
         // Iterate over pose keys and add pose marker and x/y location to poseKeyPoints map
         Map<String, Point> poseKeyPoints = new LinkedHashMap<>();
-        for (String pkey : getSchema().getPoseKeys()) {
-            View pview = getChildForName(pkey);
-            Point pnt = pview.localToParent(pview.getWidth() / 2, pview.getHeight() / 2);
-            pnt.x = pnt.x - anchor.x;
-            pnt.y = anchor.y - pnt.y;
-            poseKeyPoints.put(pkey, pnt);
+        for (String poseKey : getSchema().getPoseKeys()) {
+            View poseView = getChildForName(poseKey);
+            Point pnt = poseView.localToParent(poseView.getWidth() / 2, poseView.getHeight() / 2);
+            Point pnt2 = new Point(pnt.x - anchor.x,anchor.y - pnt.y);
+            poseKeyPoints.put(poseKey, pnt2);
         }
 
         // Return map wrapped in map to get Pose { ... }

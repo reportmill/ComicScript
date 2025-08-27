@@ -32,7 +32,7 @@ public class Explode extends View {
     double _iw, _ih, _vw, _vh;
 
     // The array of fragments
-    Frag _frags[][];
+    Frag[][] _frags;
 
     // The random number generator
     static Random _rand = new Random();
@@ -71,11 +71,9 @@ public class Explode extends View {
     {
         // Get View x/y in parent
         ParentView par = _view.getParent();
-        Point pnt = new Point(0, 0);
-        for (View v = _view; v != par; v = v.getParent()) {
-            pnt.x += v.getX();
-            pnt.y += v.getY();
-        }
+        Point pnt = Point.ZERO;
+        for (View v = _view; v != par; v = v.getParent())
+            pnt = pnt.addXY(v.getX(), v.getY());
 
         // Create image if needed
         if (_img == null)
