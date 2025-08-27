@@ -1,7 +1,5 @@
 package puppets;
-
 import java.util.*;
-
 import snap.geom.Point;
 import snap.util.*;
 
@@ -11,30 +9,21 @@ import snap.util.*;
 public class PuppetPose implements Cloneable {
 
     // The pose name
-    String _name;
+    private String _name;
 
     // The pose marker maps
-    Map<String, Point> _markers;
+    private Map<String, Point> _markers;
 
     /**
-     * Creates a new pose for name.
+     * Constructor.
      */
     public PuppetPose()
     {
-        _markers = new LinkedHashMap();
+        _markers = new LinkedHashMap<>();
     }
 
     /**
-     * Creates a new pose for name.
-     */
-    public PuppetPose(String aName)
-    {
-        _name = aName;
-        _markers = new LinkedHashMap();
-    }
-
-    /**
-     * Creates a new pose for name and map or markers.
+     * Constructor for name and map or markers.
      */
     public PuppetPose(String aName, Map<String, Point> aMap)
     {
@@ -219,14 +208,9 @@ public class PuppetPose implements Cloneable {
     public PuppetPose clone()
     {
         PuppetPose clone = null;
-        try {
-            clone = (PuppetPose) super.clone();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        clone._markers = new LinkedHashMap(_markers.size());
-        for (String name : _markers.keySet())
-            clone._markers.put(name, _markers.get(name).clone());
+        try { clone = (PuppetPose) super.clone(); }
+        catch (Exception e) { throw new RuntimeException(e); }
+        clone._markers = new LinkedHashMap<>(_markers);
         return clone;
     }
 
@@ -325,15 +309,15 @@ public class PuppetPose implements Cloneable {
         setName(name);
 
         // Iterate over markers and set
-        Map<String, Point> markers = new LinkedHashMap();
         for (XMLAttribute attr : anElement.getAttributes()) {
             String key = attr.getName(), valStr = attr.getValue();
             if (key.equals("Name")) continue;
             if (key.endsWith("Marker")) key = key.replace("Marker", "Joint"); // This can go soon
             else if (!key.endsWith("Joint")) key += "Joint";
             key = key.intern();
-            String valStrs[] = valStr.split("\\s");
-            Double val0 = Double.valueOf(valStrs[0]), val1 = Double.valueOf(valStrs[1]);
+            String[] valStrs = valStr.split("\\s");
+            double val0 = Double.parseDouble(valStrs[0]);
+            double val1 = Double.parseDouble(valStrs[1]);
             Point pnt = new Point(val0, val1);
             _markers.put(key, pnt);
         }
@@ -347,7 +331,7 @@ public class PuppetPose implements Cloneable {
      */
     public String getAsString()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (String key : _markers.keySet()) {
             Point pnt = getMarkerPoint(key);
             String x = StringUtils.formatNum("#.#", pnt.x), y = StringUtils.formatNum("#.#", pnt.y);
@@ -372,5 +356,4 @@ public class PuppetPose implements Cloneable {
     {
         return Math.atan2(y1 - y0, x1 - x0);
     }
-
 }
