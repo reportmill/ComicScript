@@ -569,7 +569,7 @@ public class PlayerView extends ScaleBox {
         _introView.setManaged(false);
         _introView.setLean(Pos.TOP_CENTER);
         _introView.setChildren(introImgView);//, realImgView);
-        _introView.setSize(_introView.getPrefSize());
+        _introView.setPrefSize(_introView.getPrefSize());
         addChild(_introView);
 
         // Configure/start anim

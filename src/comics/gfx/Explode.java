@@ -94,6 +94,7 @@ public class Explode extends View {
         // Configure this view and add to parent
         setManaged(false);
         setSize(par.getWidth(), par.getHeight());
+        setPrefSize(par.getWidth(), par.getHeight());
         ViewUtils.addChild(par, this);
 
         // Start animation with hooks to call animFrame and animFinish

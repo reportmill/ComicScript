@@ -35,7 +35,7 @@ public class PlayBar extends RowView {
     public PlayBar(PlayerView aPV)
     {
         _player = aPV;
-        setHeight(46);
+        setPrefHeight(46);
         setManaged(false);
         setLean(Pos.BOTTOM_LEFT);
         setGrowWidth(true);
@@ -291,7 +291,7 @@ public class PlayBar extends RowView {
         public PlayButtonBig(boolean isPlaying)
         {
             _playing = isPlaying;
-            setSize(100, 100);
+            setPrefSize(100, 100);
             setName("PlayButtonBig");
             setManaged(false);
             setLean(Pos.CENTER);

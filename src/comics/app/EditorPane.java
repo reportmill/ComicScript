@@ -33,9 +33,6 @@ public class EditorPane extends ViewOwner {
     // TransitionPane
     TransitionPane _transPane;
 
-    // PropChangeListener to update when player updates
-    PropChangeListener _pcLsnr = pc -> playerRunLineChanged();
-
     // Indicates to EditorPane whether Player RunLine Change originated from editor
     boolean _changingSelIndex;
 
@@ -316,7 +313,7 @@ public class EditorPane extends ViewOwner {
         closeBtn.setLean(Pos.TOP_RIGHT);
         closeBtn.setPadding(2, 2, 0, 0);
         closeBtn.setManaged(false);
-        closeBtn.setSize(20 + 2, 20 + 2);
+        closeBtn.setPrefSize(20 + 2, 20 + 2);
         closeBtn.addEventHandler(e -> _playerPane.setEditing(false), MouseRelease);
         _playerPane.getPlayerBox().addChild(closeBtn);
 
