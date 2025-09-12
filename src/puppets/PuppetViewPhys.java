@@ -68,7 +68,7 @@ public class PuppetViewPhys {
         List<View> joints = new ArrayList<>();
         List<View> markers = new ArrayList<>();
         for (View child : _puppetView.getChildren()) {
-            ViewPhysics<?> phys = child.getPhysics(true);
+            ViewPhysics phys = child.getPhysics(true);
             if (phys.isJoint())
                 joints.add(child);
             else if (pschema.isMarkerName(child.getName()))
@@ -136,7 +136,7 @@ public class PuppetViewPhys {
     private void updateViewFromJboxNative(View aView)
     {
         // Get ViewPhysics and body
-        ViewPhysics<?> phys = aView.getPhysics(); if (phys == null) return;
+        ViewPhysics phys = aView.getPhysics(); if (phys == null) return;
         Object jboxNative = phys.getNative();
 
         // Handle Body
@@ -176,12 +176,12 @@ public class PuppetViewPhys {
     private boolean isAwake(View aView)
     {
         // Get ViewPhysics (just return if null or not dynamic)
-        ViewPhysics<Body> phys = aView.getPhysics();
+        ViewPhysics phys = aView.getPhysics();
         if (phys == null || !phys.isDynamic())
             return false;
 
         // Get body and return whether awake
-        Body nativeBody = phys.getNative();
+        Body nativeBody = (Body) phys.getNative();
         return nativeBody != null && nativeBody.isAwake();
     }
 
@@ -191,7 +191,7 @@ public class PuppetViewPhys {
     public Body createJboxBodyForView(View aView)
     {
         // Create BodyDef
-        ViewPhysics<Body> phys = aView.getPhysics();
+        ViewPhysics phys = aView.getPhysics();
         BodyDef bdef = new BodyDef();
         bdef.type = phys.isDynamic() ? BodyType.DYNAMIC : BodyType.KINEMATIC;
         bdef.position.set(viewToWorld(aView.getMidX(), aView.getMidY()));
@@ -452,8 +452,8 @@ public class PuppetViewPhys {
     {
         // Get View, ViewPhysics, Body and Event point in page view
         View view = anEvent.getView();
-        ViewPhysics<Body> phys = view.getPhysics();
-        Body body = phys.getNative();
+        ViewPhysics phys = view.getPhysics();
+        Body body = (Body) phys.getNative();
         Point pnt = anEvent.getPoint(view.getParent());
         anEvent.consume();
 
@@ -501,7 +501,7 @@ public class PuppetViewPhys {
         // Iterate over joint names and set limit enabled/disabled
         while (jnameNext != null) {
             View view = getViewForName(jname);
-            ViewPhysics<Joint> phys = view.getPhysics();
+            ViewPhysics phys = view.getPhysics();
             RevoluteJoint joint = (RevoluteJoint) phys.getNative();
             joint.enableLimit(isEnabled);
             if (isEnabled) joint.setLimits(joint.getJointAngle(), joint.getJointAngle());
