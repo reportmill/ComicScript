@@ -1,11 +1,10 @@
 package puppets;
-
 import snap.geom.Rect;
 import snap.gfx.*;
 import snap.util.*;
 import snap.web.WebURL;
-
-import java.util.Objects;
+import java.nio.file.Files;
+import java.util.Arrays;
 
 /**
  * A class to represent a part of a puppet.
@@ -31,22 +30,14 @@ public class PuppetPart implements Loadable {
     PuppetPart _motherPart;
 
     /**
-     * Creates a PuppetPart.
+     * Constructor.
      */
     public PuppetPart()
     {
     }
 
     /**
-     * Creates a PuppetPart.
-     */
-    public PuppetPart(String aName, Image anImage, double aX, double aY)
-    {
-        this(aName, anImage, aX, aY, 0, 0);
-    }
-
-    /**
-     * Creates a PuppetPart.
+     * Constructor.
      */
     public PuppetPart(String aName, Image anImage, double aX, double aY, double aW, double aH)
     {
@@ -207,10 +198,12 @@ public class PuppetPart implements Loadable {
     {
         Image img = getImage();
         WebURL url = getImageURL();
-        byte ibytes[] = img.getBytesPNG();
-        byte ibytesOld[] = url.getBytes();
-        if (!Objects.equals(ibytes, ibytesOld))
-            SnapUtils.writeBytes(ibytes, url.getJavaFile());
+        byte[] ibytes = img.getBytesPNG();
+        byte[] ibytesOld = url.getBytes();
+        if (!Arrays.equals(ibytes, ibytesOld)) {
+            try { Files.write(url.getJavaFile().toPath(), ibytes); }
+            catch (Exception e) { throw new RuntimeException(e); }
+        }
     }
 
     /**

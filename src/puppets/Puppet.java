@@ -1,4 +1,5 @@
 package puppets;
+import java.nio.file.Files;
 import java.util.*;
 import snap.geom.Point;
 import snap.geom.Rect;
@@ -474,7 +475,8 @@ public class Puppet {
         // Create element for puppet, get as bytes and write to file
         XMLElement puppetXML = toXML(null);
         byte[] bytes = puppetXML.getBytes();
-        SnapUtils.writeBytes(bytes, url.getJavaFile());
+        try { Files.write(url.getJavaFile().toPath(), bytes); }
+        catch (Exception e) { throw new RuntimeException(e); }
 
         // Write images
         PuppetPart[] motherParts = getMotherParts();
