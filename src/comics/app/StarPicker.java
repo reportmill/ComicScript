@@ -386,12 +386,6 @@ public class StarPicker extends ViewOwner {
             String name = FilePathUtils.getFilenameSimple(anItem);
             return StringUtils.firstCharUpperCase(name);
         }
-
-        // Return child file icon
-        public Image getImage(String anItem)
-        {
-            return null;
-        }
     }
 
 }
