@@ -7,6 +7,7 @@ import java.util.*;
 import snap.geom.Rect;
 import snap.gfx.*;
 import snap.props.PropChangeListener;
+import snap.text.TextSel;
 import snap.util.*;
 import snap.view.*;
 
@@ -273,7 +274,7 @@ public class ScriptView extends ColView {
 
                 // If hit a word, select that word
                 if (isSel && hitText(anEvent)) {
-                    int cind = _stringView.getCharIndexForX(anEvent.getX() - _stringView.getX());
+                    int cind = _textArea.getLine(0).getCharIndexForX(anEvent.getX() - _textArea.getX());
                     _selCharIndex = cind;
                     _selRect = getFragRectForCharIndex(cind);
                 } else {
@@ -288,7 +289,7 @@ public class ScriptView extends ColView {
                 _mouseRect = null;
                 if (getSelView() != this) return;
                 if (hitText(anEvent)) {
-                    int cind = _stringView.getCharIndexForX(anEvent.getX() - _stringView.getX());
+                    int cind = _textArea.getLine(0).getCharIndexForX(anEvent.getX() - _textArea.getX());
                     _mouseRect = getFragRectForCharIndex(cind);
                 } else _mouseRect = null;
                 repaint();
@@ -306,8 +307,8 @@ public class ScriptView extends ColView {
          */
         boolean hitText(ViewEvent anEvent)
         {
-            Rect sbnds = _stringView.getTextBounds();
-            return sbnds.contains(anEvent.getX() - _stringView.getX(), anEvent.getY() - _stringView.getX());
+            Rect sbnds = getTextBounds();
+            return sbnds.contains(anEvent.getX() - _textArea.getX(), anEvent.getY() - _textArea.getX());
         }
 
         /**
@@ -317,8 +318,8 @@ public class ScriptView extends ColView {
         {
             Range range = HelpUtils.getFragRangeAtCharIndex(_line, anIndex);
             if (range.start < 0) return null;
-            Rect rect = _stringView.getTextBounds(range.start, range.end);
-            rect.offset(_stringView.getX(), _stringView.getY());
+            Rect rect = new TextSel(_textArea.getTextModel(), range.start, range.end).getPath().getBounds();
+            rect.offset(_textArea.getX(), _textArea.getY());
             rect.inset(-1);
             rect.width--;
             return rect;
