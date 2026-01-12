@@ -1,7 +1,6 @@
 package comics.player;
 
 import comics.app.EditorPane;
-import snap.geom.Insets;
 import snap.geom.Pos;
 import snap.view.*;
 
@@ -14,7 +13,7 @@ public class PlayerPane extends ViewOwner {
     PlayerView _player;
 
     // The View that holds the PlayerView
-    PlayerBox _playerBox;
+    BoxView _playerBox;
 
     // Whether PlayerPane is showing editing UI
     boolean _editing;
@@ -48,10 +47,7 @@ public class PlayerPane extends ViewOwner {
     /**
      * Returns the view that holds the player.
      */
-    public PlayerBox getPlayerBox()
-    {
-        return _playerBox;
-    }
+    public BoxView getPlayerBox()  { return _playerBox; }
 
     /**
      * Returns whether to show editor.
@@ -89,10 +85,10 @@ public class PlayerPane extends ViewOwner {
         _player = new PlayerView();
 
         // Create PlayerBox to hold Player
-        _playerBox = new PlayerBox();
+        _playerBox = new BoxView();
         _playerBox.setGrowHeight(true);
         _playerBox.setAlign(Pos.CENTER);
-        _playerBox.addChild(_player);
+        _playerBox.setContent(_player);
         return _playerBox;
     }
 
@@ -125,58 +121,4 @@ public class PlayerPane extends ViewOwner {
                 "Man waves\n" +
                 "Lady dances\n" + "Man explodes\n";
     }
-
-    /**
-     * A class to layout PlayerView.
-     */
-    public class PlayerBox extends ChildView {
-
-        /**
-         * Override.
-         */
-        protected double getPrefWidthImpl(double aH)
-        {
-            return BoxView.getPrefWidth(this, _player, aH);
-        }
-
-        /**
-         * Override.
-         */
-        protected double getPrefHeightImpl(double aW)
-        {
-            return BoxView.getPrefHeight(this, _player, aW);
-        }
-
-        /**
-         * Override.
-         */
-        protected void layoutImpl()
-        {
-            // Get parent bounds for insets (just return if empty)
-            Insets ins = getInsetsAll();
-            double px = ins.left, py = ins.top;
-            double pw = getWidth() - px - ins.right;
-            if (pw < 0) pw = 0;
-            if (pw <= 0) return;
-            double ph = getHeight() - py - ins.bottom;
-            if (ph < 0) ph = 0;
-            if (ph <= 0) return;
-
-            // Get player pref sizes
-            double cw = _player.getPrefWidth();
-            double ch = _player.getPrefHeight();
-
-            // If player size doesn't fit in available space, shrink to fit keeping aspect
-            if (cw > pw || ch > ph) {
-                double scale = Math.min(pw / cw, ph / ch);
-                cw = Math.round(cw * scale);
-                ch = Math.round(ch * scale);
-            }
-
-            // Position player in center with given sizes
-            double dx = Math.round((pw - cw) / 2), dy = Math.round((ph - ch) / 2);
-            _player.setBounds(px + dx, py + dy, cw, ch);
-        }
-    }
-
 }

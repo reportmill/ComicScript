@@ -98,7 +98,7 @@ public class EditorPane extends ViewOwner {
     {
         _playerPane.getWindow().setContent(_playerPane.getUI());
         _playerPane.getPlayerBox().setPadding(0, 0, 0, 0);
-        _playerPane.getPlayerBox().removeChild(_playerPane.getView("CloseButton"));
+        ViewUtils.removeChild(_playerPane.getPlayerBox(), _playerPane.getView("CloseButton"));
         _player.setEffect(null);
         _player.removePropChangeListener(_playerLsnr, PlayerView.Script_Prop);
         _playerPane.getWindow().setMaximized(false);
@@ -315,7 +315,7 @@ public class EditorPane extends ViewOwner {
         closeBtn.setManaged(false);
         closeBtn.setPrefSize(20 + 2, 20 + 2);
         closeBtn.addEventHandler(e -> _playerPane.setEditing(false), MouseRelease);
-        _playerPane.getPlayerBox().addChild(closeBtn);
+        ViewUtils.addChild(_playerPane.getPlayerBox(), closeBtn);
 
         // Create MainColView to hold Player and Editor
         ColView colView = new ColView();
