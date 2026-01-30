@@ -120,19 +120,19 @@ public class CameraView extends ScaleBox implements Star {
     /**
      * Copied from ScaleBox.
      */
-    protected double getPrefWidthImpl(double aH)
+    protected double computePrefWidth(double aH)
     {
         if (aH >= 0 && (isFillHeight() || aH < getPrefHeight(-1))) return aH * getAspect();
-        return super.getPrefWidthImpl(aH);
+        return super.computePrefWidth(aH);
     }
 
     /**
      * Copied from ScaleBox.
      */
-    protected double getPrefHeightImpl(double aW)
+    protected double computePrefHeight(double aW)
     {
         if (aW >= 0 && (isFillWidth() || aW < getPrefWidth(-1))) return aW / getAspect();
-        return super.getPrefHeightImpl(aW);
+        return super.computePrefHeight(aW);
     }
 
     /**

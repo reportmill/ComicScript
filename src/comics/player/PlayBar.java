@@ -190,7 +190,7 @@ public class PlayBar extends RowView {
     /**
      * Override to size to stage width.
      */
-    protected double getPrefWidthImpl(double aH)
+    protected double computePrefWidth(double aH)
     {
         return _player.getStage().getPrefWidth(aH) - 60;
     }

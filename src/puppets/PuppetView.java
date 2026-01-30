@@ -161,7 +161,7 @@ public class PuppetView extends ParentView {
     /**
      * Calculates the preferred width.
      */
-    protected double getPrefWidthImpl(double aH)
+    protected double computePrefWidth(double aH)
     {
         Insets ins = getInsetsAll();
         Rect bnds = getPuppet().getBounds();
@@ -171,7 +171,7 @@ public class PuppetView extends ParentView {
     /**
      * Calculates the preferred height.
      */
-    protected double getPrefHeightImpl(double aW)
+    protected double computePrefHeight(double aW)
     {
         Insets ins = getInsetsAll();
         Rect bnds = getPuppet().getBounds();
