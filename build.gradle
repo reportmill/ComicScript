@@ -20,7 +20,7 @@ dependencies {
 
     implementation project(':SnapKit')
 
-    implementation group: 'org.jbox2d', name: 'jbox2d-library', version: '2.2.1.1'
+    implementation 'org.jbox2d:jbox2d-library:2.2.1.1'
 }
 
 application {
