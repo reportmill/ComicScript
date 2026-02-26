@@ -1,6 +1,6 @@
 
 plugins {
-    id 'java'
+    //id 'java'
     id 'application'
 }
 
@@ -13,9 +13,7 @@ java {
 }
 
 repositories {
-
-    // Use jcenter for resolving dependencies like jbox2d
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -25,4 +23,6 @@ dependencies {
     implementation group: 'org.jbox2d', name: 'jbox2d-library', version: '2.2.1.1'
 }
 
-mainClassName = 'comics.app.App' // 'puppets.app.App'
+application {
+    mainClass = 'comics.app.App' // 'puppets.app.App'
+}
