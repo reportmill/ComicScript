@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * A class to show samples.
  */
-public class SamplesPane extends ViewOwner {
+public class SamplesPane extends ViewController {
 
     //
     private EditorPane _epane;

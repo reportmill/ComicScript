@@ -8,7 +8,7 @@ import snap.viewx.TransitionPane;
 /**
  * A class to manage UI editing of a ScriptLine.
  */
-public class LineEditor extends ViewOwner {
+public class LineEditor extends ViewController {
 
     // The EditorPane
     EditorPane _editorPane;

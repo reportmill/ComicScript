@@ -7,7 +7,7 @@ import snap.viewx.DialogBox;
 /**
  * A class to manage UI to create and edit puppet animations.
  */
-public class ActionPane extends ViewOwner {
+public class ActionPane extends ViewController {
 
     // The AppPane
     private PuppetsPane _puppetsPane;

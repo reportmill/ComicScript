@@ -7,7 +7,7 @@ import snap.view.*;
 /**
  * A class to provide UI editing for Actions.
  */
-public class ActionEditor extends ViewOwner {
+public class ActionEditor extends ViewController {
 
     // The LineEditor
     LineEditor _lineEditor;

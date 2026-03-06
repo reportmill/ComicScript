@@ -8,7 +8,7 @@ import snap.viewx.DialogBox;
 /**
  * A class to manage editing of Puppet.
  */
-public class EditorPane extends ViewOwner {
+public class EditorPane extends ViewController {
 
     // The Puppet
     private Puppet _puppet;

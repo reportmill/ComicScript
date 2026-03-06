@@ -13,7 +13,7 @@ import snap.view.*;
 /**
  * A class to provide UI for selecting the Star of a ScriptLine.
  */
-public class StarPicker extends ViewOwner {
+public class StarPicker extends ViewController {
 
     // The LineEditor
     LineEditor _lineEditor;

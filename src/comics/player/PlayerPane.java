@@ -7,7 +7,7 @@ import snap.view.*;
 /**
  * A class to show a PlayerView and allow editing.
  */
-public class PlayerPane extends ViewOwner {
+public class PlayerPane extends ViewController {
 
     // The PlayerView
     PlayerView _player;

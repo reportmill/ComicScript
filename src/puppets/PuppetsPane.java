@@ -5,7 +5,7 @@ import snap.view.*;
 /**
  * The top level document UI management class for displaying and editing puppets and actions.
  */
-public class PuppetsPane extends ViewOwner {
+public class PuppetsPane extends ViewController {
 
     // The view that holds the document
     private BoxView _docBox;

@@ -8,7 +8,7 @@ import snap.view.*;
 /**
  * A class to manage UI editing of Script.
  */
-public class ScriptEditor extends ViewOwner {
+public class ScriptEditor extends ViewController {
 
     // The EditorPane
     EditorPane _editorPane;

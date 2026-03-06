@@ -13,7 +13,7 @@ import snap.viewx.TransitionPane;
 /**
  * A class to manage UI for editing scripts.
  */
-public class EditorPane extends ViewOwner {
+public class EditorPane extends ViewController {
 
     // The PlayerPane
     PlayerPane _playerPane;

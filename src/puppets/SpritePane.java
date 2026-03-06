@@ -8,7 +8,7 @@ import snap.gfx.*;
 /**
  * A class to manage UI to generate sprites for puppets.
  */
-public class SpritePane extends ViewOwner {
+public class SpritePane extends ViewController {
 
     // The AppPane
     private PuppetsPane _puppetsPane;
