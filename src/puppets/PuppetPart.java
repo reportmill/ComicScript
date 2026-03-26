@@ -404,10 +404,10 @@ public class PuppetPart implements Loadable {
         e.add("Name", getName());
 
         // Write bounds
-        e.add("X", StringUtils.formatNum("#.##", _x));
-        e.add("Y", StringUtils.formatNum("#.##", _y));
-        e.add("Width", StringUtils.formatNum("#.##", _w));
-        e.add("Height", StringUtils.formatNum("#.##", _h));
+        e.add("X", FormatUtils.formatNum("#.##", _x));
+        e.add("Y", FormatUtils.formatNum("#.##", _y));
+        e.add("Width", FormatUtils.formatNum("#.##", _w));
+        e.add("Height", FormatUtils.formatNum("#.##", _h));
 
         // Write ImageName
         String iname = getImageName();

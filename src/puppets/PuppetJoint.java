@@ -135,8 +135,8 @@ public class PuppetJoint {
         e.add("Name", getName());
 
         // Write bounds
-        e.add("X", StringUtils.formatNum("#.##", getX()));
-        e.add("Y", StringUtils.formatNum("#.##", getY()));
+        e.add("X", FormatUtils.formatNum("#.##", getX()));
+        e.add("Y", FormatUtils.formatNum("#.##", getY()));
 
         // Return element
         return e;

@@ -205,7 +205,7 @@ public class PuppetPose implements Cloneable {
      */
     public PuppetPose clone()
     {
-        PuppetPose clone = null;
+        PuppetPose clone;
         try { clone = (PuppetPose) super.clone(); }
         catch (Exception e) { throw new RuntimeException(e); }
         clone._markers = new LinkedHashMap<>(_markers);
@@ -288,7 +288,7 @@ public class PuppetPose implements Cloneable {
         // Iterate over markers and set
         for (String key : getMarkers().keySet()) {
             Point pnt = getMarkerPoint(key);
-            String val = StringUtils.formatNum("#.##", pnt.x) + ' ' + StringUtils.formatNum("#.##", pnt.y);
+            String val = FormatUtils.formatNum("#.##", pnt.x) + ' ' + FormatUtils.formatNum("#.##", pnt.y);
             key = key.substring(0, key.length() - "Joint".length());
             e.add(key, val);
         }
@@ -332,7 +332,8 @@ public class PuppetPose implements Cloneable {
         StringBuilder sb = new StringBuilder();
         for (String key : _markers.keySet()) {
             Point pnt = getMarkerPoint(key);
-            String x = StringUtils.formatNum("#.#", pnt.x), y = StringUtils.formatNum("#.#", pnt.y);
+            String x = FormatUtils.formatNum("#.#", pnt.x);
+            String y = FormatUtils.formatNum("#.#", pnt.y);
             String str = String.format("%s: [ %s %s ],\n", key, x, y);
             sb.append(str);
         }
