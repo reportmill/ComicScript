@@ -221,10 +221,13 @@ public class Asset implements Loadable {
          */
         public Image getImageImpl()
         {
-            Image img = super.getImageImpl(), img0 = img;
-            if (img.isLoaded()) img = img.getSpriteSheetFrames(_frameCount);
-            else img.addLoadListener(() -> _img = img0.getSpriteSheetFrames(_frameCount));
-            return img;
+            // Get normal image
+            Image img = super.getImageImpl();
+
+            // Get frame images, create image set, and return first image
+            List<Image> frameImages = ImageUtils.getFrameImagesForSpriteStripImageAndFrameCount(img, _frameCount);
+            ImageSet imageSet = new ImageSet(frameImages);
+            return imageSet.getImage(0);
         }
     }
 
