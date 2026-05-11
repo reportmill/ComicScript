@@ -1,7 +1,6 @@
 package puppets;
 import java.util.*;
 import snap.geom.Insets;
-import snap.geom.Transform;
 import snap.gfx.*;
 import snap.view.*;
 
@@ -110,56 +109,8 @@ public class PuppetImager {
         }
 
         // Create ImageSet and set image loaded
-        ImageSet imgSet = new ImageSet(_images);
+        new ImageSet(_images);
         _image.setLoaded(true);
-    }
-
-    /**
-     * Returns the flipped image.
-     */
-    public static Image getImageFlipped(Image anImage)
-    {
-        int imageW = (int) Math.round(anImage.getWidth());
-        int imageH = (int) Math.round(anImage.getHeight());
-        Image img = Image.getImageForSize(imageW, imageH, anImage.hasAlpha());
-        Painter pntr = img.getPainter();
-        Transform xfm = new Transform(imageW / 2, imageH / 2);
-        xfm.scale(-1, 1);
-        xfm.translate(-imageW / 2, -imageH / 2);
-        pntr.transform(xfm);
-        pntr.drawImage(anImage, 0, 0);
-        return img;
-    }
-
-    /**
-     * Returns the flipped image.
-     */
-    public static Image getImagesFlipped(Image anImage)
-    {
-        // Get image set (if null, just return flipped image)
-        ImageSet imageSet = anImage.getImageSet();
-        if (imageSet == null)
-            return getImageFlipped(anImage);
-
-        int count = imageSet.getCount();
-        List<Image> imgs2 = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) {
-            Image img = imageSet.getImage(i);
-            imgs2.add(getImageFlipped(img));
-        }
-        ImageSet iset2 = new ImageSet(imgs2);
-        return iset2.getImage(0);
-    }
-
-    /**
-     * Returns an image for a View (1 = 72 dpi, 2 = 144 dpi, 0 = device dpi).
-     */
-    private static Image getImage(View aView)
-    {
-        Image img = Image.getImageForSizeAndDpiScale(aView.getWidth(), aView.getHeight(), true, 0);
-        Painter pntr = img.getPainter();
-        ViewUtils.paintView(aView, pntr);
-        return img;
     }
 
     /**
@@ -195,11 +146,10 @@ public class PuppetImager {
     /**
      * Removes a puppet imager.
      */
-    private static synchronized PuppetImager removeImager()
+    private static synchronized void removeImager()
     {
-        if (_imagers.isEmpty()) return null;
-        PuppetImager pi = _imagers.remove(0);
-        return pi;
+        if (_imagers.isEmpty()) return;
+        _imagers.remove(0);
     }
 
     /**

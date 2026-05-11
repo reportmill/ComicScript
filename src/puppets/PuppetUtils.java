@@ -55,37 +55,17 @@ public class PuppetUtils {
     /**
      * Returns the flipped image.
      */
-    public static Image getImageFlipped(Image anImage)
-    {
-        int w = (int) Math.round(anImage.getWidth()), h = (int) Math.round(anImage.getHeight());
-        Image img = Image.getImageForSize(w, h, anImage.hasAlpha());
-        Painter pntr = img.getPainter();
-        Transform xfm = new Transform(w / 2, h / 2);
-        xfm.scale(-1, 1);
-        xfm.translate(-w / 2, -h / 2);
-        pntr.transform(xfm);
-        pntr.drawImage(anImage, 0, 0);
-        return img;
-    }
-
-    /**
-     * Returns the flipped image.
-     */
     public static Image getImagesFlipped(Image anImage)
     {
         // Get image set (if null, just return flipped image)
-        ImageSet iset = anImage.getImageSet();
-        if (iset == null)
-            return getImageFlipped(anImage);
+        ImageSet imageSet = anImage.getImageSet();
+        if (imageSet == null)
+            return anImage.copyFlippedX();
 
-        int count = iset.getCount();
-        List<Image> imgs2 = new ArrayList(count);
-        for (int i = 0; i < count; i++) {
-            Image img = iset.getImage(i);
-            imgs2.add(getImageFlipped(img));
-        }
-        ImageSet iset2 = new ImageSet(imgs2);
-        return iset2.getImage(0);
+        List<Image> imageSetImages = imageSet.getImages();
+        List<Image> flippedImages = imageSetImages.stream().map(Image::copyFlippedX).toList();
+        ImageSet flippedImageSet = new ImageSet(flippedImages);
+        return flippedImageSet.getImage(0);
     }
 
     /**

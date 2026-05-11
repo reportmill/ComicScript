@@ -1,7 +1,5 @@
 package puppets;
 import java.util.*;
-
-import snap.geom.Transform;
 import snap.view.*;
 import snap.gfx.*;
 
@@ -91,7 +89,7 @@ public class SpritePane extends ViewController {
         PuppetAction action = _actionList.getSelItem();
         Image img = getImage(puppet, action);
         if (_flipImage)
-            img = getImagesFlipped(img);
+            img = PuppetUtils.getImagesFlipped(img);
 
         // Create/set new ImageView
         _imgView = new ImageView(img);
@@ -159,38 +157,5 @@ public class SpritePane extends ViewController {
 
         ImageSet imgSet = new ImageSet(images);
         return imgSet.getImage(0);
-    }
-
-    /**
-     * Returns the flipped image.
-     */
-    public Image getImageFlipped(Image anImage)
-    {
-        int imageW = (int) Math.round(anImage.getWidth());
-        int imageH = (int) Math.round(anImage.getHeight());
-        Image flippedImage = Image.getImageForSize(imageW, imageH, anImage.hasAlpha());
-        Painter pntr = flippedImage.getPainter();
-        Transform xfm = new Transform(imageW / 2, imageH / 2);
-        xfm.scale(-1, 1);
-        xfm.translate(-imageW / 2, -imageH / 2);
-        pntr.transform(xfm);
-        pntr.drawImage(anImage, 0, 0);
-        return flippedImage;
-    }
-
-    /**
-     * Returns the flipped image.
-     */
-    public Image getImagesFlipped(Image anImage)
-    {
-        ImageSet imageSet = anImage.getImageSet();
-        int count = imageSet.getCount();
-        List<Image> imgs2 = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) {
-            Image img = imageSet.getImage(i);
-            imgs2.add(getImageFlipped(img));
-        }
-        ImageSet iset2 = new ImageSet(imgs2);
-        return iset2.getImage(0);
     }
 }
