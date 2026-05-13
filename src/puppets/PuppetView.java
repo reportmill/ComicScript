@@ -111,7 +111,7 @@ public class PuppetView extends ParentView {
     public Shape puppetToLocalForShape(Shape aShape)
     {
         Transform xfm = getPuppetToLocal();
-        return aShape.copyFor(xfm);
+        return aShape.copyForTransform(xfm);
     }
 
     /**
@@ -120,7 +120,7 @@ public class PuppetView extends ParentView {
     public Shape localToPuppetForShape(Shape aShape)
     {
         Transform xfm = getLocalToPuppet();
-        Shape shp = aShape.copyFor(xfm);
+        Shape shp = aShape.copyForTransform(xfm);
         return shp;
     }
 

@@ -260,7 +260,7 @@ public class PuppetViewPhys {
 
         // Get shape centered around shape midpoint
         Rect bnds = aShape.getBounds();
-        Shape shape = aShape.copyFor(new Transform(-bnds.width / 2, -bnds.height / 2));
+        Shape shape = aShape.copyForTransform(new Transform(-bnds.width / 2, -bnds.height / 2));
 
         // Get convex Polygons for shape
         List<Polygon> convexPolys = Polygon.getConvexPolygonsWithMaxSideCount(shape, 8);
