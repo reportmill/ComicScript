@@ -25,7 +25,7 @@
     <Label Name="JointsLabel" Padding="4" Border="bevel" Font="Arial 14" LeanY="BOTTOM" Text="Puppet Joints:" />
     <ListView Name="JointsList" PrefHeight="160" />
   </ColView>
-  <BoxView Name="PuppetBox" Fill="#FF" Border="#00 1" GrowWidth="true">
-    <View PrefWidth="428" PrefHeight="600" Border="#C0 1" />
+  <BoxView Name="PuppetBox" Fill="#FF" Border="#00" GrowWidth="true">
+    <View PrefWidth="428" PrefHeight="600" Border="#C0" />
   </BoxView>
 </RowView>

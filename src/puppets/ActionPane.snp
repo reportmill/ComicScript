@@ -40,5 +40,5 @@
     <CheckBox Name="ShowMarkersCheckBox" Text="Show Markers" />
     <CheckBox Name="FreezeOuterJointsCheckBox" Text="Freeze Outer Joints" />
   </ColView>
-  <BoxView Name="PuppetBox" Fill="#FF" Border="#00 1" GrowWidth="true" />
+  <BoxView Name="PuppetBox" Fill="#FF" Border="#00" GrowWidth="true" />
 </RowView>

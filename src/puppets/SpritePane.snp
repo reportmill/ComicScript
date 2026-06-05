@@ -11,5 +11,5 @@
     </RowView>
     <CheckBox Name="FlipXSwitch" Text="Flip Horizontal" />
   </ColView>
-  <BoxView Name="PuppetBox" Fill="#FF" Border="#00 1" GrowWidth="true" />
+  <BoxView Name="PuppetBox" Fill="#FF" Border="#00" GrowWidth="true" />
 </RowView>
