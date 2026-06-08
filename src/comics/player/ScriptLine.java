@@ -1,7 +1,5 @@
 package comics.player;
-
 import snap.geom.Pos;
-import snap.props.PropChange;
 import snap.props.PropObject;
 import snap.util.*;
 
@@ -29,30 +27,24 @@ public class ScriptLine extends PropObject implements Loadable {
     public static final String Text_Prop = "Text";
 
     /**
-     * Creates a new ScriptLine with given text.
+     * Constructor for given text.
      */
     public ScriptLine(Script aScript, String aStr)
     {
         _script = aScript;
         _text = aStr;
-        addPropChangeListener(pc -> _script.scriptLineDidChange(pc));
+        addPropChangeListener(_script::handleScriptLinePropChange);
     }
 
     /**
      * Returns the script.
      */
-    public Script getScript()
-    {
-        return _script;
-    }
+    public Script getScript()  { return _script; }
 
     /**
      * Returns the text.
      */
-    public String getText()
-    {
-        return _text;
-    }
+    public String getText()  { return _text; }
 
     /**
      * Sets the text.
@@ -75,7 +67,7 @@ public class ScriptLine extends PropObject implements Loadable {
 
         // Get text and words
         String text = getText().toLowerCase().replace(",", " ").replace("\"", "");
-        String words[] = text.split("\\s");
+        String[] words = text.split("\\s");
         return _words = words;
     }
 
@@ -92,10 +84,10 @@ public class ScriptLine extends PropObject implements Loadable {
      */
     public String getStarName()
     {
-        String words[] = getWords();
+        String[] words = getWords();
         if (words.length == 0) return null;
         String word = words[0];
-        return word.length() > 0 ? word : null;
+        return !word.isEmpty() ? word : null;
     }
 
     /**
@@ -103,10 +95,10 @@ public class ScriptLine extends PropObject implements Loadable {
      */
     public String getActionName()
     {
-        String words[] = getWords();
+        String[] words = getWords();
         if (words.length < 2) return null;
         String word = words[1];
-        return word.length() > 0 ? word : null;
+        return !word.isEmpty() ? word : null;
     }
 
     /**
@@ -137,10 +129,10 @@ public class ScriptLine extends PropObject implements Loadable {
      */
     public void setStar(Star aStar)
     {
-        String words[] = getWords();
-        String text = aStar.getStarName();
-        for (int i = 1; i < words.length; i++) text += ' ' + words[i];
-        getScript().setLineText(text, getIndex());
+        String[] words = getWords();
+        StringBuilder text = new StringBuilder(aStar.getStarName());
+        for (int i = 1; i < words.length; i++) text.append(' ').append(words[i]);
+        getScript().setLineText(text.toString(), getIndex());
     }
 
     /**
@@ -185,10 +177,9 @@ public class ScriptLine extends PropObject implements Loadable {
         // Get star and make sure it's visible
         Star star = getStar();
         if (star == null) return;
-        if (star instanceof Actor && !((Actor) star).isVisible()) {
-            Actor actr = (Actor) star;
-            actr.setVisible(true);
-            actr.setLocXY(Pos.BOTTOM_LEFT, 10, 10, null);
+        if (star instanceof Actor actor && !actor.isVisible()) {
+            actor.setVisible(true);
+            actor.setLocXY(Pos.BOTTOM_LEFT, 10, 10, null);
         }
 
         // Get action and run
@@ -238,19 +229,7 @@ public class ScriptLine extends PropObject implements Loadable {
     public String toString()
     {
         String str = getText();
-        if (str.trim().length() == 0) str = "(empty)";
+        if (str.trim().isEmpty()) str = "(empty)";
         return "SriptLine: " + str;
-    }
-
-    /**
-     * PropChange.DoChange method.
-     */
-    public void processPropChange(PropChange aPC, Object oldVal, Object newVal)
-    {
-        String prop = aPC.getPropName();
-        if (prop == Text_Prop) {
-            setText(Convert.stringValue(newVal));
-            getScript().getPlayer().playLine(getIndex());
-        } else super.processPropChange(aPC, oldVal, newVal);
     }
 }

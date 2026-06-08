@@ -1,10 +1,7 @@
 package comics.player;
-
 import java.util.*;
-
-import snap.props.PropChange;
-import snap.props.PropObject;
-import snap.props.Undoer;
+import snap.props.*;
+import snap.util.ArrayUtils;
 
 /**
  * A class to represent the instructions.
@@ -31,7 +28,7 @@ public class Script extends PropObject {
     public static final String Text_Prop = "Text";
 
     /**
-     * Creates a script for given PlayerView.
+     * Constructor for given PlayerView.
      */
     public Script(PlayerView aPlayer)
     {
@@ -41,36 +38,27 @@ public class Script extends PropObject {
     /**
      * Returns the Player.
      */
-    public PlayerView getPlayer()
-    {
-        return _player;
-    }
+    public PlayerView getPlayer()  { return _player; }
 
     /**
      * Returns the Stage.
      */
-    public StageView getStage()
-    {
-        return _player.getStage();
-    }
+    public StageView getStage()  { return _player.getStage(); }
 
     /**
      * Returns the Script text.
      */
-    public String getText()
-    {
-        return _text;
-    }
+    public String getText()  { return _text; }
 
     /**
      * Sets the text.
      */
     public void setText(String aStr)
     {
-        // Set text, reset Lines, RunTime, notify player
-        _text = aStr;
+        if (Objects.equals(aStr, _text)) return;
         _lines = null;
         _runTime = -1;
+        firePropChange(Text_Prop, _text, _text = aStr);
         _player.scriptChanged();
     }
 
@@ -95,17 +83,9 @@ public class Script extends PropObject {
      */
     public List<ScriptLine> getLines()
     {
-        // If already set, just return
         if (_lines != null) return _lines;
-
-        // Get text lines from text
-        List slines = new ArrayList();
-        String tlines[] = _text.split("\\n");
-
-        // Iterate over text lines and create ScriptLines
-        for (String tline : tlines)
-            slines.add(new ScriptLine(this, tline));
-        return _lines = slines;
+        String[] textLines = _text.split("\\n");
+        return _lines = ArrayUtils.mapToList(textLines, textLine -> new ScriptLine(this, textLine));
     }
 
     /**
@@ -122,13 +102,12 @@ public class Script extends PropObject {
     /**
      * Removes a line.
      */
-    public ScriptLine removeLine(int anIndex)
+    public void removeLine(int anIndex)
     {
-        ScriptLine sline = getLines().remove(anIndex);
-        firePropChange(Line_Prop, sline, null, anIndex);
+        ScriptLine scriptLine = getLines().remove(anIndex);
+        firePropChange(Line_Prop, scriptLine, null, anIndex);
         _runTime = -1;
         _player.scriptChanged();
-        return sline;
     }
 
     /**
@@ -244,9 +223,9 @@ public class Script extends PropObject {
     /**
      * Called when a ScriptLine changes.
      */
-    void scriptLineDidChange(PropChange aPC)
+    void handleScriptLinePropChange(PropChange propChange)
     {
-        _undoer.addPropChange(aPC);
+        _undoer.addPropChange(propChange);
         _undoer.saveChanges();
         _runTime = -1;
         _player.scriptChanged();
@@ -277,7 +256,7 @@ public class Script extends PropObject {
      * PropChange.DoChange method.
      */
     @Override
-    public void processPropChange(PropChange aPC, Object oldVal, Object newVal)
+    protected void processPropChange(PropChange aPC, Object oldVal, Object newVal)
     {
         String prop = aPC.getPropName();
         if (prop == Line_Prop) {
@@ -289,6 +268,7 @@ public class Script extends PropObject {
                 removeLine(ind);
                 if (ind > 0) getPlayer().playLine(ind - 1);
             }
-        } else super.processPropChange(aPC, oldVal, newVal);
+        }
+        else super.processPropChange(aPC, oldVal, newVal);
     }
 }
