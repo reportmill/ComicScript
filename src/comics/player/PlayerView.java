@@ -177,7 +177,7 @@ public class PlayerView extends ScaleBox {
         // If playing, stop anim
         boolean playing = isPlaying();
         if (playing) {
-            _camera.getAnim(0).setOnFinish((Runnable) null);
+            _camera.getAnim(0).setOnFinish(null);
             _camera.stopAnimDeep();
         }
 
@@ -317,7 +317,7 @@ public class PlayerView extends ScaleBox {
     protected void playLineDone()
     {
         // Clear Anim.OnFinish so this this doesn't get called again
-        _camera.getAnim(0).setOnFinish((Runnable) null);
+        _camera.getAnim(0).setOnFinish(null);
 
         // If not Playing, just return
         if (!_playing) return;
@@ -365,8 +365,7 @@ public class PlayerView extends ScaleBox {
             setRunTime(0);
 
         // Start anim and firePropChange
-        _playing = true;
-        firePropChange(Playing_Prop, !_playing, _playing);
+        firePropChange(Playing_Prop, _playing, _playing = true);
         playLineStart();
     }
 
@@ -380,8 +379,7 @@ public class PlayerView extends ScaleBox {
 
         // Stop anim and firePropChange
         _camera.stopAnimDeep();
-        _playing = false;
-        firePropChange(Playing_Prop, !_playing, _playing);
+        firePropChange(Playing_Prop, _playing, _playing = false);
 
         // Reset controls
         resetShowingControls();
@@ -410,7 +408,7 @@ public class PlayerView extends ScaleBox {
     /**
      * Called when the PlayButton is pressed.
      */
-    void playButtonFired()
+    void handlePlayButtonActionEvent()
     {
         play();
     }
@@ -509,7 +507,7 @@ public class PlayerView extends ScaleBox {
     {
         if (_playButton != null) return _playButton;
         _playButton = new PlayButtonBig(isPlaying());
-        _playButton.addEventHandler(e -> playButtonFired(), Action);
+        _playButton.addEventHandler(e -> handlePlayButtonActionEvent(), Action);
         return _playButton;
     }
 
@@ -550,7 +548,6 @@ public class PlayerView extends ScaleBox {
             img.addLoadListener(() -> showIntroAnim());
             return;
         }
-        //Image img2 = getRealImage(); if(!img2.isLoaded()) { img2.addLoadListener(() -> showIntroAnim()); return; }
         if (!isShowing()) {
             addPropChangeListener(PropChangeListener.getOneShot(pc -> showIntroAnim()), Showing_Prop);
             return;
@@ -596,12 +593,8 @@ public class PlayerView extends ScaleBox {
         if (_introImg != null) return _introImg;
         return _introImg = Image.getImageForClassResource(getClass(), "pkg.images/Header.png");
     }
-//Image getRealImage()  { if(_realImg!=null) return _realImg;
-//    return _realImg = Image.get(getClass(), "pkg.images/RealLogo.png"); }
 
     // For IntroAnim
     ColView _introView;
     Image _introImg;
-    Image _realImg;
-
 }
