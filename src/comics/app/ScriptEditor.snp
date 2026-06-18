@@ -2,13 +2,13 @@
 <ColView Padding="8,5,5,5" Spacing="4" GrowHeight="true">
   <RowView Padding="4" Spacing="4" GrowWidth="true">
     <Label Name="ScriptLabel" Font="Arial Bold 16" Text="Script:" />
-    <Button Name="CutButton" PrefWidth="22" PrefHeight="22" LeanX="RIGHT" ToolTip="Cut" ImageName="Edit_Cut.png" ShowArea="false" />
-    <Button Name="CopyButton" PrefWidth="22" PrefHeight="22" ToolTip="Copy" ImageName="Edit_Copy.png" ShowArea="false" />
-    <Button Name="PasteButton" PrefWidth="22" PrefHeight="22" ToolTip="Paste" ImageName="Edit_Paste.png" ShowArea="false" />
-    <Button Name="DeleteButton" PrefWidth="22" PrefHeight="22" ToolTip="Delete" ImageName="Edit_Delete.png" ShowArea="false" />
+    <Button Name="CutButton" PrefWidth="22" PrefHeight="22" LeanX="RIGHT" ToolTip="Cut" ImageName="Edit_Cut.png" Plain="true" />
+    <Button Name="CopyButton" PrefWidth="22" PrefHeight="22" ToolTip="Copy" ImageName="Edit_Copy.png" Plain="true" />
+    <Button Name="PasteButton" PrefWidth="22" PrefHeight="22" ToolTip="Paste" ImageName="Edit_Paste.png" Plain="true" />
+    <Button Name="DeleteButton" PrefWidth="22" PrefHeight="22" ToolTip="Delete" ImageName="Edit_Delete.png" Plain="true" />
     <Separator PrefWidth="8" PrefHeight="18" Vertical="true" />
-    <Button Name="UndoButton" PrefWidth="22" PrefHeight="22" ToolTip="Undo" ImageName="Edit_Undo.png" ShowArea="false" />
-    <Button Name="RedoButton" PrefWidth="22" PrefHeight="22" ToolTip="Redo" ImageName="Edit_Redo.png" ShowArea="false" />
+    <Button Name="UndoButton" PrefWidth="22" PrefHeight="22" ToolTip="Undo" ImageName="Edit_Undo.png" Plain="true" />
+    <Button Name="RedoButton" PrefWidth="22" PrefHeight="22" ToolTip="Redo" ImageName="Edit_Redo.png" Plain="true" />
     <Label PrefWidth="20" PrefHeight="18" />
     <Button Name="ClearButton" PrefWidth="85" PrefHeight="26" Padding="2" LeanX="RIGHT" Text="Clear All" />
     <Button Name="SamplesButton" PrefWidth="85" PrefHeight="26" Padding="2" LeanX="RIGHT" Text="Samples" />
