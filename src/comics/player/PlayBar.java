@@ -30,10 +30,11 @@ public class PlayBar extends RowView {
     static final String BarHeight_Prop = "BarHeight";
 
     /**
-     * Creates a PlayBar.
+     * Constructor.
      */
     public PlayBar(PlayerView aPV)
     {
+        super();
         _player = aPV;
         setPrefHeight(46);
         setManaged(false);
@@ -67,7 +68,6 @@ public class PlayBar extends RowView {
         _editButton.setName("EditButton");
         _editButton.setTextColor(Color.WHITE);
         _editButton.setFont(Font.Arial14);
-        _editButton.setActionable(true);
         _editButton.addEventHandler(e -> ViewUtils.fireActionEvent(_editButton, e), MousePress);
         _editButton.addEventHandler(e -> e.consume(), MouseDrag, MouseRelease);
         _editButton.addEventHandler(e -> _editButton.setFont(Font.Arial14.getBold()), MouseEnter);
@@ -219,13 +219,13 @@ public class PlayBar extends RowView {
     public class PlayButton extends View {
 
         /**
-         * Creates a PlayButton.
+         * Constructor.
          */
         public PlayButton()
         {
+            super();
             setPrefSize(24, 24);
             setName("PlayButton");
-            setActionable(true);
             enableEvents(MousePress, MouseDrag);
         }
 
@@ -286,16 +286,16 @@ public class PlayBar extends RowView {
         boolean _mouseOver, _playing;
 
         /**
-         * Creates a PlayButton.
+         * Constructor.
          */
         public PlayButtonBig(boolean isPlaying)
         {
+            super();
             _playing = isPlaying;
             setPrefSize(100, 100);
             setName("PlayButtonBig");
             setManaged(false);
             setLean(Pos.CENTER);
-            setActionable(true);
             enableEvents(MouseEnter, MouseExit, MousePress);
         }
 

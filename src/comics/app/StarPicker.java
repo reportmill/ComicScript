@@ -173,17 +173,17 @@ public class StarPicker extends ViewController {
         Image _camImg = Image.getImageForClassResource(getClass(), "Camera.png");
 
         /**
-         * Creates a StarListView.
+         * Constructor.
          */
         public StarListView()
         {
+            super();
             setPadding(7, 5, 5, 12);
             setSpacing(12);
             setGrowWidth(true);
             setFill(Color.WHITE);
             setBorder(Border.createLoweredBevelBorder());
             enableEvents(MousePress);
-            setActionable(true);
         }
 
         /**

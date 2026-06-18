@@ -44,10 +44,11 @@ public class ScriptView extends ColView {
     static Effect SELECT_EFFECT_FOC = new ShadowEffect(8, SELECT_COLOR, 0, 0);
 
     /**
-     * Creates ScriptView.
+     * Constructor.
      */
     public ScriptView()
     {
+        super();
         setName("ScriptView");
         setPadding(8, 8, 8, 12);
         setSpacing(6);
@@ -59,7 +60,6 @@ public class ScriptView extends ColView {
         setFocusWhenPressed(true);
         setFocusKeysEnabled(false);
         enableEvents(MousePress);
-        setActionable(true);
 
         // Configure CursorLineView
         _cursorLineView = new LineView(null);

@@ -25,20 +25,20 @@ public class LineView extends RowView {
     static Effect SELECT_EFFECT_FOC = new ShadowEffect(8, SELECT_COLOR, 0, 0);
 
     /**
-     * Creates a LineView.
+     * Constructor.
      */
     public LineView()
     {
+        super();
         setGrowWidth(true);
         setPrefHeight(40);
         setPadding(5, 5, 5, 5);
         setSpacing(8);
         setFont(new Font("Arial", 15));
-        setActionable(true);
     }
 
     /**
-     * Creates a LineView for given ScriptLine.
+     * Constructor for given ScriptLine.
      */
     public LineView(ScriptLine aLine)
     {
