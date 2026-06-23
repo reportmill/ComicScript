@@ -1,4 +1,4 @@
-package comics.gfx;
+package comics.player;
 
 import snap.geom.*;
 import snap.gfx.*;

@@ -1,10 +1,8 @@
 package comics.player;
 
-import comics.gfx.*;
 import snap.geom.HPos;
 import snap.geom.Rect;
 import snap.geom.VPos;
-import snap.gfx.*;
 import snap.util.*;
 import snap.view.*;
 
@@ -27,7 +25,7 @@ public class ActorAction extends Action {
     /**
      * Makes sure an anim image is loaded.
      */
-    public Asset.AnimImage getAnim(String anAnimName)
+    public void getAnim(String anAnimName)
     {
         Actor star = getStar();
         Asset.AnimImage aimg = star.getAnim(anAnimName);
@@ -38,7 +36,6 @@ public class ActorAction extends Action {
             int time = frameCount * 25;
             setRunTime(time);
         }
-        return aimg;
     }
 
     /**
@@ -122,7 +119,7 @@ public class ActorAction extends Action {
             StageView stage = line.getScript().getStage();
 
             // Find out if walk is from right
-            String words[] = getLine().getWords();
+            String[] words = getLine().getWords();
             boolean fromRight = ArrayUtils.contains(words, "right");
             if (fromRight)
                 actor.setFlipX(true);
@@ -183,7 +180,7 @@ public class ActorAction extends Action {
             ViewAnim anim = actor.getAnim(2000);
 
             // Handle drop right
-            String words[] = getLine().getWords();
+            String[] words = getLine().getWords();
             if (ArrayUtils.contains(words, "right")) {
                 actor.setFlipX(true);
                 actor.setLocX(HPos.CENTER, 60, null);
@@ -325,7 +322,7 @@ public class ActorAction extends Action {
         public void run()
         {
             Actor actor = getStar();
-            Explode.explode(actor);
+            new snap.viewx.Explode(actor, (int) actor.getWidth() / 8, (int) actor.getHeight() / 8).play();
         }
     }
 
