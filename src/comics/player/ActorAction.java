@@ -292,7 +292,7 @@ public class ActorAction extends Action {
             stage.addChild(speakView);
 
             // Set speakView tail angle to point at actor head
-            Rect bnds = actor.getBoundsParent();
+            Rect bnds = actor.getBoundsInParent();
             speakView.setTailAngleByPoint(bnds.getMidX(), bnds.y + 30);
 
             // Add SpeakView with anim to fade in/out

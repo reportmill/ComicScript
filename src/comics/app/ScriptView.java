@@ -26,7 +26,7 @@ public class ScriptView extends ColView {
     int _selCharIndex = -1;
 
     // The current list of LineViews
-    List<LineView> _lineViews = new ArrayList();
+    List<LineView> _lineViews = new ArrayList<>();
 
     // The cursor lineview
     LineView _cursorLineView;
@@ -149,7 +149,7 @@ public class ScriptView extends ColView {
         LineView selLineView = getSelView();
         if (selLineView != null) {
             selLineView.setEffect(getSelEffect());
-            ViewUtils.runLater(() -> scrollToVisible(selLineView.getBoundsParent().getInsetRect(-5)));
+            ViewUtils.runLater(() -> scrollToVisible(selLineView.getBoundsInParent().getInsetRect(-5)));
         }
 
         // Add/remove CursorLineView
@@ -160,7 +160,7 @@ public class ScriptView extends ColView {
                 removeChild(_cursorLineView);
                 addChild(_cursorLineView, ind1);
             }
-            ViewUtils.runLater(() -> scrollToVisible(_cursorLineView.getBoundsParent().getInsetRect(-5)));
+            ViewUtils.runLater(() -> scrollToVisible(_cursorLineView.getBoundsInParent().getInsetRect(-5)));
         }
         _cursorLineView.setVisible(_selIndex < 0);
 
