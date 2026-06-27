@@ -72,7 +72,6 @@ public class PlayBar extends RowView {
         _editButton.addEventHandler(e -> e.consume(), MouseDrag, MouseRelease);
         _editButton.addEventHandler(e -> _editButton.setFont(Font.Arial14.getBold()), MouseEnter);
         _editButton.addEventHandler(e -> _editButton.setFont(Font.Arial14), MouseExit);
-        ViewUtils.enableEvents(_editButton);
         addChild(_editButton);
     }
 
