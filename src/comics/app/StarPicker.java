@@ -117,7 +117,7 @@ public class StarPicker extends ViewController {
         ScriptLine line = getSelLine();
 
         // Handle StarListView
-        if (anEvent.equals(_starsView)) {
+        if (anEvent.getView() == _starsView) {
             Star star = _starsView.getSelStar();
             line.setStar(star);
             _lineEditor._editorPane.runCurrentLine();
@@ -130,7 +130,7 @@ public class StarPicker extends ViewController {
     protected List<Star> getStarsForPlayer(PlayerView aPlayer)
     {
         Script script = aPlayer.getScript();
-        List<Star> stars = new ArrayList();
+        List<Star> stars = new ArrayList<>();
 
         Star set = script.getStage();
         stars.add(set);
@@ -163,7 +163,7 @@ public class StarPicker extends ViewController {
     public class StarListView extends RowView {
 
         // The list of Stars
-        List<Star> _stars = new ArrayList();
+        List<Star> _stars = new ArrayList<>();
 
         // The selected index
         int _selIndex = -1;
@@ -183,7 +183,7 @@ public class StarPicker extends ViewController {
             setGrowWidth(true);
             setFill(Color.WHITE);
             setBorder(Border.createLoweredBevelBorder());
-            enableEvents(MousePress);
+            addEventHandler(this::handleMousePressEvent, MousePress);
         }
 
         /**
@@ -279,7 +279,7 @@ public class StarPicker extends ViewController {
         /**
          * Returns the StarView at given index.
          */
-        protected StarView getStarView(int anIndex)
+        private StarView getStarView(int anIndex)
         {
             return anIndex >= 0 ? (StarView) getChild(anIndex) : null;
         }
@@ -287,12 +287,10 @@ public class StarPicker extends ViewController {
         /**
          * Override to handle events.
          */
-        protected void processEvent(ViewEvent anEvent)
+        private void handleMousePressEvent(ViewEvent anEvent)
         {
-            if (anEvent.isMousePress()) {
-                setSelStar(null);
-                fireActionEvent(anEvent);
-            }
+            setSelStar(null);
+            fireActionEvent(anEvent);
         }
     }
 
@@ -305,7 +303,7 @@ public class StarPicker extends ViewController {
         Star _star;
 
         /**
-         * Create an StarView.
+         * Constructor.
          */
         public StarView(Star aStar, Image anImg)
         {
@@ -314,7 +312,7 @@ public class StarPicker extends ViewController {
             setPrefSize(64, 64);
             setKeepAspect(true);
             setPadding(3, 3, 14, 3);
-            enableEvents(MouseEnter, MouseExit, MousePress);
+            addEventHandler(this::handleMouseEvent, MouseEnter, MouseExit, MousePress);
         }
 
         /**
@@ -342,15 +340,16 @@ public class StarPicker extends ViewController {
         }
 
         /**
-         * Override to handle events.
+         * Handle mouse events.
          */
-        protected void processEvent(ViewEvent anEvent)
+        private void handleMouseEvent(ViewEvent anEvent)
         {
             if (anEvent.isMousePress()) {
                 _starsView.setSelStar(_star);
                 ViewUtils.fireActionEvent(_starsView, anEvent);
             }
-            if (anEvent.isMouseEnter() || anEvent.isMouseExit()) repaint();
+            if (anEvent.isMouseEnter() || anEvent.isMouseExit())
+                repaint();
             anEvent.consume();
         }
     }

@@ -59,7 +59,7 @@ public class ScriptView extends ColView {
         setFocusable(true);
         setFocusWhenPressed(true);
         setFocusKeysEnabled(false);
-        enableEvents(MousePress);
+        addEventHandler(this::handleMousePressEvent, MousePress);
 
         // Configure CursorLineView
         _cursorLineView = new LineView(null);
@@ -186,22 +186,20 @@ public class ScriptView extends ColView {
     }
 
     /**
-     * Handle Events.
+     * Handle MousePress events.
      */
-    protected void processEvent(ViewEvent anEvent)
+    private void handleMousePressEvent(ViewEvent anEvent)
     {
-        // Handle MousePress: Select negative index to trigger insert mode
-        if (anEvent.isMousePress()) {
-            int ind = 0;
-            for (LineView lview : _lineViews) {
-                if (lview.getY() + 5 > anEvent.getY()) break;
-                ind++;
-            }
-            ind = EditorPane.negateIndex(ind);
-            setSelIndex(ind);
-            fireActionEvent(anEvent);
-            anEvent.consume();
+        // Select negative index to trigger insert mode
+        int ind = 0;
+        for (LineView lview : _lineViews) {
+            if (lview.getY() + 5 > anEvent.getY()) break;
+            ind++;
         }
+        ind = EditorPane.negateIndex(ind);
+        setSelIndex(ind);
+        fireActionEvent(anEvent);
+        anEvent.consume();
     }
 
     /**
@@ -246,7 +244,7 @@ public class ScriptView extends ColView {
                 setFont(SCRIPTVIEW_FONT);
             }
             setFill(LINEVIEW_FILL);
-            enableEvents(MousePress, MouseMove, MouseExit);
+            addEventHandler(this::handleMouseEvents, MousePress, MouseMove, MouseExit);
 
             if (aLine != null && !aLine.isLoaded()) {
                 setTextColor(Color.WHITE);
@@ -257,7 +255,7 @@ public class ScriptView extends ColView {
         /**
          * Handle Events.
          */
-        protected void processEvent(ViewEvent anEvent)
+        private void handleMouseEvents(ViewEvent anEvent)
         {
             // Handle MousePress: Select LineView and fireActionEvent
             if (anEvent.isMousePress()) {

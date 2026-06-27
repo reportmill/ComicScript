@@ -56,7 +56,7 @@ public class PlayerView extends ScaleBox {
         setFillWidth(true);
         setFillHeight(true);
         setClipToBounds(true);
-        enableEvents(MouseEnter, MouseExit, MouseMove, MousePress);
+        addEventHandler(this::handleMouseEvent, MouseEnter, MouseExit, MouseMove, MousePress);
 
         // Create configure stage
         _stage = new StageView();
@@ -512,23 +512,27 @@ public class PlayerView extends ScaleBox {
     }
 
     /**
-     * Process event.
+     * Handle mouse events.
      */
-    protected void processEvent(ViewEvent anEvent)
+    private void handleMouseEvent(ViewEvent anEvent)
     {
-        if (anEvent.isMouseEnter()) resetShowingControls();
-        else if (anEvent.isMouseExit()) resetShowingControls();
+        if (anEvent.isMouseEnter())
+            resetShowingControls();
+        else if (anEvent.isMouseExit())
+            resetShowingControls();
         else if (anEvent.isMouseMove()) {
             _lastMouseRunTime = getRunTime();
             resetShowingControls();
-        } else if (anEvent.isMousePress()) {
+        }
+        else if (anEvent.isMousePress()) {
             PlayButtonBig pb = new PlayButtonBig(isPlaying());
             addChild(pb);
             pb.animate();
             pb.getAnim(0).setOnFinish(() -> removeChild(pb));
-            if (isPlaying()) stop();
+            if (isPlaying())
+                stop();
             else play();
-        } else super.processEvent(anEvent);
+        }
     }
 
     /**

@@ -85,7 +85,7 @@ public class LineView extends RowView {
 
         // Add Action predicate
         String predText = action != null ? action.getText() : "";
-        if (predText.length() > 0) {
+        if (!predText.isEmpty()) {
             FragView predView = new FragView(predText);
             addChild(predView);
         }
@@ -149,22 +149,18 @@ public class LineView extends RowView {
             setBorderRadius(10);
             setFill(LINEPART_FILL);
             setBorder(LINEPART_BORDER, 1);
-            enableEvents(MousePress);
+            addEventHandler(this::handleMousePressEvent, MousePress);
         }
 
         /**
          * Handle Events.
          */
-        protected void processEvent(ViewEvent anEvent)
+        private void handleMousePressEvent(ViewEvent anEvent)
         {
-            // Handle MousePress
-            if (anEvent.isMousePress()) {
-                int ind = getParent().indexOfChild(this);
-                setSelIndex(ind);
-                ViewUtils.fireActionEvent(LineView.this, anEvent);
-                anEvent.consume();
-            }
+            int ind = getParent().indexOfChild(this);
+            setSelIndex(ind);
+            ViewUtils.fireActionEvent(LineView.this, anEvent);
+            anEvent.consume();
         }
     }
-
 }

@@ -43,12 +43,12 @@ public class PlayBar extends RowView {
         setPadding(16, 10, 0, 10);
         setAlignX(HPos.LEFT);
         setSpacing(20);
-        enableEvents(MouseMove, MousePress, MouseDrag, MouseExit);
+        addEventHandler(this::handleMouseEvent, MouseMove, MousePress, MouseDrag, MouseExit);
         setCursor(Cursor.HAND);
 
         // Create/set background gradient
         Color c0 = Color.CLEAR, c1 = new Color(0, 0, 0, .1), _c2 = new Color(0, 0, 0, .2), _c3 = new Color(0, 0, 0, .3);
-        GradientPaint.Stop stops[] = GradientPaint.getStops(0, c0, .2, c1, .35, _c2, 1, _c3);
+        GradientPaint.Stop[] stops = GradientPaint.getStops(0, c0, .2, c1, .35, _c2, 1, _c3);
         GradientPaint grad = new GradientPaint(90, stops);
         setFill(grad);
 
@@ -148,12 +148,13 @@ public class PlayBar extends RowView {
     /**
      * Process event.
      */
-    protected void processEvent(ViewEvent anEvent)
+    private void handleMouseEvent(ViewEvent anEvent)
     {
         if (anEvent.isMousePress() || anEvent.isMouseDrag())
             setRunTime(anEvent.getX());
 
-        if (anEvent.isMouseExit()) setMouseOverBar(false);
+        if (anEvent.isMouseExit())
+            setMouseOverBar(false);
         if (anEvent.isMouseEvent())
             setMouseOverBar(isMouseDown() || anEvent.getY() > 0 && anEvent.getY() <= BAR_MAXY);
         anEvent.consume();
@@ -176,7 +177,7 @@ public class PlayBar extends RowView {
     {
         int prt = _player.getRunTime() / 1000, pmax = _player.getRunTimeMax() / 1000;
         int prm = prt / 60, prs = prt % 60, pmm = pmax / 60, pms = pmax % 60;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prm).append(':');
         if (prs < 10) sb.append('0');
         sb.append(prs);
@@ -226,7 +227,7 @@ public class PlayBar extends RowView {
             super();
             setPrefSize(24, 24);
             setName("PlayButton");
-            enableEvents(MousePress, MouseDrag);
+            addEventHandler(this::handleMouseEvent, MousePress, MouseDrag);
         }
 
         /**
@@ -260,20 +261,19 @@ public class PlayBar extends RowView {
         }
 
         /**
-         * Override to watch mouse.
+         * Handle mouse events.
          */
-        protected void processEvent(ViewEvent anEvent)
+        private void handleMouseEvent(ViewEvent anEvent)
         {
-            if (anEvent.isMousePress()) fireActionEvent(anEvent);
-            else if (anEvent.isMouseDrag()) anEvent.consume();
+            if (anEvent.isMousePress()) {
+                if (_player.isPlaying())
+                    _player.stop();
+                else _player.play();
+                anEvent.consume();
+            }
+            else if (anEvent.isMouseDrag())
+                anEvent.consume();
             repaint();
-        }
-
-        protected void fireActionEvent(ViewEvent anEvent)
-        {
-            if (_player.isPlaying()) _player.stop();
-            else _player.play();
-            anEvent.consume();
         }
     }
 
@@ -296,7 +296,7 @@ public class PlayBar extends RowView {
             setName("PlayButtonBig");
             setManaged(false);
             setLean(Pos.CENTER);
-            enableEvents(MouseEnter, MouseExit, MousePress);
+            addEventHandler(this::handleMouseEvent, MouseEnter, MouseExit, MousePress);
         }
 
         /**
@@ -343,12 +343,14 @@ public class PlayBar extends RowView {
         }
 
         /**
-         * Override to watch mouse.
+         * Handle mouse events.
          */
-        protected void processEvent(ViewEvent anEvent)
+        private void handleMouseEvent(ViewEvent anEvent)
         {
-            if (anEvent.isMouseEnter()) _mouseOver = true;
-            else if (anEvent.isMouseExit()) _mouseOver = false;
+            if (anEvent.isMouseEnter())
+                _mouseOver = true;
+            else if (anEvent.isMouseExit())
+                _mouseOver = false;
             else if (anEvent.isMousePress()) {
                 fireActionEvent(anEvent);
                 animate();
