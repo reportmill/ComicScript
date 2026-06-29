@@ -23,9 +23,7 @@ public class ScriptEditor extends ViewController {
     TextField _inputText;
 
     // Constants
-    static Color INPUTTEXT_SEL_COLOR = new Color("#CDECF6");
-    static String _stars[] = {"Setting", "Camera", "Lady", "Man", "Car", "Cat", "Dog", "Trump", "Obama",
-            "PeeWee", "Duke"};
+    static String[] _stars = {"Setting", "Camera", "Lady", "Man", "Car", "Cat", "Dog", "Trump", "Obama", "PeeWee", "Duke"};
 
     /**
      * Creates a ScriptEditor.
@@ -113,7 +111,7 @@ public class ScriptEditor extends ViewController {
             }
 
             // Set line to new text
-            if (str.length() == 0) delete();
+            if (str.isEmpty()) delete();
             else _editorPane.setLineText(str, ind);
         }
 
@@ -121,7 +119,7 @@ public class ScriptEditor extends ViewController {
         else {
 
             // If no new text, select next line
-            if (str.length() == 0) {
+            if (str.isEmpty()) {
                 selectNext();
                 return;
             }
@@ -147,7 +145,7 @@ public class ScriptEditor extends ViewController {
     /**
      * Called when ScriptView gets KeyPress event.
      */
-    void scriptViewDidKeyPress(ViewEvent anEvent)
+    private void handleScriptViewKeyPressEvent(ViewEvent anEvent)
     {
         // Handle Delete, BackSpaceKey, Up/Down arrow
         if (anEvent.isDeleteKey() || anEvent.isBackSpaceKey()) delete();
@@ -171,7 +169,7 @@ public class ScriptEditor extends ViewController {
             char c = anEvent.getKeyChar();
             if (Character.isLetterOrDigit(c)) {
                 _inputText.requestFocus();
-                ViewUtils.processEvent(_inputText, anEvent);
+                //ViewUtils.processEvent(_inputText, anEvent);
             }
         }
         anEvent.consume();
@@ -180,9 +178,10 @@ public class ScriptEditor extends ViewController {
     /**
      * Called when ScriptView gets MouseRelease event.
      */
-    void scriptViewDidMouseRelease(ViewEvent anEvent)
+    private void handleScriptViewMouseReleaseEvent(ViewEvent anEvent)
     {
-        if (anEvent.getClickCount() == 2) _editorPane.showLineEditor();
+        if (anEvent.getClickCount() == 2)
+            _editorPane.showLineEditor();
     }
 
     /**
@@ -216,7 +215,7 @@ public class ScriptEditor extends ViewController {
             _inputText.replaceChars(str);
 
             // If Enter key and chars were added, consume event to suppress action
-            if (anEvent.isEnterKey() && str.length() > 0) {
+            if (anEvent.isEnterKey() && !str.isEmpty()) {
                 anEvent.consume();
                 if (_inputText.getSelEnd() == _inputText.length()) _inputText.replaceChars(" ");
             }
@@ -234,7 +233,7 @@ public class ScriptEditor extends ViewController {
 
         // Get HelpLabel string and HelpList items and set
         String helpName = HelpUtils.getFragTypeNameAtCharIndex(line, ind);
-        String helpItems[] = HelpUtils.getHelpItems(line, ind);
+        String[] helpItems = HelpUtils.getHelpItems(line, ind);
         setViewText("HelpLabel", helpName);
         _helpList.setItems(helpItems);
 
@@ -283,8 +282,8 @@ public class ScriptEditor extends ViewController {
 
         // Configure ScriptView
         _scriptView.setScript(getScript());
-        _scriptView.addEventFilter(e -> scriptViewDidKeyPress(e), KeyPress);
-        _scriptView.addEventFilter(e -> scriptViewDidMouseRelease(e), MouseRelease);
+        _scriptView.addEventFilter(this::handleScriptViewKeyPressEvent, KeyPress);
+        _scriptView.addEventFilter(this::handleScriptViewMouseReleaseEvent, MouseRelease);
         setFirstFocus(_scriptView);
 
         // Get/configure HelpList
@@ -308,10 +307,6 @@ public class ScriptEditor extends ViewController {
      */
     protected void resetUI()
     {
-        // Get seleccted ScriptLine and star
-        ScriptLine line = getSelLine();
-        Star star = line != null ? line.getStar() : null;
-
         // Update UndoButton, RedoButton
         setViewEnabled("UndoButton", getScript().getUndoer().hasUndos());
         setViewEnabled("RedoButton", getScript().getUndoer().hasRedos());
@@ -320,12 +315,14 @@ public class ScriptEditor extends ViewController {
         _scriptView.setSelIndex(getSelIndex());
 
         // Update InputText
+        ScriptLine line = getSelLine();
         _inputText.setText(line != null ? line.getText() : "");
         if (_scriptView.getSelCharIndex() >= 0) {
             Range range = HelpUtils.getFragRangeAtCharIndex(line, _scriptView.getSelCharIndex());
             _inputText.setSel(range.start, range.end);
             _scriptView._selCharIndex = range.start;
-        } else _inputText.selectAll();
+        }
+        else _inputText.selectAll();
     }
 
     /**
