@@ -114,14 +114,14 @@ public class SamplesPane extends ViewController {
             }
 
             // Create/add ItemBox for Sample and add ImageView + Label
-            ColView ibox = new ColView();
-            ibox.setPrefSize(175, 130);
-            ibox.setAlign(Pos.TOP_CENTER);
-            ibox.setChildren(iview, label);
-            ibox.setPadding(0, 0, 8, 0);
-            ibox.setName("ItemBox" + i);
-            ibox.addEventHandler(e -> itemBoxWasPressed(ibox, e), MousePress);
-            rowView.addChild(ibox);
+            ColView itemBox = new ColView();
+            itemBox.setPrefSize(175, 130);
+            itemBox.setAlign(Pos.TOP_CENTER);
+            itemBox.setChildren(iview, label);
+            itemBox.setPadding(0, 0, 8, 0);
+            itemBox.setName("ItemBox" + i);
+            itemBox.addEventHandler(e -> handleItemBoxMousePressEvent(itemBox, e), MousePress);
+            rowView.addChild(itemBox);
         }
 
         // Create ScrollView
@@ -151,7 +151,7 @@ public class SamplesPane extends ViewController {
     /**
      * Called when template ItemBox is clicked.
      */
-    void itemBoxWasPressed(ColView anItemBox, ViewEvent anEvent)
+    void handleItemBoxMousePressEvent(ColView anItemBox, ViewEvent anEvent)
     {
         String name = anItemBox.getName();
         int index = StringUtils.intValue(name);

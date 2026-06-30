@@ -94,7 +94,7 @@ public class LineEditor extends ViewController {
     /**
      * Called when LineView receives MousePress to have EditorPane go back to ScriptEditor.
      */
-    void lineViewDidMousePress(ViewEvent anEvent)
+    void handleLineViewMousePressEvent(ViewEvent anEvent)
     {
         _editorPane.showScriptEditor();
         anEvent.consume();
@@ -103,7 +103,7 @@ public class LineEditor extends ViewController {
     /**
      * Called when LineView.SelIndex changes to make sure correct sub-editor is showing.
      */
-    void lineViewSelIndexChanged()
+    void handleLineViewSelIndexChange()
     {
         int ind = _lineView.getSelIndex();
         if (ind == 0 && !_starPicker.getUI().isShowing()) showStarPicker();
@@ -126,8 +126,8 @@ public class LineEditor extends ViewController {
 
         // Create LineView
         _lineView = new LineView();
-        _lineView.addPropChangeListener(pc -> lineViewSelIndexChanged(), LineView.SelIndex_Prop);
-        _lineView.addEventHandler(e -> lineViewDidMousePress(e), MousePress);
+        _lineView.addPropChangeListener(pc -> handleLineViewSelIndexChange(), LineView.SelIndex_Prop);
+        _lineView.addEventHandler(this::handleLineViewMousePressEvent, MousePress);
         toolBar.addChild(_lineView, 1);
 
         // Create Divider line

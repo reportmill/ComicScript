@@ -187,7 +187,7 @@ public class ScriptEditor extends ViewController {
     /**
      * Called when InputText does KeyPress to handle tab & delete keys.
      */
-    void inputTextDidKeyPress(ViewEvent anEvent)
+    void handleInputTextKeyPressEvent(ViewEvent anEvent)
     {
         // Handle Tab key
         if (anEvent.isTabKey() && getScript().getLineCount() > 0) {
@@ -225,7 +225,7 @@ public class ScriptEditor extends ViewController {
     /**
      * Called when InputText does selection change.
      */
-    void inputTextSelChanged()
+    void handleInputTextSelectionChange()
     {
         // Get ScriptLine for InputText
         ScriptLine line = new ScriptLine(getScript(), _inputText.getText());
@@ -294,8 +294,8 @@ public class ScriptEditor extends ViewController {
         // Get/Configure InputText
         _inputText = getView("InputText", TextField.class);
         _inputText.setBorderRadius(10);
-        _inputText.addEventFilter(e -> inputTextDidKeyPress(e), KeyPress);
-        _inputText.addPropChangeListener(pc -> inputTextSelChanged(), TextField.Selection_Prop);
+        _inputText.addEventFilter(this::handleInputTextKeyPressEvent, KeyPress);
+        _inputText.addPropChangeListener(pc -> handleInputTextSelectionChange(), TextField.Selection_Prop);
 
         // Get/Configure InputButton
         Button inputButton = getView("InputButton", Button.class);
