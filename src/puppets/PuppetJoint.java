@@ -128,7 +128,7 @@ public class PuppetJoint {
     /**
      * XML Archival.
      */
-    public XMLElement toXML(XMLArchiver anArchiver)
+    public XMLElement toXML()
     {
         // Get new element with part name
         XMLElement e = new XMLElement("Part");

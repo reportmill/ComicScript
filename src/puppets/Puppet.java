@@ -473,7 +473,7 @@ public class Puppet {
         }
 
         // Create element for puppet, get as bytes and write to file
-        XMLElement puppetXML = toXML(null);
+        XMLElement puppetXML = toXML();
         byte[] bytes = puppetXML.getBytes();
         try { Files.write(url.getJavaFile().toPath(), bytes); }
         catch (Exception e) { throw new RuntimeException(e); }
@@ -489,7 +489,7 @@ public class Puppet {
     /**
      * XML Archival.
      */
-    public XMLElement toXML(XMLArchiver anArchiver)
+    public XMLElement toXML()
     {
         // Get new element with puppet Name, Path
         XMLElement e = new XMLElement("Puppet");
@@ -507,7 +507,7 @@ public class Puppet {
         PuppetPart[] motherParts = getMotherParts();
         for (PuppetPart part : motherParts) {
             if (part.getPuppet() != this) continue;
-            XMLElement partXML = part.toXML(anArchiver);
+            XMLElement partXML = part.toXML();
             partsXML.add(partXML);
         }
 
@@ -516,7 +516,7 @@ public class Puppet {
         e.add(jointsXML);
         for (PuppetJoint joint : getJoints()) {
             if (joint.getPuppet() != this) continue;
-            XMLElement jointXML = joint.toXML(anArchiver);
+            XMLElement jointXML = joint.toXML();
             jointsXML.add(jointXML);
         }
 
@@ -527,7 +527,7 @@ public class Puppet {
     /**
      * XML unarchival.
      */
-    public Puppet fromXML(XMLElement anElement)
+    public void fromXML(XMLElement anElement)
     {
         // Unarchive Name, Path
         String name = anElement.getAttributeValue("Name");
@@ -575,9 +575,6 @@ public class Puppet {
                 jnt._y = (ancY - jnt._y) * scale;
             }
         }
-
-        // Return this
-        return this;
     }
 
     /**

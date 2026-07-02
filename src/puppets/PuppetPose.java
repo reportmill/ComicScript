@@ -279,7 +279,7 @@ public class PuppetPose implements Cloneable {
     /**
      * XML Archival.
      */
-    public XMLElement toXML(XMLArchiver anArchiver)
+    public XMLElement toXML()
     {
         // Get new element with name
         XMLElement e = new XMLElement("Pose");
@@ -300,7 +300,7 @@ public class PuppetPose implements Cloneable {
     /**
      * XML unarchival.
      */
-    public PuppetPose fromXML(XMLArchiver anArchiver, XMLElement anElement)
+    public PuppetPose fromXML(XMLElement anElement)
     {
         // Unarchive name
         String name = anElement.getAttributeValue("Name");

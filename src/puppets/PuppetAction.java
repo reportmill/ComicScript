@@ -229,7 +229,7 @@ public class PuppetAction {
     /**
      * XML Archival.
      */
-    public XMLElement toXML(XMLArchiver anArchiver)
+    public XMLElement toXML()
     {
         // Get new element with class name
         XMLElement e = new XMLElement("Action");
@@ -239,7 +239,7 @@ public class PuppetAction {
         XMLElement posesXML = new XMLElement("Poses");
         e.add(posesXML);
         for (PuppetPose pose : getPoses()) {
-            XMLElement poseXML = pose.toXML(anArchiver);
+            XMLElement poseXML = pose.toXML();
             posesXML.add(poseXML);
         }
 
@@ -247,7 +247,7 @@ public class PuppetAction {
         XMLElement movesXML = new XMLElement("Moves");
         e.add(movesXML);
         for (PuppetMove move : getMoves()) {
-            XMLElement moveXML = move.toXML(anArchiver);
+            XMLElement moveXML = move.toXML();
             movesXML.add(moveXML);
         }
 
@@ -258,7 +258,7 @@ public class PuppetAction {
     /**
      * XML unarchival.
      */
-    public PuppetAction fromXML(XMLArchiver anArchiver, XMLElement anElement)
+    public PuppetAction fromXML(XMLElement anElement)
     {
         // Unarchive name
         String name = anElement.getAttributeValue("Name");
@@ -267,7 +267,7 @@ public class PuppetAction {
         // Iterate over poses element and load
         XMLElement posesXML = anElement.getElement("Poses");
         for (XMLElement poseXML : posesXML.getElements()) {
-            PuppetPose pose = new PuppetPose().fromXML(anArchiver, poseXML);
+            PuppetPose pose = new PuppetPose().fromXML(poseXML);
             _poses.add(pose);
         }
 

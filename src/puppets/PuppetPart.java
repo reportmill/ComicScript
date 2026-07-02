@@ -18,16 +18,16 @@ public class PuppetPart implements Loadable {
     double _x, _y, _w, _h;
 
     // The image
-    Image _img;
+    private Image _image;
 
     // The Puppet that owns this part
     Puppet _puppet;
 
     // The original part
-    PuppetPart _origPart;
+    private PuppetPart _origPart;
 
     // The mother part, if part was derived from another part
-    PuppetPart _motherPart;
+    private PuppetPart _motherPart;
 
     /**
      * Constructor.
@@ -52,74 +52,47 @@ public class PuppetPart implements Loadable {
     /**
      * Returns the name.
      */
-    public String getName()
-    {
-        return _name;
-    }
+    public String getName()  { return _name; }
 
     /**
      * Sets the name.
      */
-    public void setName(String aName)
-    {
-        _name = aName;
-    }
+    public void setName(String aName)  { _name = aName; }
 
     /**
      * Returns the puppet X.
      */
-    public double getX()
-    {
-        return _x;
-    }
+    public double getX()  { return _x; }
 
     /**
      * Returns the puppet Y.
      */
-    public double getY()
-    {
-        return _y;
-    }
+    public double getY()  { return _y; }
 
     /**
      * Returns the puppet width.
      */
-    public double getWidth()
-    {
-        return _w;
-    }
+    public double getWidth()  { return _w; }
 
     /**
      * Returns the puppet height.
      */
-    public double getHeight()
-    {
-        return _h;
-    }
+    public double getHeight()  { return _h; }
 
     /**
      * Returns the puppet max X.
      */
-    public double getMaxX()
-    {
-        return _x + _w;
-    }
+    public double getMaxX()  { return _x + _w; }
 
     /**
      * Returns the puppet max Y.
      */
-    public double getMaxY()
-    {
-        return _y + _h;
-    }
+    public double getMaxY()  { return _y + _h; }
 
     /**
      * Returns the bounds.
      */
-    public Rect getBounds()
-    {
-        return new Rect(_x, _y, _w, _h);
-    }
+    public Rect getBounds()  { return new Rect(_x, _y, _w, _h); }
 
     /**
      * Returns the scale.
@@ -134,7 +107,8 @@ public class PuppetPart implements Loadable {
      */
     public Image getImage()
     {
-        return _img != null ? _img : (_img = getImageImpl());
+        if (_image != null) return _image;
+        return _image = getImageImpl();
     }
 
     /**
@@ -142,14 +116,15 @@ public class PuppetPart implements Loadable {
      */
     public void setImage(Image anImage)
     {
-        _img = anImage;
+        _image = anImage;
 
         // Set size - probably don't need this
         if (_w == 0) {
             if (anImage.isLoaded()) {
                 _w = anImage.getWidth();
                 _h = anImage.getHeight();
-            } else anImage.addLoadListener(() -> {
+            }
+            else anImage.addLoadListener(() -> {
                 _w = anImage.getWidth();
                 _h = anImage.getHeight();
             });
@@ -163,7 +138,8 @@ public class PuppetPart implements Loadable {
     {
         WebURL url = getImageURL();
         Image img = url != null ? Image.getImageForSource(url) : null;
-        if (img == null) System.out.println("PuppetPart.getImage: Image not found for " + getName() + " at " + url);
+        if (img == null)
+            System.out.println("PuppetPart.getImage: Image not found for " + getName() + " at " + url);
         return img;
     }
 
@@ -187,8 +163,7 @@ public class PuppetPart implements Loadable {
         if (pup == null) return null;
         WebURL dirURL = pup.getSourceDirURL();
         String iname = getName() + ".png";
-        WebURL url = dirURL.getChildUrlForPath(iname);
-        return url;
+        return dirURL.getChildUrlForPath(iname);
     }
 
     /**
@@ -209,50 +184,34 @@ public class PuppetPart implements Loadable {
     /**
      * Returns the puppet that owns this part.
      */
-    public Puppet getPuppet()
-    {
-        return _puppet;
-    }
+    public Puppet getPuppet()  { return _puppet; }
 
     /**
      * Returns the mother part, if this part was derived from another.
      */
-    public PuppetPart getMotherPart()
-    {
-        return _motherPart;
-    }
+    public PuppetPart getMotherPart()  { return _motherPart; }
 
     /**
      * Returns whether resource is loaded.
      */
-    public boolean isLoaded()
-    {
-        return getLoadable().isLoaded();
-    }
+    public boolean isLoaded()  { return getLoadable().isLoaded(); }
 
     /**
      * Adds a callback to be triggered when resources loaded (cleared automatically when loaded).
      */
-    public void addLoadListener(Runnable aRun)
-    {
-        getLoadable().addLoadListener(aRun);
-    }
+    public void addLoadListener(Runnable aRun)  { getLoadable().addLoadListener(aRun); }
 
     /**
      * Returns the default loadable (the image).
      */
-    protected Loadable getLoadable()
-    {
-        return getImage();
-    }
+    protected Loadable getLoadable()  { return getImage(); }
 
     /**
      * Creates a clone with given image.
      */
     public PuppetPart cloneForImage(Image anImage)
     {
-        PuppetPart clone = new PuppetPart(getName(), anImage, getX(), getY(), getWidth(), getHeight());
-        return clone;
+        return new PuppetPart(getName(), anImage, getX(), getY(), getWidth(), getHeight());
     }
 
     /**
@@ -397,7 +356,7 @@ public class PuppetPart implements Loadable {
     /**
      * XML Archival.
      */
-    public XMLElement toXML(XMLArchiver anArchiver)
+    public XMLElement toXML()
     {
         // Get new element with part name
         XMLElement e = new XMLElement("Part");
@@ -432,8 +391,8 @@ public class PuppetPart implements Loadable {
         _w = anElement.getAttributeDoubleValue("Width");
         _h = anElement.getAttributeDoubleValue("Height");
 
-        // Unarchive Image
-        String iname = anElement.getAttributeValue("Image");
+        // Unarchive Image name
+        //String iname = anElement.getAttributeValue("Image");
 
         // Return this
         return this;
@@ -442,9 +401,6 @@ public class PuppetPart implements Loadable {
     /**
      * Standard toString implementation.
      */
-    public String toString()
-    {
-        return "Part: name=" + _name + ", bounds=" + getBounds();
-    }
-
+    @Override
+    public String toString()  { return "Part: name=" + _name + ", bounds=" + getBounds(); }
 }

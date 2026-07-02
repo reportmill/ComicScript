@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.*;
 import snap.geom.Arc;
 import snap.geom.Shape;
-import snap.geom.Transform;
 import snap.gfx.*;
 import snap.util.*;
 import snap.web.WebURL;
@@ -118,7 +117,7 @@ public class PuppetUtils {
         private List<PuppetEntry> _pupEnts;
 
         // The puppet names
-        private String _names[];
+        private String[] _names;
 
         // The file path
         private String _path = ROOT + "Puppets.xml";
@@ -219,7 +218,7 @@ public class PuppetUtils {
             // Iterate over actions
             List<PuppetEntry> puppets = new ArrayList<>();
             for (XMLElement pupXML : puppetsXML.getElements()) {
-                PuppetEntry pe = new PuppetEntry().fromXML(null, pupXML);
+                PuppetEntry pe = new PuppetEntry().fromXML(pupXML);
                 puppets.add(pe);
             }
 
@@ -237,7 +236,7 @@ public class PuppetUtils {
             // Create element for puppets and iterate over puppets and add each
             XMLElement puppetsXML = new XMLElement("Puppets");
             for (PuppetEntry pupEnt : getEntries()) {
-                XMLElement pupEntXML = pupEnt.toXML(null);
+                XMLElement pupEntXML = pupEnt.toXML();
                 puppetsXML.add(pupEntXML);
             }
 
@@ -308,7 +307,7 @@ public class PuppetUtils {
         /**
          * XML Archival.
          */
-        public XMLElement toXML(XMLArchiver anArchiver)
+        public XMLElement toXML()
         {
             XMLElement e = new XMLElement("Puppet");
             e.add("Name", getName());
@@ -319,7 +318,7 @@ public class PuppetUtils {
         /**
          * XML unarchival.
          */
-        public PuppetEntry fromXML(XMLArchiver anArchiver, XMLElement anElement)
+        public PuppetEntry fromXML(XMLElement anElement)
         {
             _name = anElement.getAttributeValue("Name");
             _path = anElement.getAttributeValue("Path");
@@ -412,7 +411,7 @@ public class PuppetUtils {
             // Iterate over actions
             List<PuppetAction> actions = new ArrayList<>();
             for (XMLElement actionXML : actionsXML.getElements()) {
-                PuppetAction action = new PuppetAction().fromXML(null, actionXML);
+                PuppetAction action = new PuppetAction().fromXML(actionXML);
                 actions.add(action);
             }
 
@@ -430,7 +429,7 @@ public class PuppetUtils {
             // Create element for actions and iterate over actions and add each
             XMLElement actionsXML = new XMLElement("Actions");
             for (PuppetAction action : getActions()) {
-                XMLElement actionXML = action.toXML(null);
+                XMLElement actionXML = action.toXML();
                 actionsXML.add(actionXML);
             }
 

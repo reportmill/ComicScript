@@ -1,5 +1,4 @@
 package puppets;
-
 import snap.util.*;
 
 /**
@@ -11,17 +10,17 @@ public class PuppetMove implements Cloneable {
     PuppetPose _pose;
 
     // The time span in milliseconds for the change
-    int _time;
+    private int _time;
 
     /**
-     * Creates a PuppetMove.
+     * Constructor.
      */
     public PuppetMove()
     {
     }
 
     /**
-     * Creates a PoseChange.
+     * Constructor.
      */
     public PuppetMove(PuppetPose aPose, int theTime)
     {
@@ -32,46 +31,31 @@ public class PuppetMove implements Cloneable {
     /**
      * Returns the pose.
      */
-    public PuppetPose getPose()
-    {
-        return _pose;
-    }
+    public PuppetPose getPose()  { return _pose; }
 
     /**
      * Returns the pose name.
      */
-    public String getPoseName()
-    {
-        return _pose.getName();
-    }
+    public String getPoseName()  { return _pose.getName(); }
 
     /**
      * Returns the time interval.
      */
-    public int getTime()
-    {
-        return _time;
-    }
+    public int getTime()  { return _time; }
 
     /**
      * Sets the time interval.
      */
-    public void setTime(int aValue)
-    {
-        _time = aValue;
-    }
+    public void setTime(int aValue)  { _time = aValue; }
 
     /**
      * Standard clone implementation.
      */
     public PuppetMove clone()
     {
-        PuppetMove clone = null;
-        try {
-            clone = (PuppetMove) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        PuppetMove clone;
+        try { clone = (PuppetMove) super.clone(); }
+        catch (CloneNotSupportedException e) { throw new RuntimeException(e); }
         return clone;
     }
 
@@ -86,7 +70,7 @@ public class PuppetMove implements Cloneable {
     /**
      * XML Archival.
      */
-    public XMLElement toXML(XMLArchiver anArchiver)
+    public XMLElement toXML()
     {
         XMLElement e = new XMLElement("Move");
         e.add("Pose", getPose().getName());
