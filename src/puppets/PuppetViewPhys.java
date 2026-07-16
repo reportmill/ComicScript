@@ -454,7 +454,7 @@ public class PuppetViewPhys {
         View view = anEvent.getView();
         ViewPhysics phys = view.getPhysics();
         Body body = (Body) phys.getNative();
-        Point pnt = anEvent.getPoint(view.getParent());
+        Point pnt = anEvent.getPointForView(view.getParent());
         anEvent.consume();
 
         // Handle MousePress: Create & install drag MouseJoint
